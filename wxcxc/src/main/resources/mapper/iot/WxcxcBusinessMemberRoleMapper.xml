@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcBusinessMemberRoleMapper">
+    
+    <resultMap type="WxcxcBusinessMemberRole" id="WxcxcBusinessMemberRoleResult">
+        <result property="id"    column="id"    />
+        <result property="businessMemberId"    column="business_member_id"    />
+        <result property="projectId"    column="project_id"    />
+    </resultMap>
+
+    <sql id="selectWxcxcBusinessMemberRoleVo">
+        select id, business_member_id, project_id from wxcxc_business_member_role
+    </sql>
+
+    <select id="selectWxcxcBusinessMemberRoleList" parameterType="WxcxcBusinessMemberRole" resultMap="WxcxcBusinessMemberRoleResult">
+        <include refid="selectWxcxcBusinessMemberRoleVo"/>
+        <where>  
+        </where>
+    </select>
+    
+    <select id="selectWxcxcBusinessMemberRoleById" parameterType="Long" resultMap="WxcxcBusinessMemberRoleResult">
+        <include refid="selectWxcxcBusinessMemberRoleVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWxcxcBusinessMemberRole" parameterType="WxcxcBusinessMemberRole" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_business_member_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="businessMemberId != null">business_member_id,</if>
+            <if test="projectId != null">project_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="businessMemberId != null">#{businessMemberId},</if>
+            <if test="projectId != null">#{projectId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcBusinessMemberRole" parameterType="WxcxcBusinessMemberRole">
+        update wxcxc_business_member_role
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="businessMemberId != null">business_member_id = #{businessMemberId},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcBusinessMemberRoleById" parameterType="Long">
+        delete from wxcxc_business_member_role where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcBusinessMemberRoleByIds" parameterType="String">
+        delete from wxcxc_business_member_role where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcArticleChannelMapper">
+    
+    <resultMap type="WxcxcArticleChannel" id="WxcxcArticleChannelResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="code"    column="code"    />
+    </resultMap>
+
+    <sql id="selectWxcxcArticleChannelVo">
+        select id, name, code from wxcxc_article_channel
+    </sql>
+
+    <select id="selectWxcxcArticleChannelList" parameterType="WxcxcArticleChannel" resultMap="WxcxcArticleChannelResult">
+        <include refid="selectWxcxcArticleChannelVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="code != null  and code != ''"> and code like concat('%', #{code}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectWxcxcArticleChannelById" parameterType="Long" resultMap="WxcxcArticleChannelResult">
+        <include refid="selectWxcxcArticleChannelVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWxcxcArticleChannel" parameterType="WxcxcArticleChannel" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_article_channel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="code != null">code,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="code != null">#{code},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcArticleChannel" parameterType="WxcxcArticleChannel">
+        update wxcxc_article_channel
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="code != null">code = #{code},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcArticleChannelById" parameterType="Long">
+        delete from wxcxc_article_channel where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcArticleChannelByIds" parameterType="String">
+        delete from wxcxc_article_channel where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

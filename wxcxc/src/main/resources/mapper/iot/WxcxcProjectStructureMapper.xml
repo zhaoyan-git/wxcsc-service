@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcProjectStructureMapper">
+    
+    <resultMap type="WxcxcProjectStructure" id="WxcxcProjectStructureResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="typeId"    column="type_id"    />
+        <result property="photoFile"    column="photo_file"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="alarmFlag"    column="alarm_flag"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectWxcxcProjectStructureVo">
+        select id, name, type_id, photo_file, project_id, alarm_flag, del_flag, create_by, create_time, update_by, update_time from wxcxc_project_structure
+    </sql>
+
+    <select id="selectWxcxcProjectStructureList" parameterType="WxcxcProjectStructure" resultMap="WxcxcProjectStructureResult">
+        <include refid="selectWxcxcProjectStructureVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="typeId != null "> and type_id = #{typeId}</if>
+            <if test="projectId != null "> and project_id = #{projectId}</if>
+            <if test="alarmFlag != null  and alarmFlag != ''"> and alarm_flag = #{alarmFlag}</if>
+        </where>
+    </select>
+    
+    <select id="selectWxcxcProjectStructureById" parameterType="Long" resultMap="WxcxcProjectStructureResult">
+        <include refid="selectWxcxcProjectStructureVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWxcxcProjectStructure" parameterType="WxcxcProjectStructure" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_project_structure
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="typeId != null">type_id,</if>
+            <if test="photoFile != null">photo_file,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="alarmFlag != null">alarm_flag,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="typeId != null">#{typeId},</if>
+            <if test="photoFile != null">#{photoFile},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="alarmFlag != null">#{alarmFlag},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcProjectStructure" parameterType="WxcxcProjectStructure">
+        update wxcxc_project_structure
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="typeId != null">type_id = #{typeId},</if>
+            <if test="photoFile != null">photo_file = #{photoFile},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="alarmFlag != null">alarm_flag = #{alarmFlag},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcProjectStructureById" parameterType="Long">
+        delete from wxcxc_project_structure where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcProjectStructureByIds" parameterType="String">
+        delete from wxcxc_project_structure where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

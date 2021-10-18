@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcProjectPointMapper">
+    
+    <resultMap type="WxcxcProjectPoint" id="WxcxcProjectPointResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="photoFile"    column="photo_file"    />
+        <result property="projectStructureId"    column="project_structure_id"    />
+        <result property="pointGroupId"    column="point_group_id"    />
+        <result property="alarmFlag"    column="alarm_flag"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectWxcxcProjectPointVo">
+        select id, name, photo_file, project_structure_id, point_group_id, alarm_flag, del_flag, create_by, create_time, update_by, update_time from wxcxc_project_point
+    </sql>
+
+    <select id="selectWxcxcProjectPointList" parameterType="WxcxcProjectPoint" resultMap="WxcxcProjectPointResult">
+        <include refid="selectWxcxcProjectPointVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="projectStructureId != null "> and project_structure_id = #{projectStructureId}</if>
+            <if test="pointGroupId != null "> and point_group_id = #{pointGroupId}</if>
+            <if test="alarmFlag != null  and alarmFlag != ''"> and alarm_flag = #{alarmFlag}</if>
+        </where>
+    </select>
+    
+    <select id="selectWxcxcProjectPointById" parameterType="Long" resultMap="WxcxcProjectPointResult">
+        <include refid="selectWxcxcProjectPointVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWxcxcProjectPoint" parameterType="WxcxcProjectPoint" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_project_point
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="photoFile != null">photo_file,</if>
+            <if test="projectStructureId != null">project_structure_id,</if>
+            <if test="pointGroupId != null">point_group_id,</if>
+            <if test="alarmFlag != null">alarm_flag,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="photoFile != null">#{photoFile},</if>
+            <if test="projectStructureId != null">#{projectStructureId},</if>
+            <if test="pointGroupId != null">#{pointGroupId},</if>
+            <if test="alarmFlag != null">#{alarmFlag},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcProjectPoint" parameterType="WxcxcProjectPoint">
+        update wxcxc_project_point
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="photoFile != null">photo_file = #{photoFile},</if>
+            <if test="projectStructureId != null">project_structure_id = #{projectStructureId},</if>
+            <if test="pointGroupId != null">point_group_id = #{pointGroupId},</if>
+            <if test="alarmFlag != null">alarm_flag = #{alarmFlag},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcProjectPointById" parameterType="Long">
+        delete from wxcxc_project_point where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcProjectPointByIds" parameterType="String">
+        delete from wxcxc_project_point where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcArticleMapper">
+
+    <resultMap type="WxcxcArticle" id="WxcxcArticleResult">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="details" column="details"/>
+        <result property="content" column="content"/>
+        <result property="titlePhoto" column="title_photo"/>
+        <result property="sort" column="sort"/>
+        <result property="releaseFlag" column="release_flag"/>
+        <result property="releaseTime" column="release_time"/>
+        <result property="channelId" column="channel_id"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectWxcxcArticleVo">
+        select id, title, details, content, title_photo, sort, release_flag, release_time, channel_id, del_flag, create_by, create_time, update_by, update_time from wxcxc_article
+    </sql>
+
+    <select id="selectWxcxcArticleList" parameterType="WxcxcArticle" resultMap="WxcxcArticleResult">
+        <include refid="selectWxcxcArticleVo"/>
+        <where>
+            and del_flag = '0'
+            <if test="id != null ">and id = #{id}</if>
+            <if test="channelId != null ">and channel_id = #{channelId}</if>
+            <if test="title != null  and title != ''">and title = #{title}</if>
+            <if test="params.beginReleaseTime != null and params.beginReleaseTime != '' and params.endReleaseTime != null and params.endReleaseTime != ''">
+                and release_time between #{params.beginReleaseTime} and #{params.endReleaseTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectWxcxcArticleById" parameterType="Long" resultMap="WxcxcArticleResult">
+        <include refid="selectWxcxcArticleVo"/>
+        where del_flag = '0'
+        and id = #{id}
+    </select>
+
+    <insert id="insertWxcxcArticle" parameterType="WxcxcArticle" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_article
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null">title,</if>
+            <if test="details != null">details,</if>
+            <if test="content != null">content,</if>
+            <if test="titlePhoto != null">title_photo,</if>
+            <if test="sort != null">sort,</if>
+            <if test="releaseFlag != null">release_flag,</if>
+            release_time,
+            <if test="channelId != null">channel_id,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null">#{title},</if>
+            <if test="details != null">#{details},</if>
+            <if test="content != null">#{content},</if>
+            <if test="titlePhoto != null">#{titlePhoto},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="releaseFlag != null">#{releaseFlag},</if>
+            #{releaseTime},
+            <if test="channelId != null">#{channelId},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateWxcxcArticle" parameterType="WxcxcArticle">
+        update wxcxc_article
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null">title = #{title},</if>
+            <if test="details != null">details = #{details},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="titlePhoto != null">title_photo = #{titlePhoto},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="releaseFlag != null">release_flag = #{releaseFlag},</if>
+            release_time = #{releaseTime},
+            <if test="channelId != null">channel_id = #{channelId},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcArticleById" parameterType="Long">
+        update wxcxc_article set del_flag = '2' where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcArticleByIds" parameterType="String">
+        update wxcxc_article set del_flag = '2' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

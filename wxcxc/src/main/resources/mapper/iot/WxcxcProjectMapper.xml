@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcProjectMapper">
+    
+    <resultMap type="WxcxcProject" id="WxcxcProjectResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="businessId"    column="business_id"    />
+        <result property="aim"    column="aim"    />
+        <result property="photoFile"    column="photo_file"    />
+        <result property="details"    column="details"    />
+        <result property="positionLat"    column="position_lat"    />
+        <result property="positionLng"    column="position_lng"    />
+        <result property="alarmFlag"    column="alarm_flag"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectWxcxcProjectVo">
+        select id, name, business_id, aim, photo_file, details, position_lat, position_lng, alarm_flag, del_flag, create_by, create_time, update_by, update_time from wxcxc_project
+    </sql>
+
+    <select id="selectWxcxcProjectList" parameterType="WxcxcProject" resultMap="WxcxcProjectResult">
+        <include refid="selectWxcxcProjectVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="businessId != null "> and business_id = #{businessId}</if>
+            <if test="alarmFlag != null  and alarmFlag != ''"> and alarm_flag = #{alarmFlag}</if>
+        </where>
+    </select>
+    
+    <select id="selectWxcxcProjectById" parameterType="Long" resultMap="WxcxcProjectResult">
+        <include refid="selectWxcxcProjectVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWxcxcProject" parameterType="WxcxcProject" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_project
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="businessId != null">business_id,</if>
+            <if test="aim != null">aim,</if>
+            <if test="photoFile != null">photo_file,</if>
+            <if test="details != null">details,</if>
+            <if test="positionLat != null">position_lat,</if>
+            <if test="positionLng != null">position_lng,</if>
+            <if test="alarmFlag != null">alarm_flag,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="businessId != null">#{businessId},</if>
+            <if test="aim != null">#{aim},</if>
+            <if test="photoFile != null">#{photoFile},</if>
+            <if test="details != null">#{details},</if>
+            <if test="positionLat != null">#{positionLat},</if>
+            <if test="positionLng != null">#{positionLng},</if>
+            <if test="alarmFlag != null">#{alarmFlag},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcProject" parameterType="WxcxcProject">
+        update wxcxc_project
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="businessId != null">business_id = #{businessId},</if>
+            <if test="aim != null">aim = #{aim},</if>
+            <if test="photoFile != null">photo_file = #{photoFile},</if>
+            <if test="details != null">details = #{details},</if>
+            <if test="positionLat != null">position_lat = #{positionLat},</if>
+            <if test="positionLng != null">position_lng = #{positionLng},</if>
+            <if test="alarmFlag != null">alarm_flag = #{alarmFlag},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcProjectById" parameterType="Long">
+        delete from wxcxc_project where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcProjectByIds" parameterType="String">
+        delete from wxcxc_project where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcBusinessMemberMapper">
+    
+    <resultMap type="WxcxcBusinessMember" id="WxcxcBusinessMemberResult">
+        <result property="id"    column="id"    />
+        <result property="businessId"    column="business_id"    />
+        <result property="sysUserId"    column="sys_user_id"    />
+    </resultMap>
+
+    <sql id="selectWxcxcBusinessMemberVo">
+        select id, business_id, sys_user_id from wxcxc_business_member
+    </sql>
+
+    <select id="selectWxcxcBusinessMemberList" parameterType="WxcxcBusinessMember" resultMap="WxcxcBusinessMemberResult">
+        <include refid="selectWxcxcBusinessMemberVo"/>
+        <where>  
+        </where>
+    </select>
+    
+    <select id="selectWxcxcBusinessMemberById" parameterType="Long" resultMap="WxcxcBusinessMemberResult">
+        <include refid="selectWxcxcBusinessMemberVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWxcxcBusinessMember" parameterType="WxcxcBusinessMember" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_business_member
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="businessId != null">business_id,</if>
+            <if test="sysUserId != null">sys_user_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="businessId != null">#{businessId},</if>
+            <if test="sysUserId != null">#{sysUserId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcBusinessMember" parameterType="WxcxcBusinessMember">
+        update wxcxc_business_member
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="businessId != null">business_id = #{businessId},</if>
+            <if test="sysUserId != null">sys_user_id = #{sysUserId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcBusinessMemberById" parameterType="Long">
+        delete from wxcxc_business_member where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcBusinessMemberByIds" parameterType="String">
+        delete from wxcxc_business_member where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -65,6 +65,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
+        <!-- 文兴创信 -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>wxcxc</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

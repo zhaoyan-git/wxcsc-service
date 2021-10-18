@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxccProjectStructureTypeMapper">
+
+    <resultMap type="WxcxcProjectStructureType" id="WxcxcProjectStructureTypeResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="photo"    column="photo"    />
+        <result property="disableFlag"    column="disable_flag"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectWxcxcProjectStructureTypeVo">
+        select id, name, photo, disable_flag, del_flag, create_by, create_time, update_by, update_time from wxcxc_project_structure_type
+    </sql>
+
+    <select id="selectWxcxcProjectStructureTypeList" parameterType="WxcxcProjectStructureType" resultMap="WxcxcProjectStructureTypeResult">
+        <include refid="selectWxcxcProjectStructureTypeVo"/>
+        <where>
+            and del_flag = '0'
+            <if test="id != null "> and id = #{id}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="photo != null  and photo != ''"> and photo = #{photo}</if>
+            <if test="disableFlag != null  and disableFlag != ''"> and disable_flag = #{disableFlag}</if>
+        </where>
+    </select>
+
+    <select id="selectWxcxcProjectStructureTypeById" parameterType="Long" resultMap="WxcxcProjectStructureTypeResult">
+        <include refid="selectWxcxcProjectStructureTypeVo"/>
+        where del_flag = '0'
+        and id = #{id}
+    </select>
+
+    <insert id="insertWxcxcProjectStructureType" parameterType="WxcxcProjectStructureType" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_project_structure_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="photo != null">photo,</if>
+            <if test="disableFlag != null">disable_flag,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="photo != null">#{photo},</if>
+            <if test="disableFlag != null">#{disableFlag},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcProjectStructureType" parameterType="WxcxcProjectStructureType">
+        update wxcxc_project_structure_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="photo != null">photo = #{photo},</if>
+            <if test="disableFlag != null">disable_flag = #{disableFlag},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcProjectStructureTypeById" parameterType="Long">
+        update wxcxc_project_structure_type set del_flag = '2' where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcProjectStructureTypeByIds" parameterType="String">
+        update wxcxc_project_structure_type set del_flag = '2' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -33,7 +33,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination v-show="total>0" :total="total" :page.sync="pageNum" :limit.sync="pageSize" />
 
     <el-form label-width="100px">
@@ -67,6 +67,7 @@ export default {
     };
   },
   created() {
+      console.log(this.$route )
     const userId = this.$route.params && this.$route.params.userId;
     if (userId) {
       this.loading = true;

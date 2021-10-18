@@ -150,7 +150,20 @@ export const constantRoutes = [
         meta: { title: '修改生成配置', activeMenu: '/tool/gen'}
       }
     ]
-  }
+  },
+  {
+    path: '/platform/business-mng/memberMng',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: ':businessId(\\d+)',
+        component: (resolve) => require(['@/views/iot/platform/businessMember'], resolve),
+        name: 'BusinessMemberMng',
+        meta: { title: '管理企业成员'}
+      }
+    ]
+  },
 ]
 
 export default new Router({
