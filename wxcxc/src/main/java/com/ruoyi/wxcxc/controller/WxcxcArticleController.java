@@ -36,7 +36,7 @@ public class WxcxcArticleController extends BaseController
     /**
      * 查询文章列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:article:list')")
+    @PreAuthorize("@ss.hasPermi('iot:article')")
     @GetMapping("/list")
     public TableDataInfo list(WxcxcArticle wxcxcArticle)
     {
@@ -48,7 +48,7 @@ public class WxcxcArticleController extends BaseController
     /**
      * 导出文章列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:article:export')")
+    @PreAuthorize("@ss.hasPermi('iot:article')")
     @Log(title = "文章", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WxcxcArticle wxcxcArticle)
@@ -61,7 +61,7 @@ public class WxcxcArticleController extends BaseController
     /**
      * 获取文章详细信息
      */
-    @PreAuthorize("@ss.hasPermi('iot:article:query')")
+    @PreAuthorize("@ss.hasPermi('iot:article')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -71,7 +71,7 @@ public class WxcxcArticleController extends BaseController
     /**
      * 新增文章
      */
-    @PreAuthorize("@ss.hasPermi('iot:article:add')")
+    @PreAuthorize("@ss.hasPermi('iot:article')")
     @Log(title = "文章", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WxcxcArticle wxcxcArticle)
@@ -82,7 +82,7 @@ public class WxcxcArticleController extends BaseController
     /**
      * 修改文章
      */
-    @PreAuthorize("@ss.hasPermi('iot:article:edit')")
+    @PreAuthorize("@ss.hasPermi('iot:article')")
     @Log(title = "文章", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WxcxcArticle wxcxcArticle)
@@ -93,7 +93,7 @@ public class WxcxcArticleController extends BaseController
     /**
      * 删除文章
      */
-    @PreAuthorize("@ss.hasPermi('iot:article:remove')")
+    @PreAuthorize("@ss.hasPermi('iot:article')")
     @Log(title = "文章", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)

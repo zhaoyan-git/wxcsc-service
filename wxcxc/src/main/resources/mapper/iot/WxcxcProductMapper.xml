@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcProductMapper">
+    
+    <resultMap type="WxcxcProduct" id="WxcxcProductResult">
+        <result property="id"    column="id"    />
+        <result property="type"    column="type"    />
+        <result property="name"    column="name"    />
+        <result property="manufacturer"    column="manufacturer"    />
+        <result property="modelNumber"    column="model_number"    />
+        <result property="photoFile"    column="photo_file"    />
+        <result property="detail"    column="detail"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <resultMap id="WxcxcProductWxcxcProductSensorResult" type="WxcxcProduct" extends="WxcxcProductResult">
+        <collection property="wxcxcProductSensorList" notNullColumn="sub_id" javaType="java.util.List" resultMap="WxcxcProductSensorResult" />
+    </resultMap>
+
+    <resultMap type="WxcxcProductSensor" id="WxcxcProductSensorResult">
+        <result property="id"    column="sub_id"    />
+        <result property="productId"    column="sub_product_id"    />
+        <result property="name"    column="sub_name"    />
+        <result property="iconFile"    column="sub_icon_file"    />
+        <result property="sort"    column="sub_sort"    />
+        <result property="unit"    column="sub_unit"    />
+        <result property="type"    column="sub_type"    />
+        <result property="createBy"    column="sub_create_by"    />
+        <result property="createTime"    column="sub_create_time"    />
+        <result property="updateBy"    column="sub_update_by"    />
+        <result property="updateTime"    column="sub_update_time"    />
+    </resultMap>
+
+    <sql id="selectWxcxcProductVo">
+        select id, type, name, manufacturer, model_number, photo_file, detail, create_by, create_time, update_by, update_time from wxcxc_product
+    </sql>
+
+    <select id="selectWxcxcProductList" parameterType="WxcxcProduct" resultMap="WxcxcProductResult">
+        <include refid="selectWxcxcProductVo"/>
+        <where>  
+            <if test="type != null  and type != ''"> and type like concat('%', #{type}, '%')</if>
+            <if test="name != null  and name != ''"> and name = #{name}</if>
+            <if test="manufacturer != null  and manufacturer != ''"> and manufacturer = #{manufacturer}</if>
+            <if test="modelNumber != null  and modelNumber != ''"> and model_number = #{modelNumber}</if>
+            <if test="photoFile != null  and photoFile != ''"> and photo_file = #{photoFile}</if>
+            <if test="detail != null  and detail != ''"> and detail = #{detail}</if>
+        </where>
+    </select>
+    
+    <select id="selectWxcxcProductById" parameterType="Long" resultMap="WxcxcProductWxcxcProductSensorResult">
+        select a.id, a.type, a.name, a.manufacturer, a.model_number, a.photo_file, a.detail, a.create_by, a.create_time, a.update_by, a.update_time,
+            b.id as sub_id, b.product_id as sub_product_id, b.name as sub_name, b.icon_file as sub_icon_file, b.sort as sub_sort, b.unit as sub_unit, b.type as sub_type, b.create_by as sub_create_by, b.create_time as sub_create_time, b.update_by as sub_update_by, b.update_time as sub_update_time
+        from wxcxc_product a
+        left join wxcxc_product_sensor b on b.product_id = a.id
+        where a.id = #{id}
+    </select>
+        
+    <insert id="insertWxcxcProduct" parameterType="WxcxcProduct" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="type != null and type != ''">type,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="manufacturer != null">manufacturer,</if>
+            <if test="modelNumber != null">model_number,</if>
+            <if test="photoFile != null">photo_file,</if>
+            <if test="detail != null">detail,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="type != null and type != ''">#{type},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="manufacturer != null">#{manufacturer},</if>
+            <if test="modelNumber != null">#{modelNumber},</if>
+            <if test="photoFile != null">#{photoFile},</if>
+            <if test="detail != null">#{detail},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcProduct" parameterType="WxcxcProduct">
+        update wxcxc_product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="type != null and type != ''">type = #{type},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="manufacturer != null">manufacturer = #{manufacturer},</if>
+            <if test="modelNumber != null">model_number = #{modelNumber},</if>
+            <if test="photoFile != null">photo_file = #{photoFile},</if>
+            <if test="detail != null">detail = #{detail},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcProductById" parameterType="Long">
+        delete from wxcxc_product where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcProductByIds" parameterType="String">
+        delete from wxcxc_product where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteWxcxcProductSensorByProductIds" parameterType="String">
+        delete from wxcxc_product_sensor where product_id in 
+        <foreach item="productId" collection="array" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteWxcxcProductSensorByProductId" parameterType="Long">
+        delete from wxcxc_product_sensor where product_id = #{productId}
+    </delete>
+
+    <insert id="batchWxcxcProductSensor">
+        insert into wxcxc_product_sensor( id, product_id, name, icon_file, sort, unit, type, create_by, create_time, update_by, update_time) values
+		<foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id}, #{item.productId}, #{item.name}, #{item.iconFile}, #{item.sort}, #{item.unit}, #{item.type}, #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime})
+        </foreach>
+    </insert>
+</mapper>

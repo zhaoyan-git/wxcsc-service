@@ -36,7 +36,7 @@ public class WxcxcBusinessController extends BaseController
     /**
      * 查询企业信息列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:business:list')")
+    @PreAuthorize("@ss.hasPermi('iot:business')")
     @GetMapping("/list")
     public TableDataInfo list(WxcxcBusiness wxcxcBusiness)
     {
@@ -48,7 +48,7 @@ public class WxcxcBusinessController extends BaseController
     /**
      * 导出企业信息列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:business:export')")
+    @PreAuthorize("@ss.hasPermi('iot:business')")
     @Log(title = "企业信息", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WxcxcBusiness wxcxcBusiness)
@@ -61,7 +61,7 @@ public class WxcxcBusinessController extends BaseController
     /**
      * 获取企业信息详细信息
      */
-    @PreAuthorize("@ss.hasPermi('iot:business:query')")
+    @PreAuthorize("@ss.hasPermi('iot:business')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -71,7 +71,7 @@ public class WxcxcBusinessController extends BaseController
     /**
      * 新增企业信息
      */
-    @PreAuthorize("@ss.hasPermi('iot:business:add')")
+    @PreAuthorize("@ss.hasPermi('iot:business')")
     @Log(title = "企业信息", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WxcxcBusiness wxcxcBusiness)
@@ -82,7 +82,7 @@ public class WxcxcBusinessController extends BaseController
     /**
      * 修改企业信息
      */
-    @PreAuthorize("@ss.hasPermi('iot:business:edit')")
+    @PreAuthorize("@ss.hasPermi('iot:business')")
     @Log(title = "企业信息", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WxcxcBusiness wxcxcBusiness)
@@ -93,7 +93,7 @@ public class WxcxcBusinessController extends BaseController
     /**
      * 删除企业信息
      */
-    @PreAuthorize("@ss.hasPermi('iot:business:remove')")
+    @PreAuthorize("@ss.hasPermi('iot:business')")
     @Log(title = "企业信息", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)

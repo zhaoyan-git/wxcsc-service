@@ -15,8 +15,8 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.wxcxc.domain.WxcxProjectPointGroup;
-import com.ruoyi.wxcxc.service.IWxcxProjectPointGroupService;
+import com.ruoyi.wxcxc.domain.WxcxcProjectPointGroup;
+import com.ruoyi.wxcxc.service.IWxcxcProjectPointGroupService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
@@ -28,76 +28,76 @@ import com.ruoyi.common.core.page.TableDataInfo;
  */
 @RestController
 @RequestMapping("/iot/projectPointGroup")
-public class WxcxProjectPointGroupController extends BaseController
+public class WxcxcProjectPointGroupController extends BaseController
 {
     @Autowired
-    private IWxcxProjectPointGroupService wxcxProjectPointGroupService;
+    private IWxcxcProjectPointGroupService wxcxProjectPointGroupService;
 
     /**
      * 查询测点分组列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectPointGroup:list')")
+    @PreAuthorize("@ss.hasPermi('iot:projectPointGroup')")
     @GetMapping("/list")
-    public TableDataInfo list(WxcxProjectPointGroup wxcxProjectPointGroup)
+    public TableDataInfo list(WxcxcProjectPointGroup wxcxcProjectPointGroup)
     {
         startPage();
-        List<WxcxProjectPointGroup> list = wxcxProjectPointGroupService.selectWxcxProjectPointGroupList(wxcxProjectPointGroup);
+        List<WxcxcProjectPointGroup> list = wxcxProjectPointGroupService.selectWxcxcProjectPointGroupList(wxcxcProjectPointGroup);
         return getDataTable(list);
     }
 
     /**
      * 导出测点分组列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectPointGroup:export')")
+    @PreAuthorize("@ss.hasPermi('iot:projectPointGroup')")
     @Log(title = "测点分组", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult export(WxcxProjectPointGroup wxcxProjectPointGroup)
+    public AjaxResult export(WxcxcProjectPointGroup wxcxcProjectPointGroup)
     {
-        List<WxcxProjectPointGroup> list = wxcxProjectPointGroupService.selectWxcxProjectPointGroupList(wxcxProjectPointGroup);
-        ExcelUtil<WxcxProjectPointGroup> util = new ExcelUtil<WxcxProjectPointGroup>(WxcxProjectPointGroup.class);
+        List<WxcxcProjectPointGroup> list = wxcxProjectPointGroupService.selectWxcxcProjectPointGroupList(wxcxcProjectPointGroup);
+        ExcelUtil<WxcxcProjectPointGroup> util = new ExcelUtil<WxcxcProjectPointGroup>(WxcxcProjectPointGroup.class);
         return util.exportExcel(list, "测点分组数据");
     }
 
     /**
      * 获取测点分组详细信息
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectPointGroup:query')")
+    @PreAuthorize("@ss.hasPermi('iot:projectPointGroup')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
-        return AjaxResult.success(wxcxProjectPointGroupService.selectWxcxProjectPointGroupById(id));
+        return AjaxResult.success(wxcxProjectPointGroupService.selectWxcxcProjectPointGroupById(id));
     }
 
     /**
      * 新增测点分组
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectPointGroup:add')")
+    @PreAuthorize("@ss.hasPermi('iot:projectPointGroup')")
     @Log(title = "测点分组", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody WxcxProjectPointGroup wxcxProjectPointGroup)
+    public AjaxResult add(@RequestBody WxcxcProjectPointGroup wxcxcProjectPointGroup)
     {
-        return toAjax(wxcxProjectPointGroupService.insertWxcxProjectPointGroup(wxcxProjectPointGroup));
+        return toAjax(wxcxProjectPointGroupService.insertWxcxcProjectPointGroup(wxcxcProjectPointGroup));
     }
 
     /**
      * 修改测点分组
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectPointGroup:edit')")
+    @PreAuthorize("@ss.hasPermi('iot:projectPointGroup')")
     @Log(title = "测点分组", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody WxcxProjectPointGroup wxcxProjectPointGroup)
+    public AjaxResult edit(@RequestBody WxcxcProjectPointGroup wxcxcProjectPointGroup)
     {
-        return toAjax(wxcxProjectPointGroupService.updateWxcxProjectPointGroup(wxcxProjectPointGroup));
+        return toAjax(wxcxProjectPointGroupService.updateWxcxcProjectPointGroup(wxcxcProjectPointGroup));
     }
 
     /**
      * 删除测点分组
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectPointGroup:remove')")
+    @PreAuthorize("@ss.hasPermi('iot:projectPointGroup')")
     @Log(title = "测点分组", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {
-        return toAjax(wxcxProjectPointGroupService.deleteWxcxProjectPointGroupByIds(ids));
+        return toAjax(wxcxProjectPointGroupService.deleteWxcxcProjectPointGroupByIds(ids));
     }
 }

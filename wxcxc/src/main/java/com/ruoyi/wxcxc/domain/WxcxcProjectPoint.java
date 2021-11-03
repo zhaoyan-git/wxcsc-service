@@ -9,7 +9,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 项目测点对象 wxcxc_project_point
  * 
  * @author l62202
- * @date 2021-10-17
+ * @date 2021-11-01
  */
 public class WxcxcProjectPoint extends BaseEntity
 {
@@ -38,8 +38,16 @@ public class WxcxcProjectPoint extends BaseEntity
     @Excel(name = "警报标志", readConverterExp = "0=表示未告警,1=表示告警")
     private String alarmFlag;
 
+    /** 监测因素 */
+    @Excel(name = "监测因素")
+    private String monitorType;
+
     /** 删除标志（0代表存在 2代表删除） */
     private String delFlag;
+
+    /** 监测因素所需数据 */
+    @Excel(name = "监测因素所需数据")
+    private String monitorData;
 
     public void setId(Long id) 
     {
@@ -95,6 +103,15 @@ public class WxcxcProjectPoint extends BaseEntity
     {
         return alarmFlag;
     }
+    public void setMonitorType(String monitorType) 
+    {
+        this.monitorType = monitorType;
+    }
+
+    public String getMonitorType() 
+    {
+        return monitorType;
+    }
     public void setDelFlag(String delFlag) 
     {
         this.delFlag = delFlag;
@@ -103,6 +120,15 @@ public class WxcxcProjectPoint extends BaseEntity
     public String getDelFlag() 
     {
         return delFlag;
+    }
+    public void setMonitorData(String monitorData) 
+    {
+        this.monitorData = monitorData;
+    }
+
+    public String getMonitorData() 
+    {
+        return monitorData;
     }
 
     @Override
@@ -114,7 +140,9 @@ public class WxcxcProjectPoint extends BaseEntity
             .append("projectStructureId", getProjectStructureId())
             .append("pointGroupId", getPointGroupId())
             .append("alarmFlag", getAlarmFlag())
+            .append("monitorType", getMonitorType())
             .append("delFlag", getDelFlag())
+            .append("monitorData", getMonitorData())
             .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())

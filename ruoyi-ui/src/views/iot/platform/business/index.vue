@@ -122,7 +122,7 @@
           <el-input v-model="form.name" placeholder="请输入企业名称"/>
         </el-form-item>
         <el-form-item label="企业LOGO地址">
-          <imageUpload v-model="form.logoFile"/>
+          <imageUpload v-model="form.logoFile" :limit="1"/>
         </el-form-item>
         <el-form-item label="企业域名" prop="domainName">
           <el-input v-model="form.domainName" placeholder="请输入企业域名"/>

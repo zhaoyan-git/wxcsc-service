@@ -15,7 +15,7 @@ public class RuoYiApplication {
     public static void main(String[] args) throws Exception {
         // System.setProperty("spring.devtools.restart.enabled", "false");
         SpringApplication.run(RuoYiApplication.class, args);
-        new BootNettyServer().bind(8888);
+        new BootNettyServer().bind(9555);
         System.out.println("wxcxc Started ");
     }
 }

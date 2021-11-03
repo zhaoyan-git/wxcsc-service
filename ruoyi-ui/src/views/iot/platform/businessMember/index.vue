@@ -62,7 +62,13 @@
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="ID" align="center" prop="id"/>
       <el-table-column label="企业id" align="center" prop="businessId"/>
-      <el-table-column label="用户id" align="center" prop="sysUserId"/>
+      <el-table-column label="用户名称" align="center" prop="user.userName"/>
+      <el-table-column label="用户昵称" align="center" prop="user.nickName"/>
+      <el-table-column label="用户角色" align="center" prop="user.roles">
+        <template slot-scope="scope">
+          {{scope.row.user.roles[0].roleName}}
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -72,6 +78,14 @@
             @click="handleUpdate(scope.row)"
             v-hasPermi="['iot:businessMember:edit']"
           >修改
+          </el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-key"
+            @click="handleResetPwd(scope.row)"
+            v-hasPermi="['iot:businessMember:resetPwd']"
+          >重置密码
           </el-button>
           <el-button
             size="mini"
@@ -160,7 +174,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="用户角色" prop="user.roleIds">
-              <el-select v-model="form.user.roleIds" placeholder="请选择">
+              <el-select v-model="form.user.roleIds" placeholder="请选择" multiple :multiple-limit="1">
                 <el-option
                   v-for="dict in dict.type.iot_business_member_role"
                   :key="dict.value"
@@ -190,11 +204,11 @@
 <script>
     import {
         listBusinessMemberDto,
-        getBusinessMember,
-        delBusinessMember,
+        getBusinessMemberDto,
+        delBusinessMemberDto,
         addBusinessMemberDto,
-        updateBusinessMember,
-        exportBusinessMember
+        updateBusinessMemberDto,
+        resetUserPwd
     } from "@/api/iot/businessMember";
 
     export default {
@@ -232,7 +246,7 @@
                 // 表单校验
                 rules: {
                     'user.roleIds': [
-                        {required: true, message: "上级部门不能为空", trigger: "blur"}
+                        {required: true, message: "角色不能为空", trigger: "blur"}
                     ],
                     'user.userName': [
                         {required: true, message: "用户名称不能为空", trigger: "blur"},
@@ -265,6 +279,7 @@
         dicts: ['sys_normal_disable', 'sys_user_sex', 'iot_business_member_role'],
         created() {
             const businessId = this.$route.params && this.$route.params.businessId;
+            console.log(businessId)
             if (businessId) {
                 this.queryParams.businessId = businessId;
                 this.getList();
@@ -298,7 +313,7 @@
                         password: undefined,
                         phonenumber: undefined,
                         email: undefined,
-                        sex: undefined,
+                        sex: '2',
                         status: "0",
                         remark: undefined,
                         postIds: [],
@@ -333,8 +348,12 @@
             handleUpdate(row) {
                 this.reset();
                 const id = row.id || this.ids
-                getBusinessMember(id).then(response => {
+                getBusinessMemberDto(id).then(response => {
                     this.form = response.data;
+                    if (this.form.user.roles[0]) {
+                        this.form.user.roleIds = [];
+                        this.form.user.roleIds.push(this.form.user.roles[0].roleId.toString());
+                    }
                     this.open = true;
                     this.title = "修改企业人员";
                 });
@@ -344,7 +363,7 @@
                 this.$refs["form"].validate(valid => {
                     if (valid) {
                         if (this.form.id != null) {
-                            updateBusinessMember(this.form).then(response => {
+                            updateBusinessMemberDto(this.form).then(response => {
                                 this.$modal.msgSuccess("修改成功");
                                 this.open = false;
                                 this.getList();
@@ -363,7 +382,7 @@
             handleDelete(row) {
                 const ids = row.id || this.ids;
                 this.$modal.confirm('是否确认删除企业人员编号为"' + ids + '"的数据项？').then(function () {
-                    return delBusinessMember(ids);
+                    return delBusinessMemberDto(ids);
                 }).then(() => {
                     this.getList();
                     this.$modal.msgSuccess("删除成功");
@@ -381,7 +400,22 @@
                     this.exportLoading = false;
                 }).catch(() => {
                 });
-            }
+            },
+            /** 重置密码按钮操作 */
+            handleResetPwd(row) {
+                this.$prompt('请输入"' + row.user.userName + '"的新密码', "提示", {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    closeOnClickModal: false,
+                    inputPattern: /^.{5,20}$/,
+                    inputErrorMessage: "用户密码长度必须介于 5 和 20 之间",
+                }).then(({value}) => {
+                    resetUserPwd(row.user.userId, value).then(response => {
+                        this.$modal.msgSuccess("修改成功，新密码是：" + value);
+                    });
+                }).catch(() => {
+                });
+            },
         }
     };
 </script>

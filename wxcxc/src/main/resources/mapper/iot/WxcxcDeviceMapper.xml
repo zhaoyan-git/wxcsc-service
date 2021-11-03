@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcDeviceMapper">
+    
+    <resultMap type="WxcxcDevice" id="WxcxcDeviceResult">
+        <result property="id"    column="id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="name"    column="name"    />
+        <result property="manufacturer"    column="manufacturer"    />
+        <result property="gatewayId"    column="gateway_id"    />
+        <result property="modelNumber"    column="model_number"    />
+        <result property="photoFile"    column="photo_file"    />
+        <result property="detail"    column="detail"    />
+        <result property="onlineFlag"    column="online_flag"    />
+        <result property="alarmFlag"    column="alarm_flag"    />
+        <result property="positionLat"    column="position_lat"    />
+        <result property="positionLng"    column="position_lng"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <resultMap id="WxcxcDeviceWxcxcDeviceSensorResult" type="WxcxcDevice" extends="WxcxcDeviceResult">
+        <collection property="wxcxcDeviceSensorList" notNullColumn="sub_id" javaType="java.util.List" resultMap="WxcxcDeviceSensorResult" />
+    </resultMap>
+
+    <resultMap type="WxcxcDeviceSensor" id="WxcxcDeviceSensorResult">
+        <result property="id"    column="sub_id"    />
+        <result property="deviceId"    column="sub_device_id"    />
+        <result property="name"    column="sub_name"    />
+        <result property="iconFile"    column="sub_icon_file"    />
+        <result property="sort"    column="sub_sort"    />
+        <result property="unit"    column="sub_unit"    />
+        <result property="type"    column="sub_type"    />
+        <result property="slaveUnitId"    column="sub_slave_unit_id"    />
+        <result property="slaveCode"    column="sub_slave_code"    />
+        <result property="slaveAddressHi"    column="sub_slave_address_hi"    />
+        <result property="slaveAddressLo"    column="sub_slave_address_lo"    />
+        <result property="slaveAmountHi"    column="sub_slave_amount_hi"    />
+        <result property="slaveAmountLo"    column="sub_slave_amount_lo"    />
+        <result property="cycleTime"    column="sub_cycle_time"    />
+        <result property="delFlag"    column="sub_del_flag"    />
+        <result property="createBy"    column="sub_create_by"    />
+        <result property="createTime"    column="sub_create_time"    />
+        <result property="updateBy"    column="sub_update_by"    />
+        <result property="updateTime"    column="sub_update_time"    />
+    </resultMap>
+
+    <sql id="selectWxcxcDeviceVo">
+        select id, project_id, name, manufacturer, gateway_id, model_number, photo_file, detail, online_flag, alarm_flag, position_lat, position_lng, del_flag, create_by, create_time, update_by, update_time from wxcxc_device
+    </sql>
+
+    <select id="selectWxcxcDeviceList" parameterType="WxcxcDevice" resultMap="WxcxcDeviceResult">
+        <include refid="selectWxcxcDeviceVo"/>
+        <where>  
+            <if test="projectId != null "> and project_id = #{projectId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="manufacturer != null  and manufacturer != ''"> and manufacturer = #{manufacturer}</if>
+            <if test="gatewayId != null "> and gateway_id = #{gatewayId}</if>
+            <if test="modelNumber != null  and modelNumber != ''"> and model_number = #{modelNumber}</if>
+            <if test="photoFile != null  and photoFile != ''"> and photo_file = #{photoFile}</if>
+            <if test="detail != null  and detail != ''"> and detail = #{detail}</if>
+            <if test="onlineFlag != null  and onlineFlag != ''"> and online_flag = #{onlineFlag}</if>
+            <if test="alarmFlag != null  and alarmFlag != ''"> and alarm_flag = #{alarmFlag}</if>
+            <if test="positionLat != null  and positionLat != ''"> and position_lat = #{positionLat}</if>
+            <if test="positionLng != null  and positionLng != ''"> and position_lng = #{positionLng}</if>
+        </where>
+    </select>
+    
+    <select id="selectWxcxcDeviceById" parameterType="Long" resultMap="WxcxcDeviceWxcxcDeviceSensorResult">
+        select a.id, a.project_id, a.name, a.manufacturer, a.gateway_id, a.model_number, a.photo_file, a.detail, a.online_flag, a.alarm_flag, a.position_lat, a.position_lng, a.del_flag, a.create_by, a.create_time, a.update_by, a.update_time,
+            b.id as sub_id, b.device_id as sub_device_id, b.name as sub_name, b.icon_file as sub_icon_file, b.sort as sub_sort, b.unit as sub_unit, b.type as sub_type, b.slave_unit_id as sub_slave_unit_id, b.slave_code as sub_slave_code, b.slave_address_hi as sub_slave_address_hi, b.slave_address_lo as sub_slave_address_lo, b.slave_amount_hi as sub_slave_amount_hi, b.slave_amount_lo as sub_slave_amount_lo, b.cycle_time as sub_cycle_time, b.del_flag as sub_del_flag, b.create_by as sub_create_by, b.create_time as sub_create_time, b.update_by as sub_update_by, b.update_time as sub_update_time
+        from wxcxc_device a
+        left join wxcxc_device_sensor b on b.device_id = a.id
+        where a.id = #{id}
+    </select>
+        
+    <insert id="insertWxcxcDevice" parameterType="WxcxcDevice" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">project_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="manufacturer != null">manufacturer,</if>
+            <if test="gatewayId != null">gateway_id,</if>
+            <if test="modelNumber != null">model_number,</if>
+            <if test="photoFile != null">photo_file,</if>
+            <if test="detail != null">detail,</if>
+            <if test="onlineFlag != null">online_flag,</if>
+            <if test="alarmFlag != null">alarm_flag,</if>
+            <if test="positionLat != null">position_lat,</if>
+            <if test="positionLng != null">position_lng,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">#{projectId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="manufacturer != null">#{manufacturer},</if>
+            <if test="gatewayId != null">#{gatewayId},</if>
+            <if test="modelNumber != null">#{modelNumber},</if>
+            <if test="photoFile != null">#{photoFile},</if>
+            <if test="detail != null">#{detail},</if>
+            <if test="onlineFlag != null">#{onlineFlag},</if>
+            <if test="alarmFlag != null">#{alarmFlag},</if>
+            <if test="positionLat != null">#{positionLat},</if>
+            <if test="positionLng != null">#{positionLng},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcDevice" parameterType="WxcxcDevice">
+        update wxcxc_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="manufacturer != null">manufacturer = #{manufacturer},</if>
+            <if test="gatewayId != null">gateway_id = #{gatewayId},</if>
+            <if test="modelNumber != null">model_number = #{modelNumber},</if>
+            <if test="photoFile != null">photo_file = #{photoFile},</if>
+            <if test="detail != null">detail = #{detail},</if>
+            <if test="onlineFlag != null">online_flag = #{onlineFlag},</if>
+            <if test="alarmFlag != null">alarm_flag = #{alarmFlag},</if>
+            <if test="positionLat != null">position_lat = #{positionLat},</if>
+            <if test="positionLng != null">position_lng = #{positionLng},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcDeviceById" parameterType="Long">
+        delete from wxcxc_device where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcDeviceByIds" parameterType="String">
+        delete from wxcxc_device where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+<!--    <select id="selectWxcxcDeviceSensorList" parameterType="WxcxcDeviceSensor" resultMap="WxcxcDeviceSensorResult">-->
+<!--        <include refid="selectWxcxcDeviceSensorVo"/>-->
+<!--        <where>-->
+<!--            <if test="projectId != null "> and project_id = #{projectId}</if>-->
+<!--            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>-->
+<!--            <if test="manufacturer != null  and manufacturer != ''"> and manufacturer = #{manufacturer}</if>-->
+<!--            <if test="gatewayId != null "> and gateway_id = #{gatewayId}</if>-->
+<!--            <if test="modelNumber != null  and modelNumber != ''"> and model_number = #{modelNumber}</if>-->
+<!--            <if test="photoFile != null  and photoFile != ''"> and photo_file = #{photoFile}</if>-->
+<!--            <if test="detail != null  and detail != ''"> and detail = #{detail}</if>-->
+<!--            <if test="onlineFlag != null  and onlineFlag != ''"> and online_flag = #{onlineFlag}</if>-->
+<!--            <if test="alarmFlag != null  and alarmFlag != ''"> and alarm_flag = #{alarmFlag}</if>-->
+<!--            <if test="positionLat != null  and positionLat != ''"> and position_lat = #{positionLat}</if>-->
+<!--            <if test="positionLng != null  and positionLng != ''"> and position_lng = #{positionLng}</if>-->
+<!--        </where>-->
+<!--    </select>-->
+    
+    <delete id="deleteWxcxcDeviceSensorByDeviceIds" parameterType="String">
+        delete from wxcxc_device_sensor where device_id in 
+        <foreach item="deviceId" collection="array" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteWxcxcDeviceSensorByDeviceId" parameterType="Long">
+        delete from wxcxc_device_sensor where device_id = #{deviceId}
+    </delete>
+
+    <insert id="batchWxcxcDeviceSensor">
+        insert into wxcxc_device_sensor( id, device_id, name, icon_file, sort, unit, type, slave_unit_id, slave_code, slave_address_hi, slave_address_lo, slave_amount_hi, slave_amount_lo, cycle_time, del_flag, create_by, create_time, update_by, update_time) values
+		<foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id}, #{item.deviceId}, #{item.name}, #{item.iconFile}, #{item.sort}, #{item.unit}, #{item.type}, #{item.slaveUnitId}, #{item.slaveCode}, #{item.slaveAddressHi}, #{item.slaveAddressLo}, #{item.slaveAmountHi}, #{item.slaveAmountLo}, #{item.cycleTime}, #{item.delFlag}, #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime})
+        </foreach>
+    </insert>
+</mapper>

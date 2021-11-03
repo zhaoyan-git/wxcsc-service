@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcDeviceGatewayMapper">
+    
+    <resultMap type="WxcxcDeviceGateway" id="WxcxcDeviceGatewayResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="manufacturer"    column="manufacturer"    />
+        <result property="modelNumber"    column="model_number"    />
+        <result property="detail"    column="detail"    />
+        <result property="simNumber"    column="sim_number"    />
+        <result property="dtuId"    column="dtu_id"    />
+        <result property="onlineFlag"    column="online_flag"    />
+        <result property="ip"    column="ip"    />
+        <result property="positionLat"    column="position_lat"    />
+        <result property="positionLng"    column="position_lng"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectWxcxcDeviceGatewayVo">
+        select id, name, project_id, manufacturer, model_number, detail, sim_number, dtu_id, online_flag, position_lat, position_lng, del_flag, ip, create_by, create_time, update_by, update_time from wxcxc_device_gateway
+    </sql>
+
+    <select id="selectWxcxcDeviceGatewayList" parameterType="WxcxcDeviceGateway" resultMap="WxcxcDeviceGatewayResult">
+        <include refid="selectWxcxcDeviceGatewayVo"/>
+        <where>
+            and del_flag = '0'
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="projectId != null "> and project_id = #{projectId}</if>
+            <if test="manufacturer != null  and manufacturer != ''"> and manufacturer = #{manufacturer}</if>
+            <if test="modelNumber != null  and modelNumber != ''"> and model_number = #{modelNumber}</if>
+            <if test="detail != null  and detail != ''"> and detail = #{detail}</if>
+            <if test="simNumber != null  and simNumber != ''"> and sim_number = #{simNumber}</if>
+            <if test="dtuId != null  and dtuId != ''"> and dtu_id = #{dtuId}</if>
+            <if test="onlineFlag != null  and onlineFlag != ''"> and online_flag = #{onlineFlag}</if>
+            <if test="positionLat != null  and positionLat != ''"> and position_lat = #{positionLat}</if>
+            <if test="positionLng != null  and positionLng != ''"> and position_lng = #{positionLng}</if>
+        </where>
+    </select>
+    
+    <select id="selectWxcxcDeviceGatewayById" parameterType="Long" resultMap="WxcxcDeviceGatewayResult">
+        <include refid="selectWxcxcDeviceGatewayVo"/>
+        where id = #{id}
+        and del_flag = '0'
+    </select>
+        
+    <insert id="insertWxcxcDeviceGateway" parameterType="WxcxcDeviceGateway" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_device_gateway
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="manufacturer != null">manufacturer,</if>
+            <if test="modelNumber != null">model_number,</if>
+            <if test="detail != null">detail,</if>
+            <if test="simNumber != null">sim_number,</if>
+            <if test="dtuId != null">dtu_id,</if>
+            <if test="onlineFlag != null">online_flag,</if>
+            <if test="positionLat != null">position_lat,</if>
+            <if test="positionLng != null">position_lng,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="ip != null">ip,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="manufacturer != null">#{manufacturer},</if>
+            <if test="modelNumber != null">#{modelNumber},</if>
+            <if test="detail != null">#{detail},</if>
+            <if test="simNumber != null">#{simNumber},</if>
+            <if test="dtuId != null">#{dtuId},</if>
+            <if test="onlineFlag != null">#{onlineFlag},</if>
+            <if test="positionLat != null">#{positionLat},</if>
+            <if test="positionLng != null">#{positionLng},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="ip != null">#{ip},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcDeviceGateway" parameterType="WxcxcDeviceGateway">
+        update wxcxc_device_gateway
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="manufacturer != null">manufacturer = #{manufacturer},</if>
+            <if test="modelNumber != null">model_number = #{modelNumber},</if>
+            <if test="detail != null">detail = #{detail},</if>
+            <if test="simNumber != null">sim_number = #{simNumber},</if>
+            <if test="dtuId != null">dtu_id = #{dtuId},</if>
+            <if test="onlineFlag != null">online_flag = #{onlineFlag},</if>
+            <if test="ip != null">ip = #{ip},</if>
+            <if test="positionLat != null">position_lat = #{positionLat},</if>
+            <if test="positionLng != null">position_lng = #{positionLng},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcDeviceGatewayById" parameterType="Long">
+        update wxcxc_device_gateway set del_flag = '2' where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcDeviceGatewayByIds" parameterType="String">
+        update wxcxc_device_gateway set del_flag = '2' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

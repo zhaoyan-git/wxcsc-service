@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcDeviceSensorMapper">
+    
+    <resultMap type="WxcxcDeviceSensor" id="WxcxcDeviceSensorResult">
+        <result property="id"    column="id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="name"    column="name"    />
+        <result property="iconFile"    column="icon_file"    />
+        <result property="sort"    column="sort"    />
+        <result property="unit"    column="unit"    />
+        <result property="type"    column="type"    />
+        <result property="slaveUnitId"    column="slave_unit_id"    />
+        <result property="slaveCode"    column="slave_code"    />
+        <result property="slaveAddressHi"    column="slave_address_hi"    />
+        <result property="slaveAddressLo"    column="slave_address_lo"    />
+        <result property="slaveAmountHi"    column="slave_amount_hi"    />
+        <result property="slaveAmountLo"    column="slave_amount_lo"    />
+        <result property="cycleTime"    column="cycle_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectWxcxcDeviceSensorVo">
+        select id, device_id, name, icon_file, sort, unit, type, slave_unit_id, slave_code, slave_address_hi, slave_address_lo, slave_amount_hi, slave_amount_lo, cycle_time, del_flag, create_by, create_time, update_by, update_time from wxcxc_device_sensor
+    </sql>
+
+    <select id="selectWxcxcDeviceSensorList" parameterType="WxcxcDeviceSensor" resultMap="WxcxcDeviceSensorResult">
+        <include refid="selectWxcxcDeviceSensorVo"/>
+        <where>  
+            <if test="deviceId != null "> and device_id = #{deviceId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="iconFile != null  and iconFile != ''"> and icon_file = #{iconFile}</if>
+            <if test="sort != null "> and sort = #{sort}</if>
+            <if test="unit != null  and unit != ''"> and unit = #{unit}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="slaveUnitId != null  and slaveUnitId != ''"> and slave_unit_id = #{slaveUnitId}</if>
+            <if test="slaveCode != null  and slaveCode != ''"> and slave_code = #{slaveCode}</if>
+            <if test="slaveAddressHi != null  and slaveAddressHi != ''"> and slave_address_hi = #{slaveAddressHi}</if>
+            <if test="slaveAddressLo != null  and slaveAddressLo != ''"> and slave_address_lo = #{slaveAddressLo}</if>
+            <if test="slaveAmountHi != null  and slaveAmountHi != ''"> and slave_amount_hi = #{slaveAmountHi}</if>
+            <if test="slaveAmountLo != null  and slaveAmountLo != ''"> and slave_amount_lo = #{slaveAmountLo}</if>
+            <if test="cycleTime != null "> and cycle_time = #{cycleTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectWxcxcDeviceSensorById" parameterType="Long" resultMap="WxcxcDeviceSensorResult">
+        <include refid="selectWxcxcDeviceSensorVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWxcxcDeviceSensor" parameterType="WxcxcDeviceSensor" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_device_sensor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceId != null">device_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="iconFile != null">icon_file,</if>
+            <if test="sort != null">sort,</if>
+            <if test="unit != null">unit,</if>
+            <if test="type != null">type,</if>
+            <if test="slaveUnitId != null and slaveUnitId != ''">slave_unit_id,</if>
+            <if test="slaveCode != null and slaveCode != ''">slave_code,</if>
+            <if test="slaveAddressHi != null and slaveAddressHi != ''">slave_address_hi,</if>
+            <if test="slaveAddressLo != null and slaveAddressLo != ''">slave_address_lo,</if>
+            <if test="slaveAmountHi != null and slaveAmountHi != ''">slave_amount_hi,</if>
+            <if test="slaveAmountLo != null and slaveAmountLo != ''">slave_amount_lo,</if>
+            <if test="cycleTime != null">cycle_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="iconFile != null">#{iconFile},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="unit != null">#{unit},</if>
+            <if test="type != null">#{type},</if>
+            <if test="slaveUnitId != null and slaveUnitId != ''">#{slaveUnitId},</if>
+            <if test="slaveCode != null and slaveCode != ''">#{slaveCode},</if>
+            <if test="slaveAddressHi != null and slaveAddressHi != ''">#{slaveAddressHi},</if>
+            <if test="slaveAddressLo != null and slaveAddressLo != ''">#{slaveAddressLo},</if>
+            <if test="slaveAmountHi != null and slaveAmountHi != ''">#{slaveAmountHi},</if>
+            <if test="slaveAmountLo != null and slaveAmountLo != ''">#{slaveAmountLo},</if>
+            <if test="cycleTime != null">#{cycleTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcDeviceSensor" parameterType="WxcxcDeviceSensor">
+        update wxcxc_device_sensor
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceId != null">device_id = #{deviceId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="iconFile != null">icon_file = #{iconFile},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="unit != null">unit = #{unit},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="slaveUnitId != null and slaveUnitId != ''">slave_unit_id = #{slaveUnitId},</if>
+            <if test="slaveCode != null and slaveCode != ''">slave_code = #{slaveCode},</if>
+            <if test="slaveAddressHi != null and slaveAddressHi != ''">slave_address_hi = #{slaveAddressHi},</if>
+            <if test="slaveAddressLo != null and slaveAddressLo != ''">slave_address_lo = #{slaveAddressLo},</if>
+            <if test="slaveAmountHi != null and slaveAmountHi != ''">slave_amount_hi = #{slaveAmountHi},</if>
+            <if test="slaveAmountLo != null and slaveAmountLo != ''">slave_amount_lo = #{slaveAmountLo},</if>
+            <if test="cycleTime != null">cycle_time = #{cycleTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcDeviceSensorById" parameterType="Long">
+        delete from wxcxc_device_sensor where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcDeviceSensorByIds" parameterType="String">
+        delete from wxcxc_device_sensor where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

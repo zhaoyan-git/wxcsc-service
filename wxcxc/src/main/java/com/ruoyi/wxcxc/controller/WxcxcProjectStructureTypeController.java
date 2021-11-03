@@ -36,24 +36,24 @@ public class WxcxcProjectStructureTypeController extends BaseController
     /**
      * 查询结构物选项列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectStructureType:list')")
+    @PreAuthorize("@ss.hasPermi('iot:projectStructureType')")
     @GetMapping("/list")
     public TableDataInfo list(WxcxcProjectStructureType wxcxcProjectStructureType)
     {
         startPage();
-        List<WxcxcProjectStructureType> list = wxcxProjectStructureTypeService.selectWxcxProjectStructureTypeList(wxcxcProjectStructureType);
+        List<WxcxcProjectStructureType> list = wxcxProjectStructureTypeService.selectWxcxcProjectStructureTypeList(wxcxcProjectStructureType);
         return getDataTable(list);
     }
 
     /**
      * 导出结构物选项列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectStructureType:export')")
+    @PreAuthorize("@ss.hasPermi('iot:projectStructureType')")
     @Log(title = "结构物选项", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WxcxcProjectStructureType wxcxcProjectStructureType)
     {
-        List<WxcxcProjectStructureType> list = wxcxProjectStructureTypeService.selectWxcxProjectStructureTypeList(wxcxcProjectStructureType);
+        List<WxcxcProjectStructureType> list = wxcxProjectStructureTypeService.selectWxcxcProjectStructureTypeList(wxcxcProjectStructureType);
         ExcelUtil<WxcxcProjectStructureType> util = new ExcelUtil<WxcxcProjectStructureType>(WxcxcProjectStructureType.class);
         return util.exportExcel(list, "结构物选项数据");
     }
@@ -61,43 +61,43 @@ public class WxcxcProjectStructureTypeController extends BaseController
     /**
      * 获取结构物选项详细信息
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectStructureType:query')")
+    @PreAuthorize("@ss.hasPermi('iot:projectStructureType')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
-        return AjaxResult.success(wxcxProjectStructureTypeService.selectWxcxProjectStructureTypeById(id));
+        return AjaxResult.success(wxcxProjectStructureTypeService.selectWxcxcProjectStructureTypeById(id));
     }
 
     /**
      * 新增结构物选项
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectStructureType:add')")
+    @PreAuthorize("@ss.hasPermi('iot:projectStructureType')")
     @Log(title = "结构物选项", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WxcxcProjectStructureType wxcxcProjectStructureType)
     {
-        return toAjax(wxcxProjectStructureTypeService.insertWxcxProjectStructureType(wxcxcProjectStructureType));
+        return toAjax(wxcxProjectStructureTypeService.insertWxcxcProjectStructureType(wxcxcProjectStructureType));
     }
 
     /**
      * 修改结构物选项
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectStructureType:edit')")
+    @PreAuthorize("@ss.hasPermi('iot:projectStructureType')")
     @Log(title = "结构物选项", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WxcxcProjectStructureType wxcxcProjectStructureType)
     {
-        return toAjax(wxcxProjectStructureTypeService.updateWxcxProjectStructureType(wxcxcProjectStructureType));
+        return toAjax(wxcxProjectStructureTypeService.updateWxcxcProjectStructureType(wxcxcProjectStructureType));
     }
 
     /**
      * 删除结构物选项
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectStructureType:remove')")
+    @PreAuthorize("@ss.hasPermi('iot:projectStructureType')")
     @Log(title = "结构物选项", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {
-        return toAjax(wxcxProjectStructureTypeService.deleteWxcxProjectStructureTypeByIds(ids));
+        return toAjax(wxcxProjectStructureTypeService.deleteWxcxcProjectStructureTypeByIds(ids));
     }
 }

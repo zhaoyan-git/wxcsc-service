@@ -36,7 +36,7 @@ public class WxcxcBusinessMemberRoleController extends BaseController
     /**
      * 查询企业人员权限列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMemberRole:list')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMemberRole')")
     @GetMapping("/list")
     public TableDataInfo list(WxcxcBusinessMemberRole wxcxcBusinessMemberRole)
     {
@@ -48,7 +48,7 @@ public class WxcxcBusinessMemberRoleController extends BaseController
     /**
      * 导出企业人员权限列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMemberRole:export')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMemberRole')")
     @Log(title = "企业人员权限", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WxcxcBusinessMemberRole wxcxcBusinessMemberRole)
@@ -61,7 +61,7 @@ public class WxcxcBusinessMemberRoleController extends BaseController
     /**
      * 获取企业人员权限详细信息
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMemberRole:query')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMemberRole')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -71,7 +71,7 @@ public class WxcxcBusinessMemberRoleController extends BaseController
     /**
      * 新增企业人员权限
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMemberRole:add')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMemberRole')")
     @Log(title = "企业人员权限", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WxcxcBusinessMemberRole wxcxcBusinessMemberRole)
@@ -82,7 +82,7 @@ public class WxcxcBusinessMemberRoleController extends BaseController
     /**
      * 修改企业人员权限
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMemberRole:edit')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMemberRole')")
     @Log(title = "企业人员权限", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WxcxcBusinessMemberRole wxcxcBusinessMemberRole)
@@ -93,7 +93,7 @@ public class WxcxcBusinessMemberRoleController extends BaseController
     /**
      * 删除企业人员权限
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMemberRole:remove')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMemberRole')")
     @Log(title = "企业人员权限", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)

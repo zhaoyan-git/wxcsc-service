@@ -1,373 +1,414 @@
 <template>
-  <div class="app-container" v-loading="pageLoading">
-    <!-- 筛选 START -->
-    <el-form :inline="true" class="top-form-inline">
-      <el-form-item label="编号">
-        <el-input v-model="condition.id" placeholder="编号" />
-      </el-form-item>
-      <el-form-item label="用户昵称">
-        <el-input v-model="condition.title" placeholder="用户昵称" />
-      </el-form-item>
-      <el-form-item label="手机号">
-        <el-input v-model="condition.title" placeholder="手机号" />
-      </el-form-item>
+  <div class="app-container">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item>
-        <el-button type="primary" @click="conditionQuery">条件查询</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="success" @click="handleCreate">添加用户</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
-    <!-- 筛选 END -->
 
-    <!-- 数据列表 START -->
-    <el-table
-      :data="tableData"
-      row-key="item"
-      style="width: 100%"
-      @sort-change="sortChange"
-    >
-      <!-- 表头及数据 START -->
-      <el-table-column sortable="id" prop="id" label="编号" />
-      <el-table-column prop="user.nickname" label="用户昵称" />
-      <el-table-column prop="user.username" label="登录名" />
-      <el-table-column prop="user.phone" label="手机号" />
-      <!-- 表头及数据 END -->
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+          v-hasPermi="['iot:console']"
+        >新增
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          plain
+          icon="el-icon-edit"
+          size="mini"
+          :disabled="single"
+          @click="handleUpdate"
+          v-hasPermi="['iot:console']"
+        >修改
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          plain
+          icon="el-icon-delete"
+          size="mini"
+          :disabled="multiple"
+          @click="handleDelete"
+          v-hasPermi="['iot:console']"
+        >删除
+        </el-button>
+      </el-col>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+    </el-row>
 
-      <!-- 操作列 START -->
-      <el-table-column min-width="80">
-        <template slot="header"> 操作 </template>
+    <el-table v-loading="loading" :data="businessMemberList" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center"/>
+      <el-table-column label="ID" align="center" prop="id"/>
+      <el-table-column label="企业id" align="center" prop="businessId"/>
+      <el-table-column label="用户名称" align="center" prop="user.userName"/>
+      <el-table-column label="用户昵称" align="center" prop="user.nickName"/>
+      <el-table-column label="用户角色" align="center" prop="user.roles">
+        <template slot-scope="scope">
+          {{scope.row.user.roles[0].roleName}}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
-            type="primary"
-            @click="handleUpdate(scope.$index, scope.row)"
-            >编辑</el-button
-          >
+            type="text"
+            icon="el-icon-edit"
+            @click="handleUpdate(scope.row)"
+            v-hasPermi="['iot:console']"
+          >修改
+          </el-button>
           <el-button
             size="mini"
-            type="danger"
-            @click="handleDelete(scope.$index, scope.row)"
-            v-if="isOwn(scope.row.user.coreRoleList)"
-            >删除</el-button
-          >
+            type="text"
+            icon="el-icon-key"
+            @click="handleResetPwd(scope.row)"
+            v-hasPermi="['iot:console']"
+            v-if="name != scope.row.user.userName"
+          >重置密码
+          </el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-delete"
+            @click="handleDelete(scope.row)"
+            v-hasPermi="['iot:console']"
+            v-if="name != scope.row.user.userName"
+          >删除
+          </el-button>
         </template>
       </el-table-column>
-      <!-- 操作列 END -->
     </el-table>
-    <!-- 页码 START -->
-    <el-pagination
-      :current-page="condition.page.currentPage"
-      :page-sizes="[10, 20, 30, 40]"
-      :page-size="condition.page.pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="condition.page.total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
+
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="queryParams.pageNum"
+      :limit.sync="queryParams.pageSize"
+      @pagination="getList"
     />
-    <!-- 页码 START -->
-    <!-- 数据列表 END -->
 
-    <!-- 创建及编辑视图 START -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form
-        ref="dataForm"
-        :rules="rules"
-        :model="dataForm"
-        label-position="left"
-        label-width="100px"
-      >
-        <el-form-item label="用户昵称" prop="user.nickname">
-          <el-input v-model="dataForm.user.nickname" />
-        </el-form-item>
-        <!-- <el-form-item label="头像">
-          <el-upload
-            ref="upload"
-            :file-list="uploadFileList"
-            :action="processEnv.VUE_APP_SERVERAPI + '/api/plugin/file/single'"
-            :on-success="handleAvatarSuccess"
-            :on-remove="handleUploadRemove"
-            class="avatar-uploader"
-            :class="uploadFileList.length >= 1 ? 'hide' : ''"
-            :multiple="false"
-            list-type="picture-card"
-            :limit="1"
-          >
-            <i class="el-icon-plus"></i>
-          </el-upload>
-        </el-form-item> -->
-        <el-form-item label="登录名" prop="user.username">
-          <el-input v-model="dataForm.user.username" />
-        </el-form-item>
-        <el-form-item label="密码" prop="user.password">
-          <el-input v-model="dataForm.user.password" type="password" />
-        </el-form-item>
-        <el-form-item label="手机号" prop="user.phone">
-          <el-input v-model="dataForm.user.phone" />
-        </el-form-item>
+    <!-- 添加或修改企业人员对话框 -->
+    <el-dialog :title="title" :visible.sync="open" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="用户昵称" prop="user.nickName">
+              <el-input v-model="form.user.nickName" placeholder="请输入用户昵称" maxlength="30"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="手机号码" prop="user.phonenumber">
+              <el-input v-model="form.user.phonenumber" placeholder="请输入手机号码" maxlength="11"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="用户邮箱" prop="user.email">
+              <el-input v-model="form.user.email" placeholder="请输入邮箱" maxlength="50"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item v-if="form.user.userId == undefined" label="用户名称" prop="user.userName">
+              <el-input v-model="form.user.userName" placeholder="请输入用户名称" maxlength="30"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item v-if="form.user.userId == undefined" label="用户密码" prop="user.password">
+              <el-input v-model="form.user.password" placeholder="请输入用户密码" type="password" maxlength="20"
+                        show-password/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="用户性别">
+              <el-select v-model="form.user.sex" placeholder="请选择">
+                <el-option
+                  v-for="dict in dict.type.sys_user_sex"
+                  :key="dict.value"
+                  :label="dict.label"
+                  :value="dict.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12" v-if="name != form.user.userName">
+            <el-form-item label="账号状态">
+              <el-radio-group v-model="form.user.status">
+                <el-radio
+                  v-for="dict in dict.type.sys_normal_disable"
+                  :key="dict.value"
+                  :label="dict.value"
+                >{{dict.label}}
+                </el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+
+          </el-col>
+          <el-col :span="12" v-if="name != form.user.userName">
+            <el-form-item label="用户角色" prop="user.roleIds">
+              <el-select v-model="form.user.roleIds" placeholder="请选择" multiple :multiple-limit="1">
+                <el-option
+                  v-for="dict in dict.type.iot_business_member_role"
+                  :key="dict.value"
+                  :label="dict.label"
+                  :value="dict.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="用户备注">
+              <el-input v-model="form.user.remark" type="textarea" placeholder="请输入内容"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
-
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> 关闭 </el-button>
-        <el-button
-          type="primary"
-          @click="dialogStatus === 'create' ? createData() : updateData()"
-        >
-          提交
-        </el-button>
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
-    <!-- 创建及编辑视图 START -->
   </div>
 </template>
+
 <script>
-import {
-  findBusinessMemberList,
-  businessMemberSave,
-  businessMemberDel,
-} from "@/api/wxcxc/console";
-import { parseTime } from "@/utils";
-// import md5 from "blueimp-md5";
+    import {
+        getBusinessMemberDto,
+        delBusinessMemberDto,
+        addBusinessMemberDto,
+        updateBusinessMemberDto,
+        resetUserPwd
+    } from "@/api/iot/businessMember";
 
-export default {
-  name: "atricleChannelJjfa",
-  data() {
-    var validatePass = (rule, value, callback) => {
-      if (value === "" || value == undefined) {
-        callback(new Error("请输入密码"));
-      } else {
-        if (/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]+\S{5,12}$/.test(value)) {
-          callback();
-        } else {
-          callback(new Error("需同时含有字母和数字，长度在6-12之间"));
-        }
-      }
-    };
-    return {
-      processEnv: process.env,
-      options: [],
-      pageLoading: false,
-      tableData: [],
-      dataForm: {
-        user: {},
-      },
-      currentItem: { user: {} },
-      condition: {
-        page: {
-          orderBy: "id",
-          sort: "DESC",
-          currentPage: 1,
-          pageSize: 10,
-          total: 0,
+    import {
+        consoleListBusinessMemberDto
+    } from "@/api/iot/console";
+
+    import {mapGetters} from "vuex";
+
+    export default {
+        name: "BusinessMember",
+        computed: {
+            ...mapGetters(["roles","name"]),
         },
-      },
-      dialogFormVisible: false,
-      textMap: {
-        edit: "编辑",
-        create: "创建",
-      },
-      dialogStatus: "",
-      rules: {
-        "user.nickname": [
-          { required: true, message: "请输入昵称", trigger: "blur" },
-        ],
-        "user.username": [
-          { required: true, message: "请输入登录名", trigger: "blur" },
-        ],
-        "user.password": [
-          { required: true, validator: validatePass, trigger: "blur" },
-        ],
-      },
-      uploadFileList: [],
+        data() {
+            return {
+                // 遮罩层
+                loading: true,
+                // 导出遮罩层
+                exportLoading: false,
+                // 选中数组
+                ids: [],
+                // 非单个禁用
+                single: true,
+                // 非多个禁用
+                multiple: true,
+                // 显示搜索条件
+                showSearch: true,
+                // 总条数
+                total: 0,
+                // 企业人员表格数据
+                businessMemberList: [],
+                // 弹出层标题
+                title: "",
+                // 是否显示弹出层
+                open: false,
+                // 查询参数
+                queryParams: {
+                    businessId: 0,
+                    pageNum: 1,
+                    pageSize: 10,
+                },
+                // 表单参数
+                form: {user: {}},
+                // 表单校验
+                rules: {
+                    'user.roleIds': [
+                        {required: true, message: "角色不能为空", trigger: "blur"}
+                    ],
+                    'user.userName': [
+                        {required: true, message: "用户名称不能为空", trigger: "blur"},
+                        {min: 2, max: 20, message: '用户名称长度必须介于 2 和 20 之间', trigger: 'blur'}
+                    ],
+                    'user.nickName': [
+                        {required: true, message: "用户昵称不能为空", trigger: "blur"}
+                    ],
+                    'user.password': [
+                        {required: true, message: "用户密码不能为空", trigger: "blur"},
+                        {min: 5, max: 20, message: '用户密码长度必须介于 5 和 20 之间', trigger: 'blur'}
+                    ],
+                    'user.email': [
+                        {
+                            type: "email",
+                            message: "'请输入正确的邮箱地址",
+                            trigger: ["blur", "change"]
+                        }
+                    ],
+                    'user.phonenumber': [
+                        {
+                            pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
+                            message: "请输入正确的手机号码",
+                            trigger: "blur"
+                        }
+                    ]
+                }
+            };
+        },
+        dicts: ['sys_normal_disable', 'sys_user_sex', 'iot_business_member_role'],
+        created() {
+          this.getList();
+        },
+        methods: {
+            /** 查询企业人员列表 */
+            getList() {
+                this.loading = true;
+                consoleListBusinessMemberDto(this.queryParams).then(response => {
+                    this.businessMemberList = response.rows;
+                    this.total = response.total;
+                    this.loading = false;
+                });
+            },
+            // 取消按钮
+            cancel() {
+                this.open = false;
+                this.reset();
+            },
+            // 表单重置
+            reset() {
+                this.form = {
+                    id: null,
+                    businessId: this.queryParams.businessId,
+                    user: {
+                        userId: undefined,
+                        deptId: undefined,
+                        userName: undefined,
+                        nickName: undefined,
+                        password: undefined,
+                        phonenumber: undefined,
+                        email: undefined,
+                        sex: '2',
+                        status: "0",
+                        remark: undefined,
+                        postIds: [],
+                        roleIds: []
+                    }
+                };
+                this.resetForm("form");
+            },
+            /** 搜索按钮操作 */
+            handleQuery() {
+                this.queryParams.pageNum = 1;
+                this.getList();
+            },
+            /** 重置按钮操作 */
+            resetQuery() {
+                this.resetForm("queryForm");
+                this.handleQuery();
+            },
+            // 多选框选中数据
+            handleSelectionChange(selection) {
+                this.ids = selection.map(item => item.id)
+                this.single = selection.length !== 1
+                this.multiple = !selection.length
+            },
+            /** 新增按钮操作 */
+            handleAdd() {
+                this.reset();
+                this.open = true;
+                this.title = "添加企业人员";
+            },
+            /** 修改按钮操作 */
+            handleUpdate(row) {
+                this.reset();
+                const id = row.id || this.ids
+                getBusinessMemberDto(id).then(response => {
+                    this.form = response.data;
+                    if (this.form.user.roles[0]) {
+                        this.form.user.roleIds = [];
+                        this.form.user.roleIds.push(this.form.user.roles[0].roleId.toString());
+                    }
+                    this.open = true;
+                    this.title = "修改企业人员";
+                });
+            },
+            /** 提交按钮 */
+            submitForm() {
+                this.$refs["form"].validate(valid => {
+                    if (valid) {
+                        if (this.form.id != null) {
+                            updateBusinessMemberDto(this.form).then(response => {
+                                this.$modal.msgSuccess("修改成功");
+                                this.open = false;
+                                this.getList();
+                            });
+                        } else {
+                            addBusinessMemberDto(this.form).then(response => {
+                                this.$modal.msgSuccess("新增成功");
+                                this.open = false;
+                                this.getList();
+                            });
+                        }
+                    }
+                });
+            },
+            /** 删除按钮操作 */
+            handleDelete(row) {
+                const ids = row.id || this.ids;
+                this.$modal.confirm('是否确认删除企业人员编号为"' + ids + '"的数据项？').then(function () {
+                    return delBusinessMemberDto(ids);
+                }).then(() => {
+                    this.getList();
+                    this.$modal.msgSuccess("删除成功");
+                }).catch(() => {
+                });
+            },
+            /** 导出按钮操作 */
+            handleExport() {
+                const queryParams = this.queryParams;
+                this.$modal.confirm('是否确认导出所有企业人员数据项？').then(() => {
+                    this.exportLoading = true;
+                    return exportBusinessMember(queryParams);
+                }).then(response => {
+                    this.$download.name(response.msg);
+                    this.exportLoading = false;
+                }).catch(() => {
+                });
+            },
+            /** 重置密码按钮操作 */
+            handleResetPwd(row) {
+                this.$prompt('请输入"' + row.user.userName + '"的新密码', "提示", {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    closeOnClickModal: false,
+                    inputPattern: /^.{5,20}$/,
+                    inputErrorMessage: "用户密码长度必须介于 5 和 20 之间",
+                }).then(({value}) => {
+                    resetUserPwd(row.user.userId, value).then(response => {
+                        this.$modal.msgSuccess("修改成功，新密码是：" + value);
+                    });
+                }).catch(() => {
+                });
+            },
+        }
     };
-  },
-  mounted() {
-    this.init();
-  },
-  methods: {
-    init() {
-      this.loadPage();
-    },
-    loadPage() {
-      if (this.pageLoading) {
-        return;
-      }
-      this.pageLoading = true;
-      findBusinessMemberList(this.condition).then((response) => {
-        var data = response.data;
-        this.tableData = data.content;
-        this.condition.page.total = data.totalElements;
-        this.pageLoading = false;
-      });
-    },
-    conditionQuery() {
-      this.loadPage();
-    },
-    sortChange(val) {
-      var orderBy = val.prop;
-      var sort = val.order;
-      if (sort === "ascending") {
-        this.condition.page.sort = "ASC";
-      } else {
-        this.condition.page.sort = "DESC";
-      }
-      this.condition.page.orderBy = orderBy;
-      this.loadPage();
-    },
-    resetTemp() {
-      this.dataForm = {
-        user: {},
-      };
-
-      // 清空上传图片列表
-      if (this.$refs.upload) {
-        this.$refs.upload.clearFiles();
-        this.uploadFileList = [];
-      }
-    },
-    handleSizeChange(val) {
-      this.condition.page.pageSize = val;
-      this.loadPage();
-    },
-    handleCurrentChange(val) {
-      this.condition.page.currentPage = val;
-      this.loadPage();
-    },
-    handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
-      this.dialogFormVisible = true;
-    },
-    handleDetail() {},
-    handleUpdate(index, item) {
-      this.resetTemp();
-      this.dialogStatus = "edit";
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
-
-      this.currentItem = item;
-      this.dataForm = JSON.parse(JSON.stringify(item));
-      this.dialogFormVisible = true;
-    },
-    handleDelete(index, item) {
-      this.$confirm("此操作将永久删除数据, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          businessMemberDel({ id: item.id }).then((response) => {
-            if (0 == response.code) {
-              this.$message({
-                type: "success",
-                message: `删除成功`,
-              });
-              this.loadPage();
-            } else {
-              this.$message.error("系统错误");
-            }
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
-    },
-    createData() {
-      this.$refs["dataForm"].validate((valid) => {
-        if (valid) {
-          this.dataForm.user.password = md5(
-            this.dataForm.user.password + "clco"
-          );
-          businessMemberSave(this.dataForm).then((response) => {
-            if (0 == response.code) {
-              this.$message({
-                type: "success",
-                message: `创建成功！`,
-              });
-              this.dialogFormVisible = false;
-              this.loadPage();
-            } else {
-              this.$message.error("系统错误");
-            }
-          });
-        } else {
-          return false;
-        }
-      });
-    },
-    updateData() {
-      this.$refs["dataForm"].validate((valid) => {
-        if (valid) {
-          this.dataForm.user.password = this.currentItem.user.password
-            ? this.dataForm.password
-            : md5(this.dataForm.password + "clco");
-
-          businessMemberSave(this.dataForm).then((response) => {
-            if (0 == response.code) {
-              this.$message({
-                type: "success",
-                message: `修改成功！`,
-              });
-              this.dialogFormVisible = false;
-              this.loadPage();
-            } else {
-              this.$message.error("系统错误");
-            }
-          });
-        } else {
-          return false;
-        }
-      });
-    },
-    handleAvatarSuccess(res, file) {
-      this.dataForm.fileId = res.data.id;
-    },
-    handleUploadRemove(file) {
-      // return isJPG && isLt2M;
-    },
-    formatterIsRelease(row, column) {
-      switch (row.isRelease) {
-        case 0:
-          return "否";
-        case 1:
-          return "是";
-      }
-    },
-    isOwn(roles) {
-      if (null != roles && 0 < roles.length) {
-        for (var i = 0; i < roles.length; i++) {
-          var item = roles[i];
-          if ("enterprise_own" == item.name) {
-            return false;
-          }
-        }
-        return true;
-      } else {
-        return true;
-      }
-    },
-  },
-};
 </script>
-
-<style lang="scss" scoped>
-// page start
-.el-pagination {
-  text-align: center;
-  margin-top: 10px;
-}
-.top-form-inline {
-  padding-top: 22px;
-  padding-left: 22px;
-  background: #eee;
-  align-items: center;
-}
-// page end
-</style>

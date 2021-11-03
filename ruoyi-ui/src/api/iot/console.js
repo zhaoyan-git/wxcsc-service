@@ -1,0 +1,81 @@
+import request from '@/utils/request'
+
+export function projectStructureTypeList(query) {
+  return request({
+    url: '/iot/console/projectStructureTypeList',
+    method: 'get',
+    params: query
+  })
+}
+
+export function projectListBusiness(query) {
+  return request({
+    url: '/iot/console/projectListBusiness',
+    method: 'get',
+    params: query
+  })
+}
+
+export function projectListByUserRole(query) {
+  return request({
+    url: '/iot/console/projectListByUserRole',
+    method: 'get',
+    params: query
+  })
+}
+
+export function projectStructureListByProjectId(query) {
+  return request({
+    url: '/iot/console/projectStructureListByProjectId',
+    method: 'get',
+    params: query
+  })
+}
+
+export function getBusiness(query) {
+  return request({
+    url: '/iot/console/business/get',
+    method: 'get',
+    params: query
+  })
+}
+
+export function updateBusiness(data) {
+  return request({
+    url: '/iot/console/business/update',
+    method: 'post',
+    data: data
+  })
+}
+
+export function consoleListBusinessMemberDto(data) {
+  return request({
+    url: '/iot/console/businessMemeber/listDto',
+    method: 'post',
+    data: data
+  })
+}
+
+export function deviceGatewayList(data) {
+  return request({
+    url: '/iot/console/deviceGatewayList',
+    method: 'get',
+    params: data
+  })
+}
+
+export function projectPointGroup(query) {
+  return request({
+    url: '/iot/console/projectPointGroup',
+    method: 'get',
+    params: query
+  })
+}
+
+export function projectDeviceList(query) {
+  return request({
+    url: '/iot/console/projectDeviceList',
+    method: 'get',
+    params: query
+  })
+}

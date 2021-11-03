@@ -28,7 +28,7 @@ public class WxcxcProjectStructure extends BaseEntity
 
     /** 图片 */
     @Excel(name = "图片")
-    private Long photoFile;
+    private String photoFile;
 
     /** 所属项目 */
     @Excel(name = "所属项目")
@@ -68,12 +68,12 @@ public class WxcxcProjectStructure extends BaseEntity
     {
         return typeId;
     }
-    public void setPhotoFile(Long photoFile) 
+    public void setPhotoFile(String photoFile)
     {
         this.photoFile = photoFile;
     }
 
-    public Long getPhotoFile() 
+    public String getPhotoFile()
     {
         return photoFile;
     }

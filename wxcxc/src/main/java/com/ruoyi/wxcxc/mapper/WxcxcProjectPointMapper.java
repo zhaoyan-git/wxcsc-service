@@ -7,7 +7,7 @@ import com.ruoyi.wxcxc.domain.WxcxcProjectPoint;
  * 项目测点Mapper接口
  * 
  * @author l62202
- * @date 2021-10-17
+ * @date 2021-11-01
  */
 public interface WxcxcProjectPointMapper 
 {
@@ -58,4 +58,7 @@ public interface WxcxcProjectPointMapper
      * @return 结果
      */
     public int deleteWxcxcProjectPointByIds(Long[] ids);
+
+    // 获取未分组的测点
+    public List<WxcxcProjectPoint> selectWxcxcProjectPointByPointGroupIdIsNull(Long projectStructureId);
 }

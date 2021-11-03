@@ -11,7 +11,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * @author l62202
  * @date 2021-10-17
  */
-public class WxcxProjectPointGroup extends BaseEntity
+public class WxcxcProjectPointGroup extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 

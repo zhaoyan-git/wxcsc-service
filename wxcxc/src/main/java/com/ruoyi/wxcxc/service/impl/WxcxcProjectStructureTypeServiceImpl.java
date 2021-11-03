@@ -27,9 +27,9 @@ public class WxcxcProjectStructureTypeServiceImpl implements IWxcxcProjectStruct
      * @return 结构物选项
      */
     @Override
-    public WxcxcProjectStructureType selectWxcxProjectStructureTypeById(Long id)
+    public WxcxcProjectStructureType selectWxcxcProjectStructureTypeById(Long id)
     {
-        return wxcxcProjectStructureTypeMapper.selectWxcxProjectStructureTypeById(id);
+        return wxcxcProjectStructureTypeMapper.selectWxcxcProjectStructureTypeById(id);
     }
 
     /**
@@ -39,9 +39,9 @@ public class WxcxcProjectStructureTypeServiceImpl implements IWxcxcProjectStruct
      * @return 结构物选项
      */
     @Override
-    public List<WxcxcProjectStructureType> selectWxcxProjectStructureTypeList(WxcxcProjectStructureType wxcxcProjectStructureType)
+    public List<WxcxcProjectStructureType> selectWxcxcProjectStructureTypeList(WxcxcProjectStructureType wxcxcProjectStructureType)
     {
-        return wxcxcProjectStructureTypeMapper.selectWxcxProjectStructureTypeList(wxcxcProjectStructureType);
+        return wxcxcProjectStructureTypeMapper.selectWxcxcProjectStructureTypeList(wxcxcProjectStructureType);
     }
 
     /**
@@ -51,10 +51,10 @@ public class WxcxcProjectStructureTypeServiceImpl implements IWxcxcProjectStruct
      * @return 结果
      */
     @Override
-    public int insertWxcxProjectStructureType(WxcxcProjectStructureType wxcxcProjectStructureType)
+    public int insertWxcxcProjectStructureType(WxcxcProjectStructureType wxcxcProjectStructureType)
     {
         wxcxcProjectStructureType.setCreateTime(DateUtils.getNowDate());
-        return wxcxcProjectStructureTypeMapper.insertWxcxProjectStructureType(wxcxcProjectStructureType);
+        return wxcxcProjectStructureTypeMapper.insertWxcxcProjectStructureType(wxcxcProjectStructureType);
     }
 
     /**
@@ -64,10 +64,10 @@ public class WxcxcProjectStructureTypeServiceImpl implements IWxcxcProjectStruct
      * @return 结果
      */
     @Override
-    public int updateWxcxProjectStructureType(WxcxcProjectStructureType wxcxcProjectStructureType)
+    public int updateWxcxcProjectStructureType(WxcxcProjectStructureType wxcxcProjectStructureType)
     {
         wxcxcProjectStructureType.setUpdateTime(DateUtils.getNowDate());
-        return wxcxcProjectStructureTypeMapper.updateWxcxProjectStructureType(wxcxcProjectStructureType);
+        return wxcxcProjectStructureTypeMapper.updateWxcxcProjectStructureType(wxcxcProjectStructureType);
     }
 
     /**
@@ -77,9 +77,9 @@ public class WxcxcProjectStructureTypeServiceImpl implements IWxcxcProjectStruct
      * @return 结果
      */
     @Override
-    public int deleteWxcxProjectStructureTypeByIds(Long[] ids)
+    public int deleteWxcxcProjectStructureTypeByIds(Long[] ids)
     {
-        return wxcxcProjectStructureTypeMapper.deleteWxcxProjectStructureTypeByIds(ids);
+        return wxcxcProjectStructureTypeMapper.deleteWxcxcProjectStructureTypeByIds(ids);
     }
 
     /**
@@ -89,8 +89,8 @@ public class WxcxcProjectStructureTypeServiceImpl implements IWxcxcProjectStruct
      * @return 结果
      */
     @Override
-    public int deleteWxcxProjectStructureTypeById(Long id)
+    public int deleteWxcxcProjectStructureTypeById(Long id)
     {
-        return wxcxcProjectStructureTypeMapper.deleteWxcxProjectStructureTypeById(id);
+        return wxcxcProjectStructureTypeMapper.deleteWxcxcProjectStructureTypeById(id);
     }
 }

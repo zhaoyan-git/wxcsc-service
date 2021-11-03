@@ -92,11 +92,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteWxcxcBusinessById" parameterType="Long">
-        delete from wxcxc_business where id = #{id}
+        update wxcxc_business set del_flag = '2' where id = #{id}
     </delete>
 
     <delete id="deleteWxcxcBusinessByIds" parameterType="String">
-        delete from wxcxc_business where id in 
+        update wxcxc_business set del_flag = '2' where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

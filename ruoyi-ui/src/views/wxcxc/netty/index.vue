@@ -1,6 +1,15 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="id" prop="id">
+        <el-input
+          v-model="queryParams.id"
+          placeholder="请输入id"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -15,7 +24,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['iot:projectPointGroup:add']"
+          v-hasPermi="['wxcxc:netty:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -26,7 +35,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['iot:projectPointGroup:edit']"
+          v-hasPermi="['wxcxc:netty:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -37,7 +46,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['iot:projectPointGroup:remove']"
+          v-hasPermi="['wxcxc:netty:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -48,17 +57,17 @@
           size="mini"
           :loading="exportLoading"
           @click="handleExport"
-          v-hasPermi="['iot:projectPointGroup:export']"
+          v-hasPermi="['wxcxc:netty:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="projectPointGroupList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="nettyList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="分组名称" align="center" prop="id" />
-      <el-table-column label="分组名称" align="center" prop="name" />
-      <el-table-column label="所属结构物" align="center" prop="structureId" />
+      <el-table-column label="id" align="center" prop="id" />
+      <el-table-column label="ip" align="center" prop="ip" />
+      <el-table-column label="msg" align="center" prop="msg" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -66,14 +75,14 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['iot:projectPointGroup:edit']"
+            v-hasPermi="['wxcxc:netty:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['iot:projectPointGroup:remove']"
+            v-hasPermi="['wxcxc:netty:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -87,14 +96,14 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改测点分组对话框 -->
+    <!-- 添加或修改netty对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="分组名称" prop="name">
-          <el-input v-model="form.name" type="textarea" placeholder="请输入内容" />
+        <el-form-item label="ip" prop="ip">
+          <el-input v-model="form.ip" type="textarea" placeholder="请输入内容" />
         </el-form-item>
-        <el-form-item label="所属结构物" prop="structureId">
-          <el-input v-model="form.structureId" placeholder="请输入所属结构物" />
+        <el-form-item label="msg" prop="msg">
+          <el-input v-model="form.msg" type="textarea" placeholder="请输入内容" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -106,10 +115,10 @@
 </template>
 
 <script>
-import { listProjectPointGroup, getProjectPointGroup, delProjectPointGroup, addProjectPointGroup, updateProjectPointGroup, exportProjectPointGroup } from "@/api/iot/projectPointGroup";
+import { listNetty, getNetty, delNetty, addNetty, updateNetty, exportNetty } from "@/api/wxcxc/netty";
 
 export default {
-  name: "ProjectPointGroup",
+  name: "Netty",
   data() {
     return {
       // 遮罩层
@@ -126,8 +135,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 测点分组表格数据
-      projectPointGroupList: [],
+      // netty表格数据
+      nettyList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -136,15 +145,14 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        name: null,
+        id: null,
+        ip: null,
+        msg: null,
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
-        name: [
-          { required: true, message: "分组名称不能为空", trigger: "blur" }
-        ],
       }
     };
   },
@@ -152,11 +160,11 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询测点分组列表 */
+    /** 查询netty列表 */
     getList() {
       this.loading = true;
-      listProjectPointGroup(this.queryParams).then(response => {
-        this.projectPointGroupList = response.rows;
+      listNetty(this.queryParams).then(response => {
+        this.nettyList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -170,8 +178,12 @@ export default {
     reset() {
       this.form = {
         id: null,
-        name: null,
-        structureId: null
+        ip: null,
+        msg: null,
+        createBy: null,
+        createTime: null,
+        updateBy: null,
+        updateTime: null
       };
       this.resetForm("form");
     },
@@ -195,16 +207,16 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加测点分组";
+      this.title = "添加netty";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
-      getProjectPointGroup(id).then(response => {
+      getNetty(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改测点分组";
+        this.title = "修改netty";
       });
     },
     /** 提交按钮 */
@@ -212,13 +224,13 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
-            updateProjectPointGroup(this.form).then(response => {
+            updateNetty(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addProjectPointGroup(this.form).then(response => {
+            addNetty(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -230,8 +242,8 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除测点分组编号为"' + ids + '"的数据项？').then(function() {
-        return delProjectPointGroup(ids);
+      this.$modal.confirm('是否确认删除netty编号为"' + ids + '"的数据项？').then(function() {
+        return delNetty(ids);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
@@ -240,9 +252,9 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$modal.confirm('是否确认导出所有测点分组数据项？').then(() => {
+      this.$modal.confirm('是否确认导出所有netty数据项？').then(() => {
         this.exportLoading = true;
-        return exportProjectPointGroup(queryParams);
+        return exportNetty(queryParams);
       }).then(response => {
         this.$download.name(response.msg);
         this.exportLoading = false;

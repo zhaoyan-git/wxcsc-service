@@ -1,6 +1,11 @@
 package com.ruoyi.wxcxc.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.ruoyi.wxcxc.domain.WxcxcProjectPointGroup;
+import com.ruoyi.wxcxc.dto.ProjectPointGroupDto;
+import com.ruoyi.wxcxc.service.IWxcxcProjectPointGroupService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,37 +27,70 @@ import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 项目测点Controller
- * 
+ *
  * @author l62202
- * @date 2021-10-17
+ * @date 2021-11-01
  */
 @RestController
 @RequestMapping("/iot/projectPoint")
-public class WxcxcProjectPointController extends BaseController
-{
+public class WxcxcProjectPointController extends BaseController {
     @Autowired
     private IWxcxcProjectPointService wxcxcProjectPointService;
+    @Autowired
+    private IWxcxcProjectPointGroupService wxcxcProjectPointGroupService;
 
     /**
      * 查询项目测点列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectPoint:list')")
+    @PreAuthorize("@ss.hasPermi('iot:projectPoint')")
     @GetMapping("/list")
-    public TableDataInfo list(WxcxcProjectPoint wxcxcProjectPoint)
-    {
-        startPage();
-        List<WxcxcProjectPoint> list = wxcxcProjectPointService.selectWxcxcProjectPointList(wxcxcProjectPoint);
-        return getDataTable(list);
+    public TableDataInfo list(WxcxcProjectPoint wxcxcProjectPoint) {
+        if (null == wxcxcProjectPoint.getProjectStructureId()) return getDataTable(new ArrayList<>());
+
+        List<ProjectPointGroupDto> returnList = new ArrayList<>();
+
+        // 获取未分组的测点
+        List<WxcxcProjectPoint> groupisNullList = wxcxcProjectPointService.selectWxcxcProjectPointByPointGroupIdIsNull(wxcxcProjectPoint.getProjectStructureId());
+        if (null != groupisNullList && 0 < groupisNullList.size()) {
+            ProjectPointGroupDto projectPointGroupDto = new ProjectPointGroupDto();
+            projectPointGroupDto.setId(-1l);
+            projectPointGroupDto.setName("未分组");
+            projectPointGroupDto.setStructureId(wxcxcProjectPoint.getProjectStructureId());
+
+            projectPointGroupDto.setChildren(groupisNullList);
+            returnList.add(projectPointGroupDto);
+        }
+
+        // 获取测点分组
+        WxcxcProjectPointGroup wxcxcProjectPointGroup = new WxcxcProjectPointGroup();
+        wxcxcProjectPointGroup.setStructureId(wxcxcProjectPoint.getProjectStructureId());
+        List<WxcxcProjectPointGroup> wxcxcProjectPointGroupList = wxcxcProjectPointGroupService.selectWxcxcProjectPointGroupList(wxcxcProjectPointGroup);
+        if (null != wxcxcProjectPointGroupList && 0 < wxcxcProjectPointGroupList.size()) {
+            for (WxcxcProjectPointGroup item : wxcxcProjectPointGroupList) {
+                ProjectPointGroupDto projectPointGroupDto = new ProjectPointGroupDto();
+                projectPointGroupDto.setId(item.getId());
+                projectPointGroupDto.setName(item.getName());
+                projectPointGroupDto.setStructureId(item.getStructureId());
+
+                // 获取该分组下测点
+                WxcxcProjectPoint wxcxcProjectPointCondition = new WxcxcProjectPoint();
+                wxcxcProjectPointCondition.setProjectStructureId(wxcxcProjectPoint.getProjectStructureId());
+                wxcxcProjectPointCondition.setPointGroupId(item.getId());
+                projectPointGroupDto.setChildren(wxcxcProjectPointService.selectWxcxcProjectPointList(wxcxcProjectPointCondition));
+                returnList.add(projectPointGroupDto);
+            }
+        }
+
+        return getDataTable(returnList);
     }
 
     /**
      * 导出项目测点列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectPoint:export')")
+    @PreAuthorize("@ss.hasPermi('iot:projectPoint')")
     @Log(title = "项目测点", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult export(WxcxcProjectPoint wxcxcProjectPoint)
-    {
+    public AjaxResult export(WxcxcProjectPoint wxcxcProjectPoint) {
         List<WxcxcProjectPoint> list = wxcxcProjectPointService.selectWxcxcProjectPointList(wxcxcProjectPoint);
         ExcelUtil<WxcxcProjectPoint> util = new ExcelUtil<WxcxcProjectPoint>(WxcxcProjectPoint.class);
         return util.exportExcel(list, "项目测点数据");
@@ -61,43 +99,39 @@ public class WxcxcProjectPointController extends BaseController
     /**
      * 获取项目测点详细信息
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectPoint:query')")
+    @PreAuthorize("@ss.hasPermi('iot:projectPoint')")
     @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
-    {
+    public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(wxcxcProjectPointService.selectWxcxcProjectPointById(id));
     }
 
     /**
      * 新增项目测点
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectPoint:add')")
+    @PreAuthorize("@ss.hasPermi('iot:projectPoint')")
     @Log(title = "项目测点", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody WxcxcProjectPoint wxcxcProjectPoint)
-    {
+    public AjaxResult add(@RequestBody WxcxcProjectPoint wxcxcProjectPoint) {
         return toAjax(wxcxcProjectPointService.insertWxcxcProjectPoint(wxcxcProjectPoint));
     }
 
     /**
      * 修改项目测点
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectPoint:edit')")
+    @PreAuthorize("@ss.hasPermi('iot:projectPoint')")
     @Log(title = "项目测点", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody WxcxcProjectPoint wxcxcProjectPoint)
-    {
+    public AjaxResult edit(@RequestBody WxcxcProjectPoint wxcxcProjectPoint) {
         return toAjax(wxcxcProjectPointService.updateWxcxcProjectPoint(wxcxcProjectPoint));
     }
 
     /**
      * 删除项目测点
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectPoint:remove')")
+    @PreAuthorize("@ss.hasPermi('iot:projectPoint')")
     @Log(title = "项目测点", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
-    {
+    @DeleteMapping("/{ids}")
+    public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(wxcxcProjectPointService.deleteWxcxcProjectPointByIds(ids));
     }
 }

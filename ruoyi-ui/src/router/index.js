@@ -164,6 +164,19 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path: '/console/projectPointGrouMng',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: ':projectId/:structureId',
+        component: (resolve) => require(['@/views/iot/console/projectPointGroup'], resolve),
+        name: 'BusinessMemberMng',
+        meta: { title: '管理测点分组'}
+      }
+    ]
+  },
 ]
 
 export default new Router({

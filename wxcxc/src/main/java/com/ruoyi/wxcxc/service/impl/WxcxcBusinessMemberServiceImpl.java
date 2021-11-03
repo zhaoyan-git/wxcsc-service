@@ -76,6 +76,11 @@ public class WxcxcBusinessMemberServiceImpl implements IWxcxcBusinessMemberServi
      */
     @Override
     public int deleteWxcxcBusinessMemberByIds(Long[] ids) {
+        // 禁用账户
+        for (Long id : ids) {
+            WxcxcBusinessMember wxcxcBusinessMember = selectWxcxcBusinessMemberById(id);
+            userService.deleteUserById(wxcxcBusinessMember.getSysUserId());
+        }
         return wxcxcBusinessMemberMapper.deleteWxcxcBusinessMemberByIds(ids);
     }
 
@@ -99,6 +104,12 @@ public class WxcxcBusinessMemberServiceImpl implements IWxcxcBusinessMemberServi
         wxcxcBusinessMember.setBusinessId(businessMemberDto.getBusinessId());
         wxcxcBusinessMember.setSysUserId(user.getUserId());
         return wxcxcBusinessMemberMapper.insertWxcxcBusinessMember(wxcxcBusinessMember);
+    }
+
+    @Override
+    public int updateWxcxcBusinessMember(BusinessMemberDto businessMemberDto) {
+        SysUser user = businessMemberDto.getUser();
+        return userService.updateUser(user);
     }
 
 }

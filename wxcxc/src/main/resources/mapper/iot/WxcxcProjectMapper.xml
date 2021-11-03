@@ -27,7 +27,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectWxcxcProjectList" parameterType="WxcxcProject" resultMap="WxcxcProjectResult">
         <include refid="selectWxcxcProjectVo"/>
-        <where>  
+        <where>
+            and del_flag = '0'
+            <if test="id != null  and id != ''"> and id like concat('%', #{id}, '%')</if>
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
             <if test="businessId != null "> and business_id = #{businessId}</if>
             <if test="alarmFlag != null  and alarmFlag != ''"> and alarm_flag = #{alarmFlag}</if>
@@ -37,6 +39,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectWxcxcProjectById" parameterType="Long" resultMap="WxcxcProjectResult">
         <include refid="selectWxcxcProjectVo"/>
         where id = #{id}
+        and del_flag = '0'
     </select>
         
     <insert id="insertWxcxcProject" parameterType="WxcxcProject" useGeneratedKeys="true" keyProperty="id">
@@ -94,11 +97,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteWxcxcProjectById" parameterType="Long">
-        delete from wxcxc_project where id = #{id}
+        update wxcxc_project set del_flag = '2' where id = #{id}
     </delete>
 
     <delete id="deleteWxcxcProjectByIds" parameterType="String">
-        delete from wxcxc_project where id in 
+        update wxcxc_project set del_flag = '2' where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

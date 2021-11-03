@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcNettyMapper">
+    
+    <resultMap type="WxcxcNetty" id="WxcxcNettyResult">
+        <result property="id"    column="id"    />
+        <result property="ip"    column="ip"    />
+        <result property="msg"    column="msg"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectWxcxcNettyVo">
+        select id, ip, msg, create_by, create_time, update_by, update_time from wxcxc_netty
+    </sql>
+
+    <select id="selectWxcxcNettyList" parameterType="WxcxcNetty" resultMap="WxcxcNettyResult">
+        <include refid="selectWxcxcNettyVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="ip != null  and ip != ''"> and ip = #{ip}</if>
+            <if test="msg != null  and msg != ''"> and msg = #{msg}</if>
+        </where>
+    </select>
+    
+    <select id="selectWxcxcNettyById" parameterType="Integer" resultMap="WxcxcNettyResult">
+        <include refid="selectWxcxcNettyVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWxcxcNetty" parameterType="WxcxcNetty" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_netty
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ip != null">ip,</if>
+            <if test="msg != null">msg,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="ip != null">#{ip},</if>
+            <if test="msg != null">#{msg},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcNetty" parameterType="WxcxcNetty">
+        update wxcxc_netty
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ip != null">ip = #{ip},</if>
+            <if test="msg != null">msg = #{msg},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcNettyById" parameterType="Integer">
+        delete from wxcxc_netty where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcNettyByIds" parameterType="String">
+        delete from wxcxc_netty where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

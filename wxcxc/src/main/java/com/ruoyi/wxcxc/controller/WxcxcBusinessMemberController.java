@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.wxcxc.dto.BusinessMemberDto;
@@ -47,7 +48,7 @@ public class WxcxcBusinessMemberController extends BaseController {
     /**
      * 查询企业人员列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMember:list')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMember')")
     @GetMapping("/list")
     public TableDataInfo list(WxcxcBusinessMember wxcxcBusinessMember) {
         startPage();
@@ -58,7 +59,7 @@ public class WxcxcBusinessMemberController extends BaseController {
     /**
      * 导出企业人员列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMember:export')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMember')")
     @Log(title = "企业人员", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WxcxcBusinessMember wxcxcBusinessMember) {
@@ -70,7 +71,7 @@ public class WxcxcBusinessMemberController extends BaseController {
     /**
      * 获取企业人员详细信息
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMember:query')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMember')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(wxcxcBusinessMemberService.selectWxcxcBusinessMemberById(id));
@@ -79,7 +80,7 @@ public class WxcxcBusinessMemberController extends BaseController {
     /**
      * 新增企业人员
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMember:add')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMember')")
     @Log(title = "企业人员", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WxcxcBusinessMember wxcxcBusinessMember) {
@@ -89,7 +90,7 @@ public class WxcxcBusinessMemberController extends BaseController {
     /**
      * 修改企业人员
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMember:edit')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMember')")
     @Log(title = "企业人员", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WxcxcBusinessMember wxcxcBusinessMember) {
@@ -99,7 +100,7 @@ public class WxcxcBusinessMemberController extends BaseController {
     /**
      * 删除企业人员
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMember:remove')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMember')")
     @Log(title = "企业人员", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
@@ -108,12 +109,14 @@ public class WxcxcBusinessMemberController extends BaseController {
 
 
     // 获取用户列表（分页）
-    @PreAuthorize("@ss.hasPermi('iot:businessMember:list')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMember')")
     @GetMapping("/businessMemberDto/list")
     public TableDataInfo list(BusinessMemberDto businessMemberDto) {
         startPage();
 
         if (null == businessMemberDto || null == businessMemberDto.getBusinessId()) {
+            return getDataTable(new ArrayList<>());
+        } else {
             WxcxcBusinessMember wxcxcBusinessMember = new WxcxcBusinessMember();
             wxcxcBusinessMember.setBusinessId(businessMemberDto.getBusinessId());
             List<WxcxcBusinessMember> list = wxcxcBusinessMemberService.selectWxcxcBusinessMemberList(wxcxcBusinessMember);
@@ -123,19 +126,54 @@ public class WxcxcBusinessMemberController extends BaseController {
             for (WxcxcBusinessMember item : list) {
                 returnList.add(packDto.generateBusinessMemberDtoById(item.getId()));
             }
-            return getDataTable(list);
-        } else {
-            return getDataTable(new ArrayList<>());
+            return getDataTable(returnList);
         }
+    }
+
+    /**
+     * 获取企业人员详细信息
+     */
+    @PreAuthorize("@ss.hasPermi('iot:businessMember') || @ss.hasPermi('iot:console')")
+    @GetMapping(value = "/businessMemberDto/{id}")
+    public AjaxResult getInfoDto(@PathVariable("id") Long id) {
+        return AjaxResult.success(packDto.generateBusinessMemberDtoById(id));
     }
 
     /**
      * 新增企业人员
      */
-    @PreAuthorize("@ss.hasPermi('iot:businessMember:add')")
+    @PreAuthorize("@ss.hasPermi('iot:businessMember') || @ss.hasPermi('iot:console')")
     @Log(title = "企业人员", businessType = BusinessType.INSERT)
     @PostMapping("/businessMemberDto")
     public AjaxResult add(@RequestBody BusinessMemberDto businessMemberDto) {
+        SysUser user = businessMemberDto.getUser();
+        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName())))
+        {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
+        }
+        else if (StringUtils.isNotEmpty(user.getPhonenumber())
+                && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
+        {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+        }
+        else if (StringUtils.isNotEmpty(user.getEmail())
+                && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
+        {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+        }
+        user.setCreateBy(getUsername());
+        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+
+        return toAjax(wxcxcBusinessMemberService.insertWxcxcBusinessMember(businessMemberDto));
+    }
+
+    /**
+     * 修改企业人员
+     */
+    @PreAuthorize("@ss.hasPermi('iot:businessMember') || @ss.hasPermi('iot:console')")
+    @Log(title = "企业人员", businessType = BusinessType.UPDATE)
+    @PutMapping("/businessMemberDto")
+    public AjaxResult edit(@RequestBody BusinessMemberDto businessMemberDto) {
         SysUser user = businessMemberDto.getUser();
         userService.checkUserAllowed(user);
         if (StringUtils.isNotEmpty(user.getPhonenumber())
@@ -150,7 +188,30 @@ public class WxcxcBusinessMemberController extends BaseController {
         }
         user.setUpdateBy(getUsername());
 
-        return toAjax(wxcxcBusinessMemberService.insertWxcxcBusinessMember(businessMemberDto));
+        return toAjax(wxcxcBusinessMemberService.updateWxcxcBusinessMember(businessMemberDto));
     }
 
+    /**
+     * 删除企业人员
+     */
+    @PreAuthorize("@ss.hasPermi('iot:businessMember') || @ss.hasPermi('iot:console')")
+    @Log(title = "企业人员", businessType = BusinessType.DELETE)
+    @DeleteMapping("/businessMemberDto/{ids}")
+    public AjaxResult removeByDto(@PathVariable Long[] ids) {
+        return toAjax(wxcxcBusinessMemberService.deleteWxcxcBusinessMemberByIds(ids));
+    }
+
+    /**
+     * 重置密码
+     */
+    @PreAuthorize("@ss.hasPermi('iot:businessMember') || @ss.hasPermi('iot:console')")
+    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/resetPwd")
+    public AjaxResult resetPwd(@RequestBody SysUser user)
+    {
+        userService.checkUserAllowed(user);
+        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        user.setUpdateBy(getUsername());
+        return toAjax(userService.resetPwd(user));
+    }
 }

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcProjectDeviceSensorDataMapper">
+
+    <resultMap type="WxcxcProjectDeviceSensorData" id="WxcxcProjectDeviceSensorDataResult">
+        <result property="id" column="id"/>
+        <result property="sensorId" column="sensor_id"/>
+        <result property="originalData" column="original_data"/>
+        <result property="data" column="data"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="selectWxcxcProjectDeviceSensorDataList" parameterType="WxcxcProjectDeviceSensorData"
+            resultMap="WxcxcProjectDeviceSensorDataResult">
+        select id, sensor_id, original_data, data, create_time from wxcxc_project_device_sensor_data_${deviceId}
+        <where>
+            <if test="id != null ">and id = #{id}</if>
+            <if test="sensorId != null ">and sensor_id = #{sensorId}</if>
+            <if test="originalData != null  and originalData != ''">and original_data = #{originalData}</if>
+            <if test="data != null  and data != ''">and data = #{data}</if>
+            <if test="createTime != null ">and create_time = #{createTime}</if>
+        </where>
+    </select>
+
+<!--    <select id="selectWxcxcProjectDeviceSensorDataById" parameterType="Long"-->
+<!--            resultMap="WxcxcProjectDeviceSensorDataResult">-->
+<!--        select id, sensor_id, original_data, data, create_time from wxcxc_project_device_sensor_data_${deviceId}-->
+<!--        where id = #{id}-->
+<!--    </select>-->
+
+
+    <insert id="insertWxcxcProjectDeviceSensorData" parameterType="WxcxcProjectDeviceSensorData" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into wxcxc_project_device_sensor_data_${deviceId}
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sensorId != null">sensor_id,</if>
+            <if test="originalData != null">original_data,</if>
+            <if test="data != null">data,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sensorId != null">#{sensorId},</if>
+            <if test="originalData != null">#{originalData},</if>
+            <if test="data != null">#{data},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+<!--    <update id="updateWxcxcProjectDeviceSensorData" parameterType="WxcxcProjectDeviceSensorData">-->
+<!--        update wxcxc_project_device_sensor_data-->
+<!--        <trim prefix="SET" suffixOverrides=",">-->
+<!--            <if test="sensorId != null">sensor_id = #{sensorId},</if>-->
+<!--            <if test="originalData != null">original_data = #{originalData},</if>-->
+<!--            <if test="data != null">data = #{data},</if>-->
+<!--            <if test="createTime != null">create_time = #{createTime},</if>-->
+<!--        </trim>-->
+<!--        where id = #{id}-->
+<!--    </update>-->
+
+<!--    <delete id="deleteWxcxcProjectDeviceSensorDataById" parameterType="Long">-->
+<!--        delete from wxcxc_project_device_sensor_data where id = #{id}-->
+<!--    </delete>-->
+
+<!--    <delete id="deleteWxcxcProjectDeviceSensorDataByIds" parameterType="String">-->
+<!--        delete from wxcxc_project_device_sensor_data where id in-->
+<!--        <foreach item="id" collection="array" open="(" separator="," close=")">-->
+<!--            #{id}-->
+<!--        </foreach>-->
+<!--    </delete>-->
+
+    <update id="dropTable">
+        DROP TABLE IF EXISTS wxcxc_project_device_sensor_data_${deviceId}
+    </update>
+
+    <update id="createTable" parameterType="String">
+        CREATE TABLE `wxcxc_project_device_sensor_data_${deviceId}`  (
+          `id` bigint(20) NOT NULL AUTO_INCREMENT,
+          `sensor_id` bigint(20) NULL DEFAULT NULL COMMENT '所属传感器',
+          `original_data` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '原始数据',
+          `data` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '转义后数据',
+          `create_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+          PRIMARY KEY (`id`) USING BTREE
+        ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+    </update>
+</mapper>
