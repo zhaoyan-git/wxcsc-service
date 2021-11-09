@@ -14,11 +14,14 @@ import com.ruoyi.wxcxc.domain.WxcxcDevice;
 import com.ruoyi.wxcxc.domain.WxcxcDeviceGateway;
 import com.ruoyi.wxcxc.domain.WxcxcDeviceSensor;
 import com.ruoyi.wxcxc.domain.WxcxcNetty;
+import com.ruoyi.wxcxc.dto.ModbusRtuOrderDto;
 import com.ruoyi.wxcxc.service.IWxcxcDeviceGatewayService;
 import com.ruoyi.wxcxc.service.IWxcxcDeviceSensorService;
 import com.ruoyi.wxcxc.service.IWxcxcDeviceService;
 import com.ruoyi.wxcxc.service.IWxcxcNettyService;
 import com.ruoyi.wxcxc.util.CRCUtils;
+import com.ruoyi.wxcxc.util.HexUtil;
+import com.ruoyi.wxcxc.util.ModbusRtuOrderList;
 import com.ruoyi.wxcxc.util.SpringContextUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,28 +32,6 @@ import org.springframework.stereotype.Component;
 
 public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandlerAdapter {
 
-    public static String byteToHex(byte[] bytes) {
-        String strHex = "";
-        StringBuilder sb = new StringBuilder("");
-        for (int n = 0; n < bytes.length; n++) {
-            strHex = Integer.toHexString(bytes[n] & 0xFF);
-            sb.append((strHex.length() == 1) ? "0" + strHex : strHex); // 每个字节由两个字符表示，位数不够，高位补0
-        }
-        return sb.toString().trim();
-    }
-
-    public static byte[] hexToByte(String hex) {
-        int m = 0, n = 0;
-        int byteLen = hex.length() / 2; // 每两个字符描述一个字节
-        byte[] ret = new byte[byteLen];
-        for (int i = 0; i < byteLen; i++) {
-            m = i * 2 + 1;
-            n = m + 1;
-            int intVal = Integer.decode("0x" + hex.substring(i * 2, m) + hex.substring(m, n));
-            ret[i] = Byte.valueOf((byte) intVal);
-        }
-        return ret;
-    }
 
     /**
      * 从客户端收到新的数据时，这个方法会在收到消息时被调用
@@ -75,24 +56,24 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
             // DTU ID
             String dtuId = "";
             // 反转得到正确DTU ID
-            dtuId += byteToHex(Arrays.copyOfRange(msgByte, 3, 4));
-            dtuId += byteToHex(Arrays.copyOfRange(msgByte, 2, 3));
-            dtuId += byteToHex(Arrays.copyOfRange(msgByte, 1, 2));
-            dtuId += byteToHex(Arrays.copyOfRange(msgByte, 0, 1));
+            dtuId += HexUtil.byteToHex(Arrays.copyOfRange(msgByte, 3, 4));
+            dtuId += HexUtil.byteToHex(Arrays.copyOfRange(msgByte, 2, 3));
+            dtuId += HexUtil.byteToHex(Arrays.copyOfRange(msgByte, 1, 2));
+            dtuId += HexUtil.byteToHex(Arrays.copyOfRange(msgByte, 0, 1));
             // PHONE_NUMBER
             String phoneNumber = new String(Arrays.copyOfRange(msgByte, 4, 15), "gb2312");
             // BLANK
-            String blank = byteToHex(Arrays.copyOfRange(msgByte, 15, 16));
+            String blank = HexUtil.byteToHex(Arrays.copyOfRange(msgByte, 15, 16));
             // IP_ADD
             String ipAdd = "";
-            ipAdd += Integer.parseInt(byteToHex(Arrays.copyOfRange(msgByte, 16, 17)), 16) + ".";
-            ipAdd += Integer.parseInt(byteToHex(Arrays.copyOfRange(msgByte, 17, 18)), 16) + ".";
-            ipAdd += Integer.parseInt(byteToHex(Arrays.copyOfRange(msgByte, 18, 19)), 16) + ".";
-            ipAdd += Integer.parseInt(byteToHex(Arrays.copyOfRange(msgByte, 19, 20)), 16);
+            ipAdd += Integer.parseInt(HexUtil.byteToHex(Arrays.copyOfRange(msgByte, 16, 17)), 16) + ".";
+            ipAdd += Integer.parseInt(HexUtil.byteToHex(Arrays.copyOfRange(msgByte, 17, 18)), 16) + ".";
+            ipAdd += Integer.parseInt(HexUtil.byteToHex(Arrays.copyOfRange(msgByte, 18, 19)), 16) + ".";
+            ipAdd += Integer.parseInt(HexUtil.byteToHex(Arrays.copyOfRange(msgByte, 19, 20)), 16);
             // ETX
-            String etx = byteToHex(Arrays.copyOfRange(msgByte, 20, 21));
+            String etx = HexUtil.byteToHex(Arrays.copyOfRange(msgByte, 20, 21));
 
-            System.out.println(byteToHex(msgByte));
+            System.out.println(HexUtil.byteToHex(msgByte));
             System.out.println(dtuId);
             System.out.println(phoneNumber);
             System.out.println(ipAdd);
@@ -138,7 +119,7 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
 
         // DTU 心跳包
         else if (1 == msgByte.length) {
-            if ("fe".equals(byteToHex(Arrays.copyOfRange(msgByte, 0, 1)))) {
+            if ("fe".equals(HexUtil.byteToHex(Arrays.copyOfRange(msgByte, 0, 1)))) {
                 IWxcxcDeviceGatewayService wxcxcDeviceGatewayService = (IWxcxcDeviceGatewayService) SpringContextUtil.getBean(IWxcxcDeviceGatewayService.class);
                 IWxcxcDeviceService wxcxcDeviceService = (IWxcxcDeviceService) SpringContextUtil.getBean(IWxcxcDeviceService.class);
                 IWxcxcDeviceSensorService wxcxcDeviceSensorService = (IWxcxcDeviceSensorService) SpringContextUtil.getBean(IWxcxcDeviceSensorService.class);
@@ -159,24 +140,32 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
                         List<WxcxcDeviceSensor> wxcxcDeviceSensorList = wxcxcDeviceSensorService.selectWxcxcDeviceSensorList(wxcxcDeviceSensorCondition);
 
                         if (null != wxcxcDeviceSensorList) {
+                            //待发送的指令
+                            ModbusRtuOrderList modbusRtuOrderList = new ModbusRtuOrderList();
+
                             for (WxcxcDeviceSensor deviceSensorItem : wxcxcDeviceSensorList) {
-                                // 发送读取请求
+                                // 添加指令
+                                modbusRtuOrderList.addOrder(deviceSensorItem.getSlaveUnitId(), deviceSensorItem.getSlaveCode(),
+                                        deviceSensorItem.getSlaveAddressHi(), deviceSensorItem.getSlaveAddressLo(),
+                                        deviceSensorItem.getSlaveAmountHi(), deviceSensorItem.getSlaveAmountLo());
 
+//                                String requestByte = "";
+//                                // 设备地址
+//                                requestByte += deviceSensorItem.getSlaveUnitId();
+//                                // 功能码
+//                                requestByte += deviceSensorItem.getSlaveCode();
+//                                // 起始寄存器地址
+//                                requestByte += deviceSensorItem.getSlaveAddressHi() + deviceSensorItem.getSlaveAddressLo();
+//                                // 读取寄存器个数
+//                                requestByte += deviceSensorItem.getSlaveAmountHi() + deviceSensorItem.getSlaveAmountLo();
+//
+//                                requestByte += CRCUtils.getCRC(HexUtil.hexToByte(requestByte));
+                            }
 
-                                String requestByte = "";
-                                // 设备地址
-                                requestByte += deviceSensorItem.getSlaveUnitId();
-                                // 功能码
-                                requestByte += deviceSensorItem.getSlaveCode();
-                                // 起始寄存器地址
-                                requestByte += deviceSensorItem.getSlaveAddressHi() + deviceSensorItem.getSlaveAddressLo();
-                                // 读取寄存器个数
-                                requestByte += deviceSensorItem.getSlaveAmountHi() + deviceSensorItem.getSlaveAmountLo();
-
-                                requestByte += CRCUtils.getCRC(hexToByte(requestByte));
-
-                                System.out.println("send:" + requestByte);
-                                ctx.write(requestByte);
+                            for (ModbusRtuOrderDto item : modbusRtuOrderList.getModbusRtuOrderDtoList()) {
+                                System.out.println("send:" + item.toString());
+                                ctx.write(item.toString());
+                                ctx.flush();
                             }
                         }
 
@@ -185,55 +174,55 @@ public class BootNettyChannelInboundHandlerAdapter extends ChannelInboundHandler
                 }
             }
         } else {
-            System.out.println("read:" + byteToHex(msgByte));
+            System.out.println("read:" + HexUtil.byteToHex(msgByte));
             // 接收
             // 根据IP判断网关
 
             // 在系统中查询是否有该DTU
-            IWxcxcDeviceGatewayService wxcxcDeviceGatewayService = (IWxcxcDeviceGatewayService) SpringContextUtil.getBean(IWxcxcDeviceGatewayService.class);
-            WxcxcDeviceGateway wxcxcDeviceGatewayCondition = new WxcxcDeviceGateway();
-            wxcxcDeviceGatewayCondition.setIp(clientIp);
-            wxcxcDeviceGatewayCondition.setOnlineFlag("1");
-            List<WxcxcDeviceGateway> wxcxcDeviceGatewayList = wxcxcDeviceGatewayService.selectWxcxcDeviceGatewayList(wxcxcDeviceGatewayCondition);
-
-            IWxcxcDeviceSensorService wxcxcDeviceSensorService = (IWxcxcDeviceSensorService) SpringContextUtil.getBean(IWxcxcDeviceSensorService.class);
-
-            if (null != wxcxcDeviceGatewayList) {
-                WxcxcDeviceGateway wxcxcDeviceGateway = null;
-
-                for (WxcxcDeviceGateway item : wxcxcDeviceGatewayList) {
-                    wxcxcDeviceGateway = item;
-                }
-
-                if (null != wxcxcDeviceGateway) {
-                    // 根据【设备地址】及【功能码】判断传感器
-                    String slaveUnitId = byteToHex(Arrays.copyOfRange(msgByte, 0, 2));
-                    String slaveCode = byteToHex(Arrays.copyOfRange(msgByte, 2, 4));
-
-                    // 根据【设备地址】【功能吗】获取传感器
-                    WxcxcDeviceSensor wxcxcDeviceSensor = new WxcxcDeviceSensor();
-                    List<WxcxcDeviceSensor> wxcxcDeviceSensorList = wxcxcDeviceSensorService.selectWxcxcDeviceSensorList(wxcxcDeviceSensor);
-
-                    // 根据寄存器地址和数量获取信息
-
-                    // ModBus 功能码0x01
-                    // ModBus 功能码0x02
-                    // ModBus 功能码0x03
-                    // ModBus 功能码0x04
-                    // ModBus 功能码0x05
-                    // ModBus 功能码0x06
-
-                    return;
-                } else {
-                    // 不符合结构
-                    ctx.close();
-                    return;
-                }
-            } else {
-                // 不符合结构
-                ctx.close();
-                return;
-            }
+//            IWxcxcDeviceGatewayService wxcxcDeviceGatewayService = (IWxcxcDeviceGatewayService) SpringContextUtil.getBean(IWxcxcDeviceGatewayService.class);
+//            WxcxcDeviceGateway wxcxcDeviceGatewayCondition = new WxcxcDeviceGateway();
+//            wxcxcDeviceGatewayCondition.setIp(clientIp);
+//            wxcxcDeviceGatewayCondition.setOnlineFlag("1");
+//            List<WxcxcDeviceGateway> wxcxcDeviceGatewayList = wxcxcDeviceGatewayService.selectWxcxcDeviceGatewayList(wxcxcDeviceGatewayCondition);
+//
+//            IWxcxcDeviceSensorService wxcxcDeviceSensorService = (IWxcxcDeviceSensorService) SpringContextUtil.getBean(IWxcxcDeviceSensorService.class);
+//
+//            if (null != wxcxcDeviceGatewayList) {
+//                WxcxcDeviceGateway wxcxcDeviceGateway = null;
+//
+//                for (WxcxcDeviceGateway item : wxcxcDeviceGatewayList) {
+//                    wxcxcDeviceGateway = item;
+//                }
+//
+//                if (null != wxcxcDeviceGateway) {
+//                    // 根据【设备地址】及【功能码】判断传感器
+//                    String slaveUnitId = byteToHex(Arrays.copyOfRange(msgByte, 0, 2));
+//                    String slaveCode = byteToHex(Arrays.copyOfRange(msgByte, 2, 4));
+//
+//                    // 根据【设备地址】【功能码】获取传感器
+//                    WxcxcDeviceSensor wxcxcDeviceSensor = new WxcxcDeviceSensor();
+//                    List<WxcxcDeviceSensor> wxcxcDeviceSensorList = wxcxcDeviceSensorService.selectWxcxcDeviceSensorList(wxcxcDeviceSensor);
+//
+//                    // 根据寄存器地址和数量获取信息
+//
+//                    // ModBus 功能码0x01
+//                    // ModBus 功能码0x02
+//                    // ModBus 功能码0x03
+//                    // ModBus 功能码0x04
+//                    // ModBus 功能码0x05
+//                    // ModBus 功能码0x06
+//
+//                    return;
+//                } else {
+//                    // 不符合结构
+//                    ctx.close();
+//                    return;
+//                }
+//            } else {
+//                // 不符合结构
+//                ctx.close();
+//                return;
+//            }
 
 
         }

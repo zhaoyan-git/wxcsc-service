@@ -58,4 +58,9 @@ public interface WxcxcProjectMapper
      * @return 结果
      */
     public int deleteWxcxcProjectByIds(Long[] ids);
+
+    // 根据用户ID获取项目列表
+    public List<WxcxcProject> selectWxcxcProjectByUserId(Long selectWxcxcProjectByUserId);
+
+
 }

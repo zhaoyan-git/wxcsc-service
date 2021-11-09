@@ -9,15 +9,15 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.wxcxc.domain.*;
 import com.ruoyi.wxcxc.dto.BusinessMemberDto;
+import com.ruoyi.wxcxc.mapper.WxcxcConsoleMapper;
 import com.ruoyi.wxcxc.service.*;
 import com.ruoyi.wxcxc.util.PackDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Handler;
 
 @RestController
 @RequestMapping("/iot/console")
@@ -40,7 +40,10 @@ public class ConsoleController extends BaseController {
     private IWxcxcProjectPointGroupService wxcxcProjectPointGroupService;
     @Autowired
     private IWxcxcDeviceService wxcxcDeviceService;
+    @Autowired
+    private IWxcxcDataBusinessService wxcxcDataBusinessService;
 
+    // 获取企业全部项目
     @PreAuthorize("@ss.hasPermi('iot:console')")
     @GetMapping("/projectListBusiness")
     public List<WxcxcProject> projectListBusiness() {
@@ -52,14 +55,13 @@ public class ConsoleController extends BaseController {
         return list;
     }
 
+    // 根据用户权限获取项目
     @PreAuthorize("@ss.hasPermi('iot:console')")
     @GetMapping("/projectListByUserRole")
     public List<WxcxcProject> projectListByUserRole() {
-        WxcxcProject wxcxcProject = new WxcxcProject();
-        wxcxcProject.setBusinessId(getBusinessId());
+        SysUser user = SecurityUtils.getLoginUser().getUser();
 
-        // TODO 未实现
-        List<WxcxcProject> list = wxcxcProjectService.selectWxcxcProjectList(wxcxcProject);
+        List<WxcxcProject> list = wxcxcProjectService.selectWxcxcProjectByUserId(user.getUserId());
 
         return list;
     }
@@ -149,18 +151,38 @@ public class ConsoleController extends BaseController {
         return list;
     }
 
-    // TODO 获取仪表盘数据
+    // 获取仪表盘数据
     @PreAuthorize("@ss.hasPermi('iot:console')")
-    @GetMapping("/dashboard")
-    public Map<String, Object> dashboard() {
-        getBusinessId();
+    @GetMapping("/dashboardBusiness")
+    public Map<String, Object> dashboardBusiness() {
+        Map<String, Object> map = new HashMap<>();
+        WxcxcDataBusiness wxcxcDataBusiness = new WxcxcDataBusiness();
+        wxcxcDataBusiness.setBusinessId(getBusinessId());
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("beginTime", new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 7)));
+        wxcxcDataBusiness.setParams(params);
+
         // 返回数据列表，包含数据产生
-        // 数据总量
-        // 发布项目数
-        // 结构物数
-        // 设备总数
+        List<WxcxcDataBusiness> list = wxcxcDataBusinessService.selectWxcxcDataBusinessList(wxcxcDataBusiness);
+        if (null == list || 0 == list.size()) {
+            list = new ArrayList<>();
+            wxcxcDataBusiness.setDataCount("0");
+            wxcxcDataBusiness.setProjectCount("0");
+            wxcxcDataBusiness.setStructureCount("0");
+            wxcxcDataBusiness.setDeviceCount("0");
+
+            list.add(wxcxcDataBusiness);
+        }
+        map.put("businessData", list);
+
         // 项目列表
-        return null;
+        WxcxcProject wxcxcProject = new WxcxcProject();
+        wxcxcProject.setBusinessId(getBusinessId());
+        List<WxcxcProject> wxcxcProjectList = wxcxcProjectService.selectWxcxcProjectList(wxcxcProject);
+        map.put("projectList", wxcxcProjectList);
+
+        return map;
     }
 
     // 获取设备数据

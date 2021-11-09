@@ -36,7 +36,7 @@ public class WxcxcArticleChannelController extends BaseController
     /**
      * 查询栏目列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:channel:list')")
+    @PreAuthorize("@ss.hasPermi('iot:channel')")
     @GetMapping("/list")
     public TableDataInfo list(WxcxcArticleChannel wxcxcArticleChannel)
     {
@@ -48,7 +48,7 @@ public class WxcxcArticleChannelController extends BaseController
     /**
      * 导出栏目列表
      */
-    @PreAuthorize("@ss.hasPermi('iot:channel:export')")
+    @PreAuthorize("@ss.hasPermi('iot:channel')")
     @Log(title = "栏目", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WxcxcArticleChannel wxcxcArticleChannel)
@@ -61,7 +61,7 @@ public class WxcxcArticleChannelController extends BaseController
     /**
      * 获取栏目详细信息
      */
-    @PreAuthorize("@ss.hasPermi('iot:channel:query')")
+    @PreAuthorize("@ss.hasPermi('iot:channel')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -71,7 +71,7 @@ public class WxcxcArticleChannelController extends BaseController
     /**
      * 新增栏目
      */
-    @PreAuthorize("@ss.hasPermi('iot:channel:add')")
+    @PreAuthorize("@ss.hasPermi('iot:channel')")
     @Log(title = "栏目", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WxcxcArticleChannel wxcxcArticleChannel)
@@ -82,7 +82,7 @@ public class WxcxcArticleChannelController extends BaseController
     /**
      * 修改栏目
      */
-    @PreAuthorize("@ss.hasPermi('iot:channel:edit')")
+    @PreAuthorize("@ss.hasPermi('iot:channel')")
     @Log(title = "栏目", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WxcxcArticleChannel wxcxcArticleChannel)
@@ -93,7 +93,7 @@ public class WxcxcArticleChannelController extends BaseController
     /**
      * 删除栏目
      */
-    @PreAuthorize("@ss.hasPermi('iot:channel:remove')")
+    @PreAuthorize("@ss.hasPermi('iot:channel')")
     @Log(title = "栏目", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)

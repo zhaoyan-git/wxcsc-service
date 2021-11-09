@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcProjectMapper">
-    
+
     <resultMap type="WxcxcProject" id="WxcxcProjectResult">
-        <result property="id"    column="id"    />
-        <result property="name"    column="name"    />
-        <result property="businessId"    column="business_id"    />
-        <result property="aim"    column="aim"    />
-        <result property="photoFile"    column="photo_file"    />
-        <result property="details"    column="details"    />
-        <result property="positionLat"    column="position_lat"    />
-        <result property="positionLng"    column="position_lng"    />
-        <result property="alarmFlag"    column="alarm_flag"    />
-        <result property="delFlag"    column="del_flag"    />
-        <result property="createBy"    column="create_by"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateBy"    column="update_by"    />
-        <result property="updateTime"    column="update_time"    />
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="businessId" column="business_id"/>
+        <result property="aim" column="aim"/>
+        <result property="photoFile" column="photo_file"/>
+        <result property="details" column="details"/>
+        <result property="positionLat" column="position_lat"/>
+        <result property="positionLng" column="position_lng"/>
+        <result property="alarmFlag" column="alarm_flag"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
     </resultMap>
 
     <sql id="selectWxcxcProjectVo">
@@ -29,19 +29,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectWxcxcProjectVo"/>
         <where>
             and del_flag = '0'
-            <if test="id != null  and id != ''"> and id like concat('%', #{id}, '%')</if>
-            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
-            <if test="businessId != null "> and business_id = #{businessId}</if>
-            <if test="alarmFlag != null  and alarmFlag != ''"> and alarm_flag = #{alarmFlag}</if>
+            <if test="id != null  and id != ''">and id like concat('%', #{id}, '%')</if>
+            <if test="name != null  and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="businessId != null ">and business_id = #{businessId}</if>
+            <if test="alarmFlag != null  and alarmFlag != ''">and alarm_flag = #{alarmFlag}</if>
         </where>
     </select>
-    
+
+    <select id="selectWxcxcProjectByUserId" parameterType="Long" resultMap="WxcxcProjectResult">
+        <include refid="selectWxcxcProjectVo"/>
+        where id in (select project_id from wxcxc_business_member_role where business_member_id = #{businessMemberId})
+        and del_flag = '0'
+    </select>
+
     <select id="selectWxcxcProjectById" parameterType="Long" resultMap="WxcxcProjectResult">
         <include refid="selectWxcxcProjectVo"/>
         where id = #{id}
         and del_flag = '0'
     </select>
-        
+
     <insert id="insertWxcxcProject" parameterType="WxcxcProject" useGeneratedKeys="true" keyProperty="id">
         insert into wxcxc_project
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -58,7 +64,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="name != null and name != ''">#{name},</if>
             <if test="businessId != null">#{businessId},</if>
@@ -73,7 +79,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateWxcxcProject" parameterType="WxcxcProject">

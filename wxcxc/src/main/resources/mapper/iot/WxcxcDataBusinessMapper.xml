@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcDataBusinessMapper">
+
+    <resultMap type="WxcxcDataBusiness" id="WxcxcDataBusinessResult">
+        <result property="id" column="id"/>
+        <result property="businessId" column="business_id"/>
+        <result property="dataCount" column="data_count"/>
+        <result property="projectCount" column="project_count"/>
+        <result property="structureCount" column="structure_count"/>
+        <result property="deviceCount" column="device_count"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectWxcxcDataBusinessVo">
+        select id, business_id, data_count, project_count, structure_count, device_count, create_time from wxcxc_data_business
+    </sql>
+
+    <select id="selectWxcxcDataBusinessList" parameterType="WxcxcDataBusiness" resultMap="WxcxcDataBusinessResult">
+        <include refid="selectWxcxcDataBusinessVo"/>
+        <where>
+            <if test="businessId != null ">and business_id = #{businessId}</if>
+            <if test="dataCount != null  and dataCount != ''">and data_count = #{dataCount}</if>
+            <if test="projectCount != null  and projectCount != ''">and project_count = #{projectCount}</if>
+            <if test="structureCount != null  and structureCount != ''">and structure_count = #{structureCount}</if>
+            <if test="deviceCount != null  and deviceCount != ''">and device_count = #{deviceCount}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectWxcxcDataBusinessById" parameterType="Long" resultMap="WxcxcDataBusinessResult">
+        <include refid="selectWxcxcDataBusinessVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertWxcxcDataBusiness" parameterType="WxcxcDataBusiness" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_data_business
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="businessId != null">business_id,</if>
+            <if test="dataCount != null">data_count,</if>
+            <if test="projectCount != null">project_count,</if>
+            <if test="structureCount != null">structure_count,</if>
+            <if test="deviceCount != null">device_count,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="businessId != null">#{businessId},</if>
+            <if test="dataCount != null">#{dataCount},</if>
+            <if test="projectCount != null">#{projectCount},</if>
+            <if test="structureCount != null">#{structureCount},</if>
+            <if test="deviceCount != null">#{deviceCount},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateWxcxcDataBusiness" parameterType="WxcxcDataBusiness">
+        update wxcxc_data_business
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="businessId != null">business_id = #{businessId},</if>
+            <if test="dataCount != null">data_count = #{dataCount},</if>
+            <if test="projectCount != null">project_count = #{projectCount},</if>
+            <if test="structureCount != null">structure_count = #{structureCount},</if>
+            <if test="deviceCount != null">device_count = #{deviceCount},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcDataBusinessById" parameterType="Long">
+        delete from wxcxc_data_business where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcDataBusinessByIds" parameterType="String">
+        delete from wxcxc_data_business where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

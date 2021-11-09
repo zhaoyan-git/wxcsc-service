@@ -9,6 +9,8 @@ public class Test {
 
 
     public static void main(String[] args) throws IOException {
+
+        System.out.println(Integer.toHexString(32));
         byte[] bytes1 = hexToByte("030300000003");
         System.out.println(CRCUtils.getCRC(bytes1));
 //

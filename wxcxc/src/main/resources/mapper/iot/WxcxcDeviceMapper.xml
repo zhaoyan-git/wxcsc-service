@@ -187,4 +187,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             ( #{item.id}, #{item.deviceId}, #{item.name}, #{item.iconFile}, #{item.sort}, #{item.unit}, #{item.type}, #{item.slaveUnitId}, #{item.slaveCode}, #{item.slaveAddressHi}, #{item.slaveAddressLo}, #{item.slaveAmountHi}, #{item.slaveAmountLo}, #{item.cycleTime}, #{item.delFlag}, #{item.createBy}, #{item.createTime}, #{item.updateBy}, #{item.updateTime})
         </foreach>
     </insert>
+
+    <select id="selectWxcxcDeviceListByBusinessId" parameterType="Long" resultMap="WxcxcDeviceResult">
+        SELECT * FROM wxcxc_device WHERE del_flag = 0 AND project_id IN (SELECT id FROM wxcxc_project WHERE business_id = 1 AND del_flag = 0);
+    </select>
 </mapper>

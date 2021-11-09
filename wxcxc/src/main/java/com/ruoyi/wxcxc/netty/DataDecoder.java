@@ -19,13 +19,11 @@ public class DataDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext arg0, ByteBuf in, List<Object> list) throws Exception {
-        // TODO 自动生成的方法存根
         //System.err.println(parseData.getDrcProInfo().getParseDataName() + "--------解码器正在解码----------");
         try {
             in.retain();
             parseData.decoder(in, list);
         } catch (Exception e) {
-            // TODO: handle exception
             e.printStackTrace();
         }
     }

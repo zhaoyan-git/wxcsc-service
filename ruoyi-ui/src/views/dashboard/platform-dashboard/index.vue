@@ -10,7 +10,7 @@
             <div class="card-panel-text">入驻企业数量</div>
             <count-to
               :start-val="0"
-              :end-val="125"
+              :end-val="2"
               :duration="1500"
               class="card-panel-num"
             />
@@ -26,7 +26,7 @@
             <div class="card-panel-text">平台总项目数</div>
             <count-to
               :start-val="0"
-              :end-val="130"
+              :end-val="2"
               :duration="1500"
               class="card-panel-num"
             />
@@ -42,7 +42,7 @@
             <div class="card-panel-text">平台设备数</div>
             <count-to
               :start-val="0"
-              :end-val="350"
+              :end-val="2"
               :duration="1500"
               class="card-panel-num"
             />
@@ -58,7 +58,7 @@
             <div class="card-panel-text">平台DTU数</div>
             <count-to
               :start-val="0"
-              :end-val="50"
+              :end-val="1"
               :duration="1500"
               class="card-panel-num"
             />

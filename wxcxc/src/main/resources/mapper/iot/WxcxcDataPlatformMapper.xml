@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcDataPlatformMapper">
+    
+    <resultMap type="WxcxcDataPlatform" id="WxcxcDataPlatformResult">
+        <result property="id"    column="id"    />
+        <result property="businessCount"    column="business_count"    />
+        <result property="projectCount"    column="project_count"    />
+        <result property="deviceCount"    column="device_count"    />
+        <result property="dtuCount"    column="dtu_count"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectWxcxcDataPlatformVo">
+        select id, business_count, project_count, device_count, dtu_count, create_time from wxcxc_data_platform
+    </sql>
+
+    <select id="selectWxcxcDataPlatformList" parameterType="WxcxcDataPlatform" resultMap="WxcxcDataPlatformResult">
+        <include refid="selectWxcxcDataPlatformVo"/>
+        <where>  
+            <if test="businessCount != null  and businessCount != ''"> and business_count = #{businessCount}</if>
+            <if test="projectCount != null  and projectCount != ''"> and project_count = #{projectCount}</if>
+            <if test="deviceCount != null  and deviceCount != ''"> and device_count = #{deviceCount}</if>
+            <if test="dtuCount != null  and dtuCount != ''"> and dtu_count = #{dtuCount}</if>
+        </where>
+    </select>
+    
+    <select id="selectWxcxcDataPlatformById" parameterType="Long" resultMap="WxcxcDataPlatformResult">
+        <include refid="selectWxcxcDataPlatformVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWxcxcDataPlatform" parameterType="WxcxcDataPlatform" useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_data_platform
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="businessCount != null">business_count,</if>
+            <if test="projectCount != null">project_count,</if>
+            <if test="deviceCount != null">device_count,</if>
+            <if test="dtuCount != null">dtu_count,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="businessCount != null">#{businessCount},</if>
+            <if test="projectCount != null">#{projectCount},</if>
+            <if test="deviceCount != null">#{deviceCount},</if>
+            <if test="dtuCount != null">#{dtuCount},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWxcxcDataPlatform" parameterType="WxcxcDataPlatform">
+        update wxcxc_data_platform
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="businessCount != null">business_count = #{businessCount},</if>
+            <if test="projectCount != null">project_count = #{projectCount},</if>
+            <if test="deviceCount != null">device_count = #{deviceCount},</if>
+            <if test="dtuCount != null">dtu_count = #{dtuCount},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcDataPlatformById" parameterType="Long">
+        delete from wxcxc_data_platform where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcDataPlatformByIds" parameterType="String">
+        delete from wxcxc_data_platform where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcMiniProgramMapper">
+
+
+    <!--  获取项目结构物数  -->
+    <select id="getProjectStructureCount" parameterType="Long" resultType="int">
+		SELECT COUNT(*) FROM wxcxc_project_structure WHERE project_id = #{projectId} AND del_flag = 0;
+	</select>
+
+    <!--  获取项目测点数  -->
+    <select id="getProjectPointCount" parameterType="Long" resultType="int">
+		SELECT COUNT(*) FROM wxcxc_project_point WHERE project_structure_id in (SELECT id FROM wxcxc_project_structure WHERE project_id = #{projectId} AND del_flag = 0) AND del_flag = 0;
+	</select>
+
+    <!--  获取项目DTO数  -->
+    <select id="getProjectDtoCount" parameterType="Long" resultType="int">
+		SELECT COUNT(*) FROM wxcxc_device_gateway WHERE project_id = #{projectId} AND del_flag = 0;
+	</select>
+
+    <!--  获取项目报警数  -->
+    <select id="getProjectAlarmCount" parameterType="Long" resultType="int">
+		SELECT COUNT(*) FROM wxcxc_project_point WHERE project_structure_id in (SELECT id FROM wxcxc_project_structure WHERE project_id = #{projectId} AND del_flag = 0) AND del_flag = 0 AND alarm_flag = 1;
+	</select>
+
+    <!--  获取企业测点数  -->
+    <select id="getBusinessPointCount" parameterType="Long" resultType="int">
+		SELECT COUNT(*) FROM wxcxc_project_point WHERE del_flag = 0 AND project_structure_id in
+        (SELECT id FROM wxcxc_project_structure WHERE del_flag = 0 AND project_id IN (SELECT id FROM wxcxc_project WHERE business_id = #{businessId} AND del_flag = 0));
+	</select>
+
+    <!--  根据企业成员ID获取项目结构物数  -->
+    <select id="getProjectStructureCountByMemberId" parameterType="Long" resultType="int">
+		SELECT COUNT(*) FROM wxcxc_project_structure WHERE project_id in (SELECT project_id FROM wxcxc_business_member_role WHERE business_member_id = #{member_id}) AND del_flag = 0;
+	</select>
+
+    <!--  根据企业成员ID获取项目测点数  -->
+    <select id="getProjectPointCountByMemberId" parameterType="Long" resultType="int">
+		SELECT COUNT(*) FROM wxcxc_project_point WHERE project_structure_id in (SELECT id FROM wxcxc_project_structure WHERE project_id in (SELECT project_id FROM wxcxc_business_member_role WHERE business_member_id = #{member_id}) AND del_flag = 0) AND del_flag = 0;
+	</select>
+
+    <!--  根据企业成员ID获取项目设备数  -->
+    <select id="getProjectDeviceCountByMemberId" parameterType="Long" resultType="int">
+		SELECT COUNT(*) FROM wxcxc_device_gateway WHERE project_id in (SELECT project_id FROM wxcxc_business_member_role WHERE business_member_id = #{member_id}) AND del_flag = 0;
+	</select>
+</mapper>

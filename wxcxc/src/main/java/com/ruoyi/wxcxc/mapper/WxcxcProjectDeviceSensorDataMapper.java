@@ -90,4 +90,7 @@ public interface WxcxcProjectDeviceSensorDataMapper
      * @return
      */
     int createTable(@Param("deviceId")Long deviceId);
+
+    // 获取数据数
+    int getDataCount(@Param("deviceId")Long deviceId);
 }

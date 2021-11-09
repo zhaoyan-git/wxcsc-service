@@ -265,11 +265,11 @@
               <el-input v-model="scope.row.slaveAmountLo" placeholder="请输入数量Lo"/>
             </template>
           </el-table-column>
-          <el-table-column label="采集周期" prop="cycleTime">
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.cycleTime" placeholder="请输入采集周期"/>
-            </template>
-          </el-table-column>
+<!--          <el-table-column label="采集周期" prop="cycleTime">-->
+<!--            <template slot-scope="scope">-->
+<!--              <el-input v-model="scope.row.cycleTime" placeholder="请输入采集周期"/>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
         </el-table>
       </el-form>
       <div slot="footer" class="dialog-footer">

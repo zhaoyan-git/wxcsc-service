@@ -58,4 +58,7 @@ public interface IWxcxcProjectService
      * @return 结果
      */
     public int deleteWxcxcProjectById(Long id);
+
+    // 根据用户ID获取项目列表
+    public List<WxcxcProject> selectWxcxcProjectByUserId(Long userId);
 }

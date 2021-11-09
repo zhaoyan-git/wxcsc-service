@@ -24,11 +24,11 @@
         </where>
     </select>
 
-<!--    <select id="selectWxcxcProjectDeviceSensorDataById" parameterType="Long"-->
-<!--            resultMap="WxcxcProjectDeviceSensorDataResult">-->
-<!--        select id, sensor_id, original_data, data, create_time from wxcxc_project_device_sensor_data_${deviceId}-->
-<!--        where id = #{id}-->
-<!--    </select>-->
+    <!--    <select id="selectWxcxcProjectDeviceSensorDataById" parameterType="Long"-->
+    <!--            resultMap="WxcxcProjectDeviceSensorDataResult">-->
+    <!--        select id, sensor_id, original_data, data, create_time from wxcxc_project_device_sensor_data_${deviceId}-->
+    <!--        where id = #{id}-->
+    <!--    </select>-->
 
 
     <insert id="insertWxcxcProjectDeviceSensorData" parameterType="WxcxcProjectDeviceSensorData" useGeneratedKeys="true"
@@ -48,27 +48,27 @@
         </trim>
     </insert>
 
-<!--    <update id="updateWxcxcProjectDeviceSensorData" parameterType="WxcxcProjectDeviceSensorData">-->
-<!--        update wxcxc_project_device_sensor_data-->
-<!--        <trim prefix="SET" suffixOverrides=",">-->
-<!--            <if test="sensorId != null">sensor_id = #{sensorId},</if>-->
-<!--            <if test="originalData != null">original_data = #{originalData},</if>-->
-<!--            <if test="data != null">data = #{data},</if>-->
-<!--            <if test="createTime != null">create_time = #{createTime},</if>-->
-<!--        </trim>-->
-<!--        where id = #{id}-->
-<!--    </update>-->
+    <!--    <update id="updateWxcxcProjectDeviceSensorData" parameterType="WxcxcProjectDeviceSensorData">-->
+    <!--        update wxcxc_project_device_sensor_data-->
+    <!--        <trim prefix="SET" suffixOverrides=",">-->
+    <!--            <if test="sensorId != null">sensor_id = #{sensorId},</if>-->
+    <!--            <if test="originalData != null">original_data = #{originalData},</if>-->
+    <!--            <if test="data != null">data = #{data},</if>-->
+    <!--            <if test="createTime != null">create_time = #{createTime},</if>-->
+    <!--        </trim>-->
+    <!--        where id = #{id}-->
+    <!--    </update>-->
 
-<!--    <delete id="deleteWxcxcProjectDeviceSensorDataById" parameterType="Long">-->
-<!--        delete from wxcxc_project_device_sensor_data where id = #{id}-->
-<!--    </delete>-->
+    <!--    <delete id="deleteWxcxcProjectDeviceSensorDataById" parameterType="Long">-->
+    <!--        delete from wxcxc_project_device_sensor_data where id = #{id}-->
+    <!--    </delete>-->
 
-<!--    <delete id="deleteWxcxcProjectDeviceSensorDataByIds" parameterType="String">-->
-<!--        delete from wxcxc_project_device_sensor_data where id in-->
-<!--        <foreach item="id" collection="array" open="(" separator="," close=")">-->
-<!--            #{id}-->
-<!--        </foreach>-->
-<!--    </delete>-->
+    <!--    <delete id="deleteWxcxcProjectDeviceSensorDataByIds" parameterType="String">-->
+    <!--        delete from wxcxc_project_device_sensor_data where id in-->
+    <!--        <foreach item="id" collection="array" open="(" separator="," close=")">-->
+    <!--            #{id}-->
+    <!--        </foreach>-->
+    <!--    </delete>-->
 
     <update id="dropTable">
         DROP TABLE IF EXISTS wxcxc_project_device_sensor_data_${deviceId}
@@ -84,4 +84,9 @@
           PRIMARY KEY (`id`) USING BTREE
         ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
     </update>
+
+    <!--  获取数据数  -->
+    <select id="getDataCount" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM `wxcxc_project_device_sensor_data_${deviceId}`;
+	</select>
 </mapper>

@@ -79,3 +79,11 @@ export function projectDeviceList(query) {
     params: query
   })
 }
+
+export function dashboardBusiness(query) {
+  return request({
+    url: '/iot/console/dashboardBusiness',
+    method: 'get',
+    params: query
+  })
+}
