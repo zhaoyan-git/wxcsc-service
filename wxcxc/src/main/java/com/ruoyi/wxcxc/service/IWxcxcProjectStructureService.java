@@ -33,7 +33,7 @@ public interface IWxcxcProjectStructureService
      * @param wxcxcProjectStructure 项目结构物
      * @return 结果
      */
-    public int insertWxcxcProjectStructure(WxcxcProjectStructure wxcxcProjectStructure);
+    public int insertWxcxcProjectStructure(WxcxcProjectStructure wxcxcProjectStructure) throws Exception;
 
     /**
      * 修改项目结构物

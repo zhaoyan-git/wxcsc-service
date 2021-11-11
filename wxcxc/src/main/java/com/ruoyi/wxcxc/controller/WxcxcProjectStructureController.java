@@ -74,7 +74,7 @@ public class WxcxcProjectStructureController extends BaseController {
     @PreAuthorize("@ss.hasPermi('iot:integrate:projectStructure')")
     @Log(title = "项目结构物", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody WxcxcProjectStructure wxcxcProjectStructure) {
+    public AjaxResult add(@RequestBody WxcxcProjectStructure wxcxcProjectStructure) throws Exception {
         return toAjax(wxcxcProjectStructureService.insertWxcxcProjectStructure(wxcxcProjectStructure));
     }
 

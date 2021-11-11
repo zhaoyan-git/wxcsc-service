@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcProjectPointDataMapper">
+
+    <resultMap type="WxcxcProjectPointData" id="WxcxcProjectPointDataResult">
+        <result property="id" column="id"/>
+        <result property="pointId" column="point_id"/>
+        <result property="data" column="data"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectWxcxcProjectPointDataVo">
+        select id, point_id, data, create_time from wxcxc_project_point_data
+    </sql>
+
+    <select id="selectWxcxcProjectPointDataList" parameterType="WxcxcProjectPointData"
+            resultMap="WxcxcProjectPointDataResult">
+        select id, point_id, data, create_time from wxcxc_project_point_data_${structureId}
+        <where>
+            <if test="wxcxcProjectPointData.id != null ">and id = #{wxcxcProjectPointData.id}</if>
+            <if test="wxcxcProjectPointData.pointId != null ">and point_id = #{wxcxcProjectPointData.pointId}</if>
+            <if test="wxcxcProjectPointData.data != null  and data != ''">and data = #{wxcxcProjectPointData.data}</if>
+            <if test="wxcxcProjectPointData.createTime != null ">and create_time = #{wxcxcProjectPointData.createTime}
+            </if>
+            <if test="wxcxcProjectPointData.params.beginTime != null and wxcxcProjectPointData.params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%Y%m%d%H%i') &gt;=
+                date_format(#{wxcxcProjectPointData.params.beginTime},'%Y%m%d%H%i')
+            </if>
+            <if test="wxcxcProjectPointData.params.endTime != null and wxcxcProjectPointData.params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%Y%m%d%H%i') &lt;=
+                date_format(#{wxcxcProjectPointData.params.endTime},'%Y%m%d%H%i')
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertWxcxcProjectPointData" parameterType="WxcxcProjectPointData" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into wxcxc_project_point_data_${structureId}
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="wxcxcProjectPointData.pointId != null">point_id,</if>
+            <if test="wxcxcProjectPointData.data != null">data,</if>
+            <if test="wxcxcProjectPointData.createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="wxcxcProjectPointData.pointId != null">#{wxcxcProjectPointData.point_id},</if>
+            <if test="wxcxcProjectPointData.data != null">#{wxcxcProjectPointData.data},</if>
+            <if test="wxcxcProjectPointData.createTime != null">#{wxcxcProjectPointData.createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="dropTable">
+        DROP TABLE IF EXISTS wxcxc_project_point_data_${structureId}
+    </update>
+
+    <update id="createTable" parameterType="String">
+      CREATE TABLE `wxcxc_project_point_data_${structureId}`  (
+          `id` bigint(20) NOT NULL AUTO_INCREMENT,
+          `point_id` bigint(20) NULL DEFAULT NULL COMMENT '所属测点',
+          `data` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '数据',
+          `create_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+          PRIMARY KEY (`id`) USING BTREE
+        ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+    </update>
+
+    <!--  获取数据数  -->
+    <select id="getDataCount" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM `wxcxc_project_point_data_${structureId}`;
+	</select>
+</mapper>

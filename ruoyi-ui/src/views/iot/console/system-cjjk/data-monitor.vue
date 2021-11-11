@@ -42,7 +42,7 @@
             </el-form-item>
             <el-form-item label="查询时间">
               <el-date-picker
-                v-model="value2"
+                v-model="daterangeReleaseTime"
                 type="daterange"
                 align="right"
                 unlink-panels
@@ -93,6 +93,14 @@
         projectStructureListByProjectId,
         projectDeviceList
     } from "@/api/iot/console";
+
+    import {
+        listProjectDeivceSensorData
+    } from "@/api/iot/projectDeivceSensorData";
+
+    import {
+        listStructurePointData
+    } from "@/api/iot/structurePointData";
 
     const lineChartData = {
         newVisitis: {
@@ -182,7 +190,8 @@
                 projectStructureData: [],
                 optionsPointOrDeviceData: [],
                 currentProjectId: "",
-                pointOrDeviceData: []
+                pointOrDeviceData: [],
+                daterangeReleaseTime: [],
             };
         },
         mounted() {
@@ -211,17 +220,39 @@
                     this.tableData = response;
                 });
 
+                var condition = {};
+
+                if (null != this.daterangeReleaseTime && '' != this.daterangeReleaseTime) {
+                    condition['params'] = {
+                        'beginReleaseTime': this.formatDate(this.daterangeReleaseTime[0]),
+                        'endReleaseTime': this.formatDate(this.daterangeReleaseTime[1])
+                    }
+                }
+
                 // 获取设备数据
+                // pointOrDeviceData长度为2时代表设备
+                if (2 == this.pointOrDeviceData.length) {
+                    condition.deviceId = this.pointOrDeviceData[1]
+
+                    console.log(condition)
+                    listProjectDeivceSensorData(condition).then((response) => {
+                        var data = response.data;
+                        this.pageLoading = false;
+                    });
+                }
 
 
                 // 获取测点数据
+                // pointOrDeviceData长度为3时代表设备
+                if (3 == this.pointOrDeviceData.length) {
+                    condition.structureId = this.condition.projectStructureId
+                    condition.pointId = this.pointOrDeviceData[2]
 
-                //   getList(this.condition).then((response) => {
-                //     var data = response.data;
-                //     this.tableData = data.content;
-                //     this.condition.page.total = data.totalElements;
-                this.pageLoading = false;
-                //   });
+                    listStructurePointData(condition).then((response) => {
+                        var data = response.data;
+                        this.pageLoading = false;
+                    });
+                }
             },
             conditionQuery() {
                 if (2 != this.pointOrDeviceData.length && 3 != this.pointOrDeviceData.length) {
@@ -230,7 +261,8 @@
                 }
 
                 this.loadPage();
-            },
+            }
+            ,
             sortChange(val) {
                 var orderBy = val.prop;
                 var sort = val.order;
@@ -241,11 +273,13 @@
                 }
                 this.condition.page.orderBy = orderBy;
                 this.loadPage();
-            },
+            }
+            ,
             initChart() {
                 this.chart = echarts.init(this.$refs.chart, "macarons");
                 this.setOptions(this.chartData);
-            },
+            }
+            ,
             setOptions({expectedData} = {}) {
                 this.chart.setOption({
                     xAxis: {
@@ -297,7 +331,8 @@
                         },
                     ],
                 });
-            },
+            }
+            ,
             handleCurrentChange(val) {
                 this.currentProjectId = val.id;
                 projectStructureListByProjectId({
@@ -308,16 +343,14 @@
 
                     this.condition.projectStructureId = ""
                 });
-            },
+            }
+            ,
+            // 选择结构物
             conditionProjectStructureChange() {
                 this.optionsPointOrDeviceData = [];
 
                 // 获取该项目所有设备
                 var projectDeviceData = [];
-
-                console.log({
-                    projectId: this.currentProjectId
-                })
 
                 projectDeviceList({
                     projectId: this.currentProjectId
@@ -369,9 +402,26 @@
                     label: '设备',
                     children: projectDeviceData
                 })
-            },
+            }
+            ,
             pointOrDeviceChange(val) {
                 console.log(val)
+            },
+            formatDate(date) {
+                // var date = new Date(time);
+
+                var year = date.getFullYear(),
+                    month = date.getMonth() + 1,//月份是从0开始的
+                    day = date.getDate(),
+                    hour = date.getHours(),
+                    min = date.getMinutes();
+                var newTime = '' + year +
+                    (month < 10 ? '0' + month : month) +
+                    (day < 10 ? '0' + day : day) +
+                    (hour < 10 ? '0' + hour : hour) +
+                    (min < 10 ? '0' + min : min);
+
+                return newTime;
             }
         }
     };

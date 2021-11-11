@@ -16,59 +16,36 @@
             resultMap="WxcxcProjectDeviceSensorDataResult">
         select id, sensor_id, original_data, data, create_time from wxcxc_project_device_sensor_data_${deviceId}
         <where>
-            <if test="id != null ">and id = #{id}</if>
-            <if test="sensorId != null ">and sensor_id = #{sensorId}</if>
-            <if test="originalData != null  and originalData != ''">and original_data = #{originalData}</if>
-            <if test="data != null  and data != ''">and data = #{data}</if>
-            <if test="createTime != null ">and create_time = #{createTime}</if>
+            <if test="wxcxcProjectDeviceSensorData.id != null ">and id = #{wxcxcProjectDeviceSensorData.id}</if>
+            <if test="wxcxcProjectDeviceSensorData.sensorId != null ">and sensor_id = #{wxcxcProjectDeviceSensorData.sensorId}</if>
+            <if test="wxcxcProjectDeviceSensorData.originalData != null  and originalData != ''">and original_data = #{wxcxcProjectDeviceSensorData.originalData}</if>
+            <if test="wxcxcProjectDeviceSensorData.data != null  and data != ''">and data = #{wxcxcProjectDeviceSensorData.data}</if>
+            <if test="wxcxcProjectDeviceSensorData.createTime != null ">and create_time = #{wxcxcProjectDeviceSensorData.createTime}</if>
+            <if test="wxcxcProjectDeviceSensorData.params.beginTime != null and wxcxcProjectDeviceSensorData.params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%Y%m%d%H%i') &gt;= date_format(#{wxcxcProjectDeviceSensorData.params.beginTime},'%Y%m%d%H%i')
+            </if>
+            <if test="wxcxcProjectDeviceSensorData.params.endTime != null and wxcxcProjectDeviceSensorData.params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%Y%m%d%H%i') &lt;= date_format(#{wxcxcProjectDeviceSensorData.params.endTime},'%Y%m%d%H%i')
+            </if>
         </where>
     </select>
-
-    <!--    <select id="selectWxcxcProjectDeviceSensorDataById" parameterType="Long"-->
-    <!--            resultMap="WxcxcProjectDeviceSensorDataResult">-->
-    <!--        select id, sensor_id, original_data, data, create_time from wxcxc_project_device_sensor_data_${deviceId}-->
-    <!--        where id = #{id}-->
-    <!--    </select>-->
-
 
     <insert id="insertWxcxcProjectDeviceSensorData" parameterType="WxcxcProjectDeviceSensorData" useGeneratedKeys="true"
             keyProperty="id">
         insert into wxcxc_project_device_sensor_data_${deviceId}
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="sensorId != null">sensor_id,</if>
-            <if test="originalData != null">original_data,</if>
-            <if test="data != null">data,</if>
-            <if test="createTime != null">create_time,</if>
+            <if test="wxcxcProjectDeviceSensorData.sensorId != null">sensor_id,</if>
+            <if test="wxcxcProjectDeviceSensorData.originalData != null">original_data,</if>
+            <if test="wxcxcProjectDeviceSensorData.data != null">data,</if>
+            <if test="wxcxcProjectDeviceSensorData.createTime != null">create_time,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="sensorId != null">#{sensorId},</if>
-            <if test="originalData != null">#{originalData},</if>
-            <if test="data != null">#{data},</if>
-            <if test="createTime != null">#{createTime},</if>
+            <if test="wxcxcProjectDeviceSensorData.sensorId != null">#{wxcxcProjectDeviceSensorData.sensorId},</if>
+            <if test="wxcxcProjectDeviceSensorData.originalData != null">#{wxcxcProjectDeviceSensorData.originalData},</if>
+            <if test="wxcxcProjectDeviceSensorData.data != null">#{wxcxcProjectDeviceSensorData.data},</if>
+            <if test="wxcxcProjectDeviceSensorData.createTime != null">#{wxcxcProjectDeviceSensorData.createTime},</if>
         </trim>
     </insert>
-
-    <!--    <update id="updateWxcxcProjectDeviceSensorData" parameterType="WxcxcProjectDeviceSensorData">-->
-    <!--        update wxcxc_project_device_sensor_data-->
-    <!--        <trim prefix="SET" suffixOverrides=",">-->
-    <!--            <if test="sensorId != null">sensor_id = #{sensorId},</if>-->
-    <!--            <if test="originalData != null">original_data = #{originalData},</if>-->
-    <!--            <if test="data != null">data = #{data},</if>-->
-    <!--            <if test="createTime != null">create_time = #{createTime},</if>-->
-    <!--        </trim>-->
-    <!--        where id = #{id}-->
-    <!--    </update>-->
-
-    <!--    <delete id="deleteWxcxcProjectDeviceSensorDataById" parameterType="Long">-->
-    <!--        delete from wxcxc_project_device_sensor_data where id = #{id}-->
-    <!--    </delete>-->
-
-    <!--    <delete id="deleteWxcxcProjectDeviceSensorDataByIds" parameterType="String">-->
-    <!--        delete from wxcxc_project_device_sensor_data where id in-->
-    <!--        <foreach item="id" collection="array" open="(" separator="," close=")">-->
-    <!--            #{id}-->
-    <!--        </foreach>-->
-    <!--    </delete>-->
 
     <update id="dropTable">
         DROP TABLE IF EXISTS wxcxc_project_device_sensor_data_${deviceId}

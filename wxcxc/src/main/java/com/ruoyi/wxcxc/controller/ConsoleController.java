@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Handler;
 
@@ -160,7 +161,9 @@ public class ConsoleController extends BaseController {
         wxcxcDataBusiness.setBusinessId(getBusinessId());
 
         Map<String, Object> params = new HashMap<>();
-        params.put("beginTime", new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 7)));
+
+
+        params.put("beginTime", new SimpleDateFormat("yyMMdd").format(new Date().getTime() - (1000 * 60 * 60 * 24 * 7)));
         wxcxcDataBusiness.setParams(params);
 
         // 返回数据列表，包含数据产生

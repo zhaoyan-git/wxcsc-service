@@ -1,6 +1,11 @@
 package com.ruoyi.wxcxc.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import com.ruoyi.wxcxc.dto.WxcxcProjectDeviceSensorDataDto;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,82 +27,41 @@ import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 项目设备数据表Controller
- * 
+ *
  * @author l62202
  * @date 2021-11-02
  */
 @RestController
 @RequestMapping("/iot/projectDeivceSensorData")
-public class WxcxcProjectDeviceSensorDataController extends BaseController
-{
+public class WxcxcProjectDeviceSensorDataController extends BaseController {
     @Autowired
     private IWxcxcProjectDeviceSensorDataService wxcxcProjectDeviceSensorDataService;
 
-//    /**
-//     * 查询项目设备数据表列表
-//     */
-//    @PreAuthorize("@ss.hasPermi('iot:projectDeivceSensorData:list')")
-//    @GetMapping("/list")
-//    public TableDataInfo list(WxcxcProjectDeviceSensorData wxcxcProjectDeviceSensorData)
-//    {
-//        startPage();
-//        List<WxcxcProjectDeviceSensorData> list = wxcxcProjectDeviceSensorDataService.selectWxcxcProjectDeviceSensorDataList(wxcxcProjectDeviceSensorData);
-//        return getDataTable(list);
-//    }
-//
-//    /**
-//     * 导出项目设备数据表列表
-//     */
-//    @PreAuthorize("@ss.hasPermi('iot:projectDeivceSensorData:export')")
-//    @Log(title = "项目设备数据表", businessType = BusinessType.EXPORT)
-//    @GetMapping("/export")
-//    public AjaxResult export(WxcxcProjectDeviceSensorData wxcxcProjectDeviceSensorData)
-//    {
-//        List<WxcxcProjectDeviceSensorData> list = wxcxcProjectDeviceSensorDataService.selectWxcxcProjectDeviceSensorDataList(wxcxcProjectDeviceSensorData);
-//        ExcelUtil<WxcxcProjectDeviceSensorData> util = new ExcelUtil<WxcxcProjectDeviceSensorData>(WxcxcProjectDeviceSensorData.class);
-//        return util.exportExcel(list, "项目设备数据表数据");
-//    }
-//
-//    /**
-//     * 获取项目设备数据表详细信息
-//     */
-//    @PreAuthorize("@ss.hasPermi('iot:projectDeivceSensorData:query')")
-//    @GetMapping(value = "/{id}")
-//    public AjaxResult getInfo(@PathVariable("id") Long id)
-//    {
-//        return AjaxResult.success(wxcxcProjectDeviceSensorDataService.selectWxcxcProjectDeviceSensorDataById(id));
-//    }
-//
-//    /**
-//     * 新增项目设备数据表
-//     */
-//    @PreAuthorize("@ss.hasPermi('iot:projectDeivceSensorData:add')")
-//    @Log(title = "项目设备数据表", businessType = BusinessType.INSERT)
-//    @PostMapping
-//    public AjaxResult add(@RequestBody WxcxcProjectDeviceSensorData wxcxcProjectDeviceSensorData)
-//    {
-//        return toAjax(wxcxcProjectDeviceSensorDataService.insertWxcxcProjectDeviceSensorData(wxcxcProjectDeviceSensorData));
-//    }
-//
-//    /**
-//     * 修改项目设备数据表
-//     */
-//    @PreAuthorize("@ss.hasPermi('iot:projectDeivceSensorData:edit')")
-//    @Log(title = "项目设备数据表", businessType = BusinessType.UPDATE)
-//    @PutMapping
-//    public AjaxResult edit(@RequestBody WxcxcProjectDeviceSensorData wxcxcProjectDeviceSensorData)
-//    {
-//        return toAjax(wxcxcProjectDeviceSensorDataService.updateWxcxcProjectDeviceSensorData(wxcxcProjectDeviceSensorData));
-//    }
-//
-//    /**
-//     * 删除项目设备数据表
-//     */
-//    @PreAuthorize("@ss.hasPermi('iot:projectDeivceSensorData:remove')")
-//    @Log(title = "项目设备数据表", businessType = BusinessType.DELETE)
-//	@DeleteMapping("/{ids}")
-//    public AjaxResult remove(@PathVariable Long[] ids)
-//    {
-//        return toAjax(wxcxcProjectDeviceSensorDataService.deleteWxcxcProjectDeviceSensorDataByIds(ids));
-//    }
+    // 获取设备数据
+    @PreAuthorize("@ss.hasPermi('iot:console')")
+    @PostMapping("/list")
+    public Map<Long, List<WxcxcProjectDeviceSensorData>> projectDeviceList(@RequestBody WxcxcProjectDeviceSensorDataDto wxcxcProjectDeviceSensorDataDto) {
+        if (null == wxcxcProjectDeviceSensorDataDto.getDeviceId()) {
+            return null;
+        }
+
+        WxcxcProjectDeviceSensorData wxcxcProjectDeviceSensorDataCondition = new WxcxcProjectDeviceSensorData();
+        wxcxcProjectDeviceSensorDataCondition.setParams(wxcxcProjectDeviceSensorDataDto.getParams());
+
+        List<WxcxcProjectDeviceSensorData> list = wxcxcProjectDeviceSensorDataService.selectWxcxcProjectDeviceSensorDataList(wxcxcProjectDeviceSensorDataDto.getDeviceId(), wxcxcProjectDeviceSensorDataCondition);
+
+        Map<Long, List<WxcxcProjectDeviceSensorData>> resList = new HashMap<>();
+
+        for (WxcxcProjectDeviceSensorData item : list) {
+            // 判断是否已经存在
+            List<WxcxcProjectDeviceSensorData> sensorDataList = resList.get(item.getSensorId());
+            if (null == sensorDataList) sensorDataList = new ArrayList<>();
+
+            sensorDataList.add(item);
+
+            resList.put(item.getSensorId(), sensorDataList);
+        }
+
+        return resList;
+    }
 }
