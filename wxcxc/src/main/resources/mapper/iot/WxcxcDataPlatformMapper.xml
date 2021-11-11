@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcDataPlatformMapper">
-    
+
     <resultMap type="WxcxcDataPlatform" id="WxcxcDataPlatformResult">
-        <result property="id"    column="id"    />
-        <result property="businessCount"    column="business_count"    />
-        <result property="projectCount"    column="project_count"    />
-        <result property="deviceCount"    column="device_count"    />
-        <result property="dtuCount"    column="dtu_count"    />
-        <result property="createTime"    column="create_time"    />
+        <result property="id" column="id"/>
+        <result property="businessCount" column="business_count"/>
+        <result property="projectCount" column="project_count"/>
+        <result property="deviceCount" column="device_count"/>
+        <result property="dtuCount" column="dtu_count"/>
+        <result property="createTime" column="create_time"/>
     </resultMap>
 
     <sql id="selectWxcxcDataPlatformVo">
@@ -19,19 +19,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectWxcxcDataPlatformList" parameterType="WxcxcDataPlatform" resultMap="WxcxcDataPlatformResult">
         <include refid="selectWxcxcDataPlatformVo"/>
-        <where>  
-            <if test="businessCount != null  and businessCount != ''"> and business_count = #{businessCount}</if>
-            <if test="projectCount != null  and projectCount != ''"> and project_count = #{projectCount}</if>
-            <if test="deviceCount != null  and deviceCount != ''"> and device_count = #{deviceCount}</if>
-            <if test="dtuCount != null  and dtuCount != ''"> and dtu_count = #{dtuCount}</if>
+        <where>
+            <if test="businessCount != null  and businessCount != ''">and business_count = #{businessCount}</if>
+            <if test="projectCount != null  and projectCount != ''">and project_count = #{projectCount}</if>
+            <if test="deviceCount != null  and deviceCount != ''">and device_count = #{deviceCount}</if>
+            <if test="dtuCount != null  and dtuCount != ''">and dtu_count = #{dtuCount}</if>
         </where>
     </select>
-    
+
     <select id="selectWxcxcDataPlatformById" parameterType="Long" resultMap="WxcxcDataPlatformResult">
         <include refid="selectWxcxcDataPlatformVo"/>
         where id = #{id}
     </select>
-        
+
     <insert id="insertWxcxcDataPlatform" parameterType="WxcxcDataPlatform" useGeneratedKeys="true" keyProperty="id">
         insert into wxcxc_data_platform
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -40,14 +40,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="deviceCount != null">device_count,</if>
             <if test="dtuCount != null">dtu_count,</if>
             <if test="createTime != null">create_time,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="businessCount != null">#{businessCount},</if>
             <if test="projectCount != null">#{projectCount},</if>
             <if test="deviceCount != null">#{deviceCount},</if>
             <if test="dtuCount != null">#{dtuCount},</if>
             <if test="createTime != null">#{createTime},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateWxcxcDataPlatform" parameterType="WxcxcDataPlatform">
@@ -67,9 +67,30 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteWxcxcDataPlatformByIds" parameterType="String">
-        delete from wxcxc_data_platform where id in 
+        delete from wxcxc_data_platform where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
+
+    <!--    入驻企业数量    -->
+    <select id="getPlatformBusinessCount" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM `wxcxc_business` WHERE del_flag = '0';
+	</select>
+
+    <!--    平台总项目数    -->
+    <select id="getPlatformProjectCount" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM `wxcxc_project` WHERE del_flag = '0';
+	</select>
+
+    <!--    平台设备数    -->
+    <select id="getPlatformDeviceCount" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM `wxcxc_device` WHERE del_flag = '0';
+	</select>
+
+    <!--    平台DTU数    -->
+    <select id="getPlatformDeviceGatewayCount" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM `wxcxc_device_gateway` WHERE del_flag = '0';
+	</select>
+
 </mapper>

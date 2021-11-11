@@ -58,4 +58,16 @@ public interface WxcxcDataPlatformMapper
      * @return 结果
      */
     public int deleteWxcxcDataPlatformByIds(Long[] ids);
+
+    // 入驻企业数量
+    public int getPlatformBusinessCount();
+
+    // 平台总项目数
+    public int getPlatformProjectCount();
+
+    // 平台设备数
+    public int getPlatformDeviceCount();
+
+    // 平台DTU数
+    public int getPlatformDeviceGatewayCount();
 }
