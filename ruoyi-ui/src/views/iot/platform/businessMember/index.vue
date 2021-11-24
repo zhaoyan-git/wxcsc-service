@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
+      <!--      <el-form-item>-->
+      <!--        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>-->
+      <!--        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>-->
+      <!--      </el-form-item>-->
     </el-form>
 
     <el-row :gutter="10" class="mb8">
@@ -15,7 +15,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['iot:businessMember:add']"
+          v-hasPermi="['iot:businessMember']"
         >新增
         </el-button>
       </el-col>
@@ -27,7 +27,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['iot:businessMember:edit']"
+          v-hasPermi="['iot:businessMember']"
         >修改
         </el-button>
       </el-col>
@@ -39,7 +39,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['iot:businessMember:remove']"
+          v-hasPermi="['iot:businessMember']"
         >删除
         </el-button>
       </el-col>
@@ -76,7 +76,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['iot:businessMember:edit']"
+            v-hasPermi="['iot:businessMember']"
           >修改
           </el-button>
           <el-button
@@ -84,7 +84,7 @@
             type="text"
             icon="el-icon-key"
             @click="handleResetPwd(scope.row)"
-            v-hasPermi="['iot:businessMember:resetPwd']"
+            v-hasPermi="['iot:businessMember']"
           >重置密码
           </el-button>
           <el-button
@@ -92,7 +92,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['iot:businessMember:remove']"
+            v-hasPermi="['iot:businessMember']"
           >删除
           </el-button>
         </template>
@@ -170,17 +170,27 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-
-          </el-col>
-          <el-col :span="12">
             <el-form-item label="用户角色" prop="user.roleIds">
-              <el-select v-model="form.user.roleIds" placeholder="请选择" multiple :multiple-limit="1">
+              <el-select v-model="form.user.roleIds" placeholder="请选择" multiple :multiple-limit="1"
+                         @change="roleIdsChange">
                 <el-option
                   v-for="dict in dict.type.iot_business_member_role"
                   :key="dict.value"
                   :label="dict.label"
                   :value="dict.value"
                 ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="项目权限" prop="businessMemberRoleList" v-if="hasMngRole">
+              <el-select v-model="form.projectIds" multiple placeholder="请选择">
+                <el-option
+                  v-for="item in projectData"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -210,6 +220,8 @@
         updateBusinessMemberDto,
         resetUserPwd
     } from "@/api/iot/businessMember";
+
+    import {getListByBusinessId} from "@/api/iot/project";
 
     export default {
         name: "BusinessMember",
@@ -273,16 +285,23 @@
                             trigger: "blur"
                         }
                     ]
-                }
+                },
+                projectData: [],
+                hasMngRole: false
             };
         },
         dicts: ['sys_normal_disable', 'sys_user_sex', 'iot_business_member_role'],
         created() {
             const businessId = this.$route.params && this.$route.params.businessId;
-            console.log(businessId)
+
             if (businessId) {
                 this.queryParams.businessId = businessId;
                 this.getList();
+
+                // 获取项目列表
+                getListByBusinessId({businessId: businessId}).then(response => {
+                    this.projectData = response;
+                });
             }
         },
         methods: {
@@ -354,6 +373,9 @@
                         this.form.user.roleIds = [];
                         this.form.user.roleIds.push(this.form.user.roles[0].roleId.toString());
                     }
+
+                    this.roleIdsChange()
+
                     this.open = true;
                     this.title = "修改企业人员";
                 });
@@ -362,6 +384,18 @@
             submitForm() {
                 this.$refs["form"].validate(valid => {
                     if (valid) {
+                        this.form.businessMemberRoleList = []
+
+                        if (null != this.form.projectIds && 0 < this.form.projectIds.length) {
+                            for (var i = 0; i < this.form.projectIds.length; i++) {
+                                var item = this.form.projectIds[i]
+
+                                this.form.businessMemberRoleList.push({
+                                    projectId: item
+                                })
+                            }
+                        }
+
                         if (this.form.id != null) {
                             updateBusinessMemberDto(this.form).then(response => {
                                 this.$modal.msgSuccess("修改成功");
@@ -416,6 +450,13 @@
                 }).catch(() => {
                 });
             },
+            roleIdsChange() {
+                if (0 < this.form.user.roleIds.length && 5 == this.form.user.roleIds[0]) {
+                    this.hasMngRole = true;
+                } else {
+                    this.hasMngRole = false;
+                }
+            }
         }
     };
 </script>

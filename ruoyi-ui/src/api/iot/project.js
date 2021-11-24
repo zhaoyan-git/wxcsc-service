@@ -51,3 +51,12 @@ export function exportProject(query) {
     params: query
   })
 }
+
+// 根据企业ID获取项目列表
+export function getListByBusinessId(query) {
+  return request({
+    url: '/iot/project/getListByBusinessId',
+    method: 'get',
+    params: query
+  })
+}

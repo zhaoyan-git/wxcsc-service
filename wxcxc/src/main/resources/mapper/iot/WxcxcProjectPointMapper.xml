@@ -43,6 +43,9 @@
         and del_flag = '0'
     </select>
 
+    <select id="selectWxcxcProjectPointByProjectId" parameterType="Long" resultMap="WxcxcProjectPointResult">
+        SELECT * FROM wxcxc_project_point WHERE del_flag = 0 AND project_structure_id in (SELECT id FROM wxcxc_project_structure WHERE del_flag = 0 AND project_id = #{projectId})
+    </select>
     <select id="selectWxcxcProjectPointByPointGroupIdIsNull" parameterType="Long" resultMap="WxcxcProjectPointResult">
         <include refid="selectWxcxcProjectPointVo"/>
         where point_group_id = -1

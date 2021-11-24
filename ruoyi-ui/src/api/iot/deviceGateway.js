@@ -51,3 +51,12 @@ export function exportDeviceGateway(query) {
     params: query
   })
 }
+
+// 手动采集
+export function manualGet(query) {
+  return request({
+    url: '/iot/deviceGateway/manualGet',
+    method: 'get',
+    params: query
+  })
+}

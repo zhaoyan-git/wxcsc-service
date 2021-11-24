@@ -29,12 +29,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectWxcxcBusinessVo"/>
         <where>  
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            and del_flag = 0
         </where>
     </select>
     
     <select id="selectWxcxcBusinessById" parameterType="Long" resultMap="WxcxcBusinessResult">
         <include refid="selectWxcxcBusinessVo"/>
         where id = #{id}
+        and del_flag = 0
     </select>
         
     <insert id="insertWxcxcBusiness" parameterType="WxcxcBusiness" useGeneratedKeys="true" keyProperty="id">

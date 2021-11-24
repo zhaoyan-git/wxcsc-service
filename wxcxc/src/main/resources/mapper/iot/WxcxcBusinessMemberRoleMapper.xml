@@ -56,4 +56,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+    <!--  根据用户ID删除权限  -->
+    <delete id="deleteWxcxcBusinessMemberRoleByBusinessMemberId" parameterType="Long">
+        delete from wxcxc_business_member_role where business_member_id = #{businessMemberId}
+    </delete>
+
 </mapper>

@@ -31,7 +31,7 @@
     </select>
 
     <insert id="insertWxcxcProjectDeviceSensorData" parameterType="WxcxcProjectDeviceSensorData" useGeneratedKeys="true"
-            keyProperty="id">
+            keyProperty="wxcxcProjectDeviceSensorData.id">
         insert into wxcxc_project_device_sensor_data_${deviceId}
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="wxcxcProjectDeviceSensorData.sensorId != null">sensor_id,</if>
@@ -66,4 +66,5 @@
     <select id="getDataCount" parameterType="String" resultType="int">
         SELECT COUNT(*) FROM `wxcxc_project_device_sensor_data_${deviceId}`;
 	</select>
+
 </mapper>

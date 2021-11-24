@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcProjectAlarmRecordMapper">
+
+    <resultMap type="WxcxcProjectAlarmRecord" id="WxcxcProjectAlarmRecordResult">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="projectId" column="project_id"/>
+        <result property="readFlag" column="read_flag"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectWxcxcProjectAlarmRecordVo">
+        select id, title, content, project_id, read_flag, create_time, update_time from wxcxc_project_alarm_record
+    </sql>
+
+    <select id="selectWxcxcProjectAlarmRecordList" parameterType="WxcxcProjectAlarmRecord"
+            resultMap="WxcxcProjectAlarmRecordResult">
+        <include refid="selectWxcxcProjectAlarmRecordVo"/>
+        <where>
+            <if test="title != null  and title != ''">and title = #{title}</if>
+            <if test="content != null  and content != ''">and content = #{content}</if>
+            <if test="projectId != null ">and project_id = #{projectId}</if>
+            <if test="readFlag != null  and readFlag != ''">and read_flag = #{readFlag}</if>
+        </where>
+    </select>
+
+    <select id="selectWxcxcProjectAlarmRecordById" parameterType="Long" resultMap="WxcxcProjectAlarmRecordResult">
+        <include refid="selectWxcxcProjectAlarmRecordVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertWxcxcProjectAlarmRecord" parameterType="WxcxcProjectAlarmRecord" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into wxcxc_project_alarm_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null">title,</if>
+            <if test="content != null">content,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="readFlag != null">read_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null">#{title},</if>
+            <if test="content != null">#{content},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="readFlag != null">#{readFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateWxcxcProjectAlarmRecord" parameterType="WxcxcProjectAlarmRecord">
+        update wxcxc_project_alarm_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="readFlag != null">read_flag = #{readFlag},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcProjectAlarmRecordById" parameterType="Long">
+        delete from wxcxc_project_alarm_record where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcProjectAlarmRecordByIds" parameterType="String">
+        delete from wxcxc_project_alarm_record where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectWxcxcProjectAlarmRecordListByMemberId" parameterType="WxcxcProjectAlarmRecord"
+            resultMap="WxcxcProjectAlarmRecordResult">
+        <include refid="selectWxcxcProjectAlarmRecordVo"/>
+        <where>
+            <if test="wxcxcProjectAlarmRecord.title != null  and wxcxcProjectAlarmRecord.title != ''">and title = #{wxcxcProjectAlarmRecord.title}</if>
+            <if test="wxcxcProjectAlarmRecord.content != null  and wxcxcProjectAlarmRecord.content != ''">and content = #{wxcxcProjectAlarmRecord.content}</if>
+            <if test="wxcxcProjectAlarmRecord.projectId != null and businessMemberId == null">and project_id = #{wxcxcProjectAlarmRecord.projectId}</if>
+            <if test="wxcxcProjectAlarmRecord.readFlag != null  and wxcxcProjectAlarmRecord.readFlag != ''">and read_flag = #{wxcxcProjectAlarmRecord.readFlag}</if>
+            <if test="wxcxcProjectAlarmRecord.projectId == null and businessMemberId != null  and businessMemberId != ''">and project_id in
+                (select project_id from wxcxc_business_member_role where business_member_id = #{businessMemberId})
+            </if>
+        </where>
+    </select>
+</mapper>

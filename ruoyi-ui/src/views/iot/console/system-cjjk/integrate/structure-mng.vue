@@ -143,13 +143,13 @@
       </el-form>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> 关闭</el-button>
         <el-button
           type="primary"
           @click="dialogStatus === 'create' ? createData() : updateData()"
         >
           提交
         </el-button>
+        <el-button @click="dialogFormVisible = false"> 关闭</el-button>
       </div>
     </el-dialog>
     <!-- 创建及编辑视图 START -->

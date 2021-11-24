@@ -147,6 +147,7 @@ public class WxcxcBusinessMemberController extends BaseController {
     @PostMapping("/businessMemberDto")
     public AjaxResult add(@RequestBody BusinessMemberDto businessMemberDto) {
         SysUser user = businessMemberDto.getUser();
+        // 创建用户
         if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName())))
         {
             return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
@@ -164,6 +165,8 @@ public class WxcxcBusinessMemberController extends BaseController {
         user.setCreateBy(getUsername());
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
 
+        // TODO 创建项目权限
+
         return toAjax(wxcxcBusinessMemberService.insertWxcxcBusinessMember(businessMemberDto));
     }
 
@@ -174,6 +177,7 @@ public class WxcxcBusinessMemberController extends BaseController {
     @Log(title = "企业人员", businessType = BusinessType.UPDATE)
     @PutMapping("/businessMemberDto")
     public AjaxResult edit(@RequestBody BusinessMemberDto businessMemberDto) {
+        // 修改用户
         SysUser user = businessMemberDto.getUser();
         userService.checkUserAllowed(user);
         if (StringUtils.isNotEmpty(user.getPhonenumber())

@@ -26,4 +26,7 @@ public interface WxcxcProjectPointDataMapper {
 
     // 获取数据数
     int getDataCount(@Param("structureId") Long structureId);
+
+    WxcxcProjectPointData selectWxcxcProjectPointDataListReportForm(@Param("structureId") Long structureId, @Param("pointId") Long pointId,
+                                                                    @Param("beginTime") String beginTime, @Param("endTime") String endTime, @Param("position") Long position);
 }

@@ -15,6 +15,7 @@ public class BootNettyChannelInitializer<SocketChannel> extends ChannelInitializ
     protected void initChannel(Channel ch) throws Exception {
 
         // ChannelOutboundHandler，依照逆序执行
+        ch.pipeline().addLast("encoder", new ByteArrayEncoder());
 //        ch.pipeline().addLast("encoder", new StringEncoder());
 //        ch.pipeline().addLast(new ChineseMessageEncoder(Charset.forName("UTF-8")));
 
@@ -22,7 +23,7 @@ public class BootNettyChannelInitializer<SocketChannel> extends ChannelInitializ
 //        ch.pipeline().addLast("decoder", new StringDecoder());
 //        ch.pipeline().addLast("decoder", new ChineseMessageDecoder());
 
-//        ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(15, 0, 0, TimeUnit.MINUTES));
+        ch.pipeline().addLast(new IdleStateHandler(2, 0, 0, TimeUnit.MINUTES));
 //
 //        ch.pipeline().addLast(new ByteArrayEncoder());
 

@@ -79,8 +79,10 @@ public class WxcxcDeviceServiceImpl implements IWxcxcDeviceService {
     @Override
     public int updateWxcxcDevice(WxcxcDevice wxcxcDevice) {
         wxcxcDevice.setUpdateTime(DateUtils.getNowDate());
+        // 删除旧传感器
         wxcxcDeviceMapper.deleteWxcxcDeviceSensorByDeviceId(wxcxcDevice.getId());
         insertWxcxcDeviceSensor(wxcxcDevice);
+
         return wxcxcDeviceMapper.updateWxcxcDevice(wxcxcDevice);
     }
 
@@ -120,6 +122,7 @@ public class WxcxcDeviceServiceImpl implements IWxcxcDeviceService {
         if (StringUtils.isNotNull(wxcxcDeviceSensorList)) {
             List<WxcxcDeviceSensor> list = new ArrayList<WxcxcDeviceSensor>();
             for (WxcxcDeviceSensor wxcxcDeviceSensor : wxcxcDeviceSensorList) {
+                wxcxcDeviceSensor.setId(null);
                 wxcxcDeviceSensor.setDeviceId(id);
                 list.add(wxcxcDeviceSensor);
             }

@@ -24,7 +24,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['iot:business:add']"
+          v-hasPermi="['iot:business']"
         >新增
         </el-button>
       </el-col>
@@ -36,7 +36,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['iot:business:edit']"
+          v-hasPermi="['iot:business']"
         >修改
         </el-button>
       </el-col>
@@ -48,7 +48,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['iot:business:remove']"
+          v-hasPermi="['iot:business']"
         >删除
         </el-button>
       </el-col>
@@ -60,7 +60,7 @@
           size="mini"
           :loading="exportLoading"
           @click="handleExport"
-          v-hasPermi="['iot:business:export']"
+          v-hasPermi="['iot:business']"
         >导出
         </el-button>
       </el-col>
@@ -92,7 +92,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['iot:business:edit']"
+            v-hasPermi="['iot:business']"
           >修改
           </el-button>
           <el-button
@@ -100,7 +100,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['iot:business:remove']"
+            v-hasPermi="['iot:business']"
           >删除
           </el-button>
         </template>

@@ -134,7 +134,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改设备表对话框 -->
+    <!-- 添加或修改设备对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="80%" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="所属项目" prop="projectId">
@@ -147,16 +147,16 @@
             ></el-option>
           </el-select>
         </el-form-item>
-<!--        <el-form-item label="选择产品" prop="projectId">-->
-<!--          <el-select v-model="form.projectId" placeholder="请选择产品" @change="dialogFormProjectChange">-->
-<!--            <el-option-->
-<!--              :label="item.name"-->
-<!--              :value="item.id"-->
-<!--              v-for="item in projectData"-->
-<!--              :key="item.id"-->
-<!--            ></el-option>-->
-<!--          </el-select>-->
-<!--        </el-form-item>-->
+        <!--        <el-form-item label="选择产品" prop="projectId">-->
+        <!--          <el-select v-model="form.projectId" placeholder="请选择产品" @change="dialogFormProjectChange">-->
+        <!--            <el-option-->
+        <!--              :label="item.name"-->
+        <!--              :value="item.id"-->
+        <!--              v-for="item in projectData"-->
+        <!--              :key="item.id"-->
+        <!--            ></el-option>-->
+        <!--          </el-select>-->
+        <!--        </el-form-item>-->
         <el-form-item label="设备名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入设备名称"/>
         </el-form-item>
@@ -231,7 +231,6 @@
                   :label="dict.label"
                   :value="dict.value"
                 ></el-option>
-                <!--                <dict-tag :options="dict.type.iot_device_sensor_type" :value="scope.row.type"/>-->
               </el-select>
             </template>
           </el-table-column>
@@ -265,11 +264,11 @@
               <el-input v-model="scope.row.slaveAmountLo" placeholder="请输入数量Lo"/>
             </template>
           </el-table-column>
-<!--          <el-table-column label="采集周期" prop="cycleTime">-->
-<!--            <template slot-scope="scope">-->
-<!--              <el-input v-model="scope.row.cycleTime" placeholder="请输入采集周期"/>-->
-<!--            </template>-->
-<!--          </el-table-column>-->
+          <!--          <el-table-column label="采集周期" prop="cycleTime">-->
+          <!--            <template slot-scope="scope">-->
+          <!--              <el-input v-model="scope.row.cycleTime" placeholder="请输入采集周期（分钟）"/>-->
+          <!--            </template>-->
+          <!--          </el-table-column>-->
         </el-table>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -458,7 +457,7 @@
             handleAdd() {
                 this.reset();
                 this.open = true;
-                this.title = "添加设备表";
+                this.title = "添加设备";
             },
             /** 修改按钮操作 */
             handleUpdate(row) {
@@ -475,7 +474,7 @@
                     });
 
                     this.open = true;
-                    this.title = "修改设备表";
+                    this.title = "修改设备";
                 });
             },
             /** 提交按钮 */
@@ -502,7 +501,7 @@
             /** 删除按钮操作 */
             handleDelete(row) {
                 const ids = row.id || this.ids;
-                this.$modal.confirm('是否确认删除设备表编号为"' + ids + '"的数据项？').then(function () {
+                this.$modal.confirm('是否确认删除设备编号为"' + ids + '"的数据项？').then(function () {
                     return delDevice(ids);
                 }).then(() => {
                     this.getList();
@@ -550,7 +549,7 @@
             /** 导出按钮操作 */
             handleExport() {
                 const queryParams = this.queryParams;
-                this.$modal.confirm('是否确认导出所有设备表数据项？').then(() => {
+                this.$modal.confirm('是否确认导出所有设备数据项？').then(() => {
                     this.exportLoading = true;
                     return exportDevice(queryParams);
                 }).then(response => {

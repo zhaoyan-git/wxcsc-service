@@ -102,21 +102,6 @@
         listStructurePointData
     } from "@/api/iot/structurePointData";
 
-    const lineChartData = {
-        newVisitis: {
-            expectedData: [100, 120, 161, 134, 105, 160, 165],
-        },
-        messages: {
-            expectedData: [200, 192, 120, 144, 160, 130, 140],
-        },
-        purchases: {
-            expectedData: [80, 100, 121, 104, 105, 90, 100],
-        },
-        shoppings: {
-            expectedData: [130, 140, 141, 142, 145, 150, 160],
-        },
-    };
-
     export default {
         name: "atricleChannelJjfa",
         data() {
@@ -125,7 +110,6 @@
                 options: [],
                 pageLoading: false,
                 tableData: [],
-                dataForm: {},
                 condition: {
                     page: {
                         orderBy: "id",
@@ -135,24 +119,6 @@
                         total: 0,
                     },
                 },
-                dialogFormVisible: false,
-                textMap: {
-                    edit: "编辑",
-                    create: "创建",
-                },
-                dialogStatus: "",
-                rules: {
-                    username: [
-                        {required: true, message: "请输入登录名", trigger: "blur"},
-                    ],
-                    nickname: [{required: true, message: "请输入昵称", trigger: "blur"}],
-                },
-                uploadFileList: [
-                    {
-                        name: "food.jpg",
-                        url: "http://www.csbme.org/upload/userfiles/images/%E5%BB%BA%E5%85%9A100%E5%91%A8%E5%B9%B4.jpg",
-                    },
-                ],
                 width: "100%",
                 height: "100%",
                 pickerOptions: {
@@ -186,7 +152,6 @@
                         },
                     ],
                 },
-                value2: "",
                 projectStructureData: [],
                 optionsPointOrDeviceData: [],
                 currentProjectId: "",
@@ -234,11 +199,34 @@
                 if (2 == this.pointOrDeviceData.length) {
                     condition.deviceId = this.pointOrDeviceData[1]
 
-                    console.log(condition)
                     listProjectDeivceSensorData(condition).then((response) => {
-                        var data = response.data;
-                        this.pageLoading = false;
-                    });
+                            var data = [];
+
+                            for (var i = 0; i < response.length; i++) {
+                                var item = response[i]
+                                var itemData = []
+
+                                for (var j = 0; j < item.length; j++) {
+                                    itemData.push([
+                                        item[j].createTime,
+                                        item[j].data
+                                    ])
+                                }
+
+                                data.push({
+                                    name: item.id,
+                                    data: itemData,
+                                    type:
+                                        'line',
+                                    smooth:
+                                        true
+                                })
+                            }
+
+                            this.setOptions(data)
+                            this.pageLoading = false;
+                        }
+                    )
                 }
 
 
@@ -249,7 +237,24 @@
                     condition.pointId = this.pointOrDeviceData[2]
 
                     listStructurePointData(condition).then((response) => {
-                        var data = response.data;
+                        var data = [];
+
+                        for (var i = 0; i < response.length; i++) {
+                            var item = response[i]
+                            data.push([
+                                item.createTime,
+                                item.data
+                            ])
+                        }
+
+                        this.setOptions([{
+                            data: data,
+                            type:
+                                'line',
+                            smooth:
+                                true
+                        }])
+
                         this.pageLoading = false;
                     });
                 }
@@ -280,21 +285,10 @@
                 this.setOptions(this.chartData);
             }
             ,
-            setOptions({expectedData} = {}) {
-                this.chart.setOption({
+            setOptions(expectedData) {
+                var option = {
                     xAxis: {
-                        data: ["8-20", "8-21", "8-22", "8-23", "8-24", "8-25", "8-26"],
-                        boundaryGap: false,
-                        axisTick: {
-                            show: false,
-                        },
-                    },
-                    grid: {
-                        left: 10,
-                        right: 10,
-                        bottom: 20,
-                        top: 30,
-                        containLabel: true,
+                        type: 'category'
                     },
                     tooltip: {
                         trigger: "axis",
@@ -304,35 +298,14 @@
                         padding: [5, 10],
                     },
                     yAxis: {
-                        axisTick: {
-                            show: false,
-                        },
+                        type: 'value'
                     },
-                    legend: {
-                        data: ["设备1"],
-                    },
-                    series: [
-                        {
-                            name: "设备1",
-                            itemStyle: {
-                                normal: {
-                                    color: "#FF005A",
-                                    lineStyle: {
-                                        color: "#FF005A",
-                                        width: 2,
-                                    },
-                                },
-                            },
-                            smooth: true,
-                            type: "line",
-                            data: expectedData,
-                            animationDuration: 2800,
-                            animationEasing: "cubicInOut",
-                        },
-                    ],
-                });
-            }
-            ,
+                    series: expectedData
+
+                }
+
+                this.chart.setOption(option)
+            },
             handleCurrentChange(val) {
                 this.currentProjectId = val.id;
                 projectStructureListByProjectId({
@@ -343,8 +316,7 @@
 
                     this.condition.projectStructureId = ""
                 });
-            }
-            ,
+            },
             // 选择结构物
             conditionProjectStructureChange() {
                 this.optionsPointOrDeviceData = [];
@@ -402,8 +374,7 @@
                     label: '设备',
                     children: projectDeviceData
                 })
-            }
-            ,
+            },
             pointOrDeviceChange(val) {
                 console.log(val)
             },

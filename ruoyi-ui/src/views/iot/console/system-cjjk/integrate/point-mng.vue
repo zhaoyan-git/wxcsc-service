@@ -34,26 +34,17 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <!--      <el-form-item label="所属分组" prop="pointGroupId">-->
-      <!--        <el-select v-model="queryParams.pointGroupId" placeholder="请选择所属分组" clearable size="small">-->
+
+      <!--      <el-form-item label="监测因素" prop="monitorType">-->
+      <!--        <el-select v-model="queryParams.monitorType" placeholder="请选择监测因素" clearable size="small">-->
       <!--          <el-option-->
-      <!--            :label="item.name"-->
-      <!--            :value="item.id"-->
-      <!--            v-for="item in projectPointGroupData"-->
-      <!--            :key="item.id"-->
-      <!--          ></el-option>-->
+      <!--            v-for="dict in dict.type.iot_monitor_type"-->
+      <!--            :key="dict.value"-->
+      <!--            :label="dict.label"-->
+      <!--            :value="dict.value"-->
+      <!--          />-->
       <!--        </el-select>-->
       <!--      </el-form-item>-->
-      <el-form-item label="监测因素" prop="monitorType">
-        <el-select v-model="queryParams.monitorType" placeholder="请选择监测因素" clearable size="small">
-          <el-option
-            v-for="dict in dict.type.iot_monitor_type"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
-        </el-select>
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -83,39 +74,6 @@
         >新增测点分组
         </el-button>
       </el-col>
-      <!--      <el-col :span="1.5">-->
-      <!--        <el-button-->
-      <!--          type="success"-->
-      <!--          plain-->
-      <!--          icon="el-icon-edit"-->
-      <!--          size="mini"-->
-      <!--          :disabled="single"-->
-      <!--          @click="handleUpdate"-->
-      <!--          v-hasPermi="['iot:projectPoint']"-->
-      <!--        >修改</el-button>-->
-      <!--      </el-col>-->
-      <!--      <el-col :span="1.5">-->
-      <!--        <el-button-->
-      <!--          type="danger"-->
-      <!--          plain-->
-      <!--          icon="el-icon-delete"-->
-      <!--          size="mini"-->
-      <!--          :disabled="multiple"-->
-      <!--          @click="handleDelete"-->
-      <!--          v-hasPermi="['iot:projectPoint']"-->
-      <!--        >删除</el-button>-->
-      <!--      </el-col>-->
-      <!--      <el-col :span="1.5">-->
-      <!--        <el-button-->
-      <!--          type="warning"-->
-      <!--          plain-->
-      <!--          icon="el-icon-download"-->
-      <!--          size="mini"-->
-      <!--          :loading="exportLoading"-->
-      <!--          @click="handleExport"-->
-      <!--          v-hasPermi="['iot:projectPoint:export']"-->
-      <!--        >导出</el-button>-->
-      <!--      </el-col>-->
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -125,8 +83,6 @@
               @selection-change="handleSelectionChange"
               :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       >
-      <!--      <el-table-column type="selection" width="55" align="center" />-->
-
       <el-table-column label="分组名称" align="center" prop="name">
         <template slot-scope="scope">
           <block v-if="null == scope.row.pointGroupId">
@@ -205,50 +161,49 @@
 
     </el-table>
 
-    <!--    <pagination-->
-    <!--      v-show="total>0"-->
-    <!--      :total="total"-->
-    <!--      :page.sync="queryParams.pageNum"-->
-    <!--      :limit.sync="queryParams.pageSize"-->
-    <!--      @pagination="getList"-->
-    <!--    />-->
-
     <!-- 添加或修改项目测点对话框 -->
     <el-dialog :title="title" :visible.sync="open" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="140px">
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入名称"/>
         </el-form-item>
         <el-form-item label="图片地址">
           <imageUpload v-model="form.photoFile"/>
         </el-form-item>
-        <el-form-item label="所属项目" prop="projectId">
-          <el-select
-            v-model="form.projectId"
-            placeholder="请选择所属项目"
-            @change="dialogFormProjectChange"
-          >
-            <el-option
-              v-for="item in projectData"
-              v-bind:key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="所属结构物" prop="projectStructureId">
-          <el-select v-model="form.projectStructureId"
-                     placeholder="请选择所属结构物"
-                     @change="dialogFormProjectStructureChange"
-          >
-            <el-option
-              v-for="item in formProjectStructureData"
-              v-bind:key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="所属项目" prop="projectId">
+              <el-select
+                v-model="form.projectId"
+                placeholder="请选择所属项目"
+                @change="dialogFormProjectChange"
+              >
+                <el-option
+                  v-for="item in projectData"
+                  v-bind:key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属结构物" prop="projectStructureId">
+              <el-select v-model="form.projectStructureId"
+                         placeholder="请选择所属结构物"
+                         @change="dialogFormProjectStructureChange"
+              >
+                <el-option
+                  v-for="item in formProjectStructureData"
+                  v-bind:key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
         <el-form-item label="所属分组" prop="pointGroupId">
           <el-select v-model="form.pointGroupId" placeholder="请选择所属分组">
             <el-option
@@ -269,9 +224,46 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <!--        <el-form-item label="监测因素所需数据" prop="monitorData">-->
-        <!--          <el-input v-model="form.monitorData" type="textarea" placeholder="请输入内容"/>-->
-        <!--        </el-form-item>-->
+        <block v-if="1 == form.monitorType">
+          <el-form-item label="选择数据来源" prop="monitorData.data_source_point">
+            <el-cascader
+              v-model="form.monitorData.data_source_point"
+              :options="optionsPointData"
+              :props="{ expandTrigger: 'hover' }"></el-cascader>
+          </el-form-item>
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="选择基准值数据来源" prop="monitorData.type">
+                <el-select v-model="form.monitorData.type" placeholder="选择基准值数据来源">
+                  <el-option
+                    :key="1"
+                    label="基准测点"
+                    :value="1"
+                  ></el-option>
+                  <el-option
+                    :key="2"
+                    label="初始值"
+                    :value="2"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="选择基准测点" prop="monitorData.data_source_standard_point"
+                            v-if="1 == form.monitorData.type">
+                <el-cascader
+                  v-model="form.monitorData.data_source_standard_point"
+                  :options="optionsPointData"
+                  :props="{ expandTrigger: 'hover' }"></el-cascader>
+              </el-form-item>
+              <el-form-item label="初始值" prop="monitorData.data_source_standard_value" v-if="2 == form.monitorData.type">
+                <el-input v-model="form.monitorData.data_source_standard_value" type="input" placeholder="请输入初始值"/>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+        </block>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -279,7 +271,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="openGroup" append-to-body>
+    <el-dialog :title="titleGroup" :visible.sync="openGroup" append-to-body>
       <el-form ref="formGroup" :model="formGroup" :rules="rulesGroup" label-width="120px">
         <el-form-item label="分组名称" prop="name">
           <el-input v-model="formGroup.name" placeholder="请输入分组名称"/>
@@ -374,7 +366,7 @@
                         this.projectStructureData = response;
                     });
                 }
-            }
+            },
         },
         data() {
             return {
@@ -422,6 +414,21 @@
                     projectId: [
                         {required: true, message: "所属项目不能为空", trigger: "change"}
                     ],
+                    monitorType: [
+                        {required: true, message: "监测因素不能为空", trigger: "change"}
+                    ],
+                    'monitorData.data_source_point': [
+                        {required: true, message: "数据来源不能为空", trigger: "change"}
+                    ],
+                    'monitorData.type': [
+                        {required: true, message: "基准值数据来源不能为空", trigger: "change"}
+                    ],
+                    'monitorData.data_source_standard_point': [
+                        {required: true, message: "基准点不能为空", trigger: "change"}
+                    ],
+                    'monitorData.data_source_standard_value': [
+                        {required: true, message: "初始值不能为空", trigger: "change"}
+                    ]
                 },
                 projectData: [],
                 projectStructureData: [],
@@ -438,7 +445,9 @@
                     ],
                 },
                 titleGroup: "",
-                formGroupProjectStructureData: []
+                formGroupProjectStructureData: [],
+                optionsPointData: [],
+                titleGroup: ""
             };
         },
         created() {
@@ -485,7 +494,7 @@
                     alarmFlag: null,
                     monitorType: null,
                     delFlag: null,
-                    monitorData: null,
+                    monitorData: {},
                     createBy: null,
                     createTime: null,
                     updateBy: null,
@@ -515,6 +524,10 @@
             /** 新增按钮操作 */
             handleAdd() {
                 this.reset();
+
+                this.form.projectId = this.queryParams.projectId
+                this.form.projectStructureId = this.queryParams.projectStructureId
+
                 this.open = true;
                 this.title = "添加项目测点";
             },
@@ -533,6 +546,18 @@
                         }
                     }
 
+                    // 数据回填
+                    var resMonitorData = JSON.parse(response.data.monitorData)
+                    var monitorData = {}
+
+                    monitorData.data_source_point = this.getProjectPointDataIdByPointId(resMonitorData.data_source_point)
+                    monitorData.data_source_standard_point = this.getProjectPointDataIdByPointId(resMonitorData.data_source_standard_point)
+                    monitorData.type = resMonitorData.type
+
+                    this.form.monitorData = monitorData
+
+                    console.log(this.getProjectPointDataIdByPointId(resMonitorData.data_source_point))
+
                     this.open = true;
                     this.title = "修改项目测点";
                 });
@@ -541,14 +566,31 @@
             submitForm() {
                 this.$refs["form"].validate(valid => {
                     if (valid) {
+                        var formData = JSON.parse(JSON.stringify(this.form))
+                        // 处理检测因素
+                        var monitorData = {};
+                        console.log(formData)
+
+                        if (1 == formData.monitorType) {
+                            monitorData.data_source_point = formData.monitorData.data_source_point[1]
+                            monitorData.type = formData.monitorData.type
+                            if (1 == formData.monitorData.type) {
+                                monitorData.data_source_standard_point = formData.monitorData.data_source_standard_point[1]
+                            } else if (2 == formData.monitorData.type) {
+                                monitorData.data_source_standard_value = formData.monitorData.data_source_standard_value
+                            }
+                        }
+
+                        formData.monitorData = monitorData;
+
                         if (this.form.id != null) {
-                            updateProjectPoint(this.form).then(response => {
+                            updateProjectPoint(formData).then(response => {
                                 this.$modal.msgSuccess("修改成功");
                                 this.open = false;
                                 this.getList();
                             });
                         } else {
-                            addProjectPoint(this.form).then(response => {
+                            addProjectPoint(formData).then(response => {
                                 this.$modal.msgSuccess("新增成功");
                                 this.open = false;
                                 this.getList();
@@ -593,6 +635,7 @@
                     this.getList();
                 }
             },
+            // 筛选结构物
             conditionProjectStructureChange() {
                 if (null != this.queryParams.projectStructureId) {
                     projectPointGroup({
@@ -607,6 +650,9 @@
                     });
 
                     this.getList();
+
+                    // 获取测点及分组
+                    this.getPointAndGroup(this.queryParams.projectStructureId)
                 }
             },
             dialogFormProjectChange() {
@@ -620,8 +666,10 @@
                     });
                 }
             },
+            // 测点dialog 结构物变化
             dialogFormProjectStructureChange() {
                 if (null != this.form.projectStructureId) {
+                    // 获取测点分组
                     projectPointGroup({
                         structureId: this.form.projectStructureId,
                     }).then((response) => {
@@ -633,6 +681,10 @@
                         })
                         this.form.pointGroupId = null;
                     });
+
+                    // 获取测点和分组
+                    this.getPointAndGroup(this.form.projectStructureId)
+
                 }
             },
             // 取消按钮
@@ -716,7 +768,53 @@
                         this.formGroup.structureId = null;
                     });
                 }
+            },
+            getProjectPointDataIdByPointId(pointId) {
+                for (var i = 0; i < this.optionsPointData.length; i++) {
+                    var item = this.optionsPointData[i]
+
+                    for (var j = 0; j < item.children.length; j++) {
+                        var childrenItem = item.children[j]
+
+                        if (pointId == childrenItem.value) {
+                            return [item.value, childrenItem.value]
+                        }
+                    }
+
+                }
+            },
+            getPointAndGroup(projectStructureId) {
+                // 获取测点及分组
+                var projectPointData = [];
+
+                listProjectPoint({
+                    projectStructureId: projectStructureId
+                }).then(response => {
+                    for (var i = 0; i < response.rows.length; i++) {
+                        var item = response.rows[i];
+                        var children = [];
+
+                        if (null != item.children) {
+                            for (var j = 0; j < item.children.length; j++) {
+                                var childrenItem = item.children[j]
+                                children.push({
+                                    value: childrenItem.id,
+                                    label: childrenItem.name,
+                                })
+                            }
+                        }
+
+                        projectPointData.push({
+                            value: item.id,
+                            label: item.name,
+                            children: children
+                        })
+                    }
+
+                    this.optionsPointData = projectPointData
+                });
             }
+
         }
     };
 </script>

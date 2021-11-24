@@ -1,19 +1,19 @@
 package com.ruoyi.wxcxc.mapper;
 
 import java.util.List;
+
 import com.ruoyi.wxcxc.domain.WxcxcProjectPoint;
 
 /**
  * 项目测点Mapper接口
- * 
+ *
  * @author l62202
  * @date 2021-11-01
  */
-public interface WxcxcProjectPointMapper 
-{
+public interface WxcxcProjectPointMapper {
     /**
      * 查询项目测点
-     * 
+     *
      * @param id 项目测点主键
      * @return 项目测点
      */
@@ -21,7 +21,7 @@ public interface WxcxcProjectPointMapper
 
     /**
      * 查询项目测点列表
-     * 
+     *
      * @param wxcxcProjectPoint 项目测点
      * @return 项目测点集合
      */
@@ -29,7 +29,7 @@ public interface WxcxcProjectPointMapper
 
     /**
      * 新增项目测点
-     * 
+     *
      * @param wxcxcProjectPoint 项目测点
      * @return 结果
      */
@@ -37,7 +37,7 @@ public interface WxcxcProjectPointMapper
 
     /**
      * 修改项目测点
-     * 
+     *
      * @param wxcxcProjectPoint 项目测点
      * @return 结果
      */
@@ -45,7 +45,7 @@ public interface WxcxcProjectPointMapper
 
     /**
      * 删除项目测点
-     * 
+     *
      * @param id 项目测点主键
      * @return 结果
      */
@@ -53,7 +53,7 @@ public interface WxcxcProjectPointMapper
 
     /**
      * 批量删除项目测点
-     * 
+     *
      * @param ids 需要删除的数据主键集合
      * @return 结果
      */
@@ -61,4 +61,7 @@ public interface WxcxcProjectPointMapper
 
     // 获取未分组的测点
     public List<WxcxcProjectPoint> selectWxcxcProjectPointByPointGroupIdIsNull(Long projectStructureId);
+
+    // 根据项目ID获取测点
+    public List<WxcxcProjectPoint> selectWxcxcProjectPointByProjectId(Long projectId);
 }

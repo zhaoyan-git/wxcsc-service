@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.ruoyi.wxcxc.domain.WxcxcProjectPointGroup;
 import com.ruoyi.wxcxc.dto.ProjectPointGroupDto;
+import com.ruoyi.wxcxc.dto.WxcxcProjectPointDto;
 import com.ruoyi.wxcxc.service.IWxcxcProjectPointGroupService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,7 +112,18 @@ public class WxcxcProjectPointController extends BaseController {
     @PreAuthorize("@ss.hasPermi('iot:projectPoint')")
     @Log(title = "项目测点", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody WxcxcProjectPoint wxcxcProjectPoint) {
+    public AjaxResult add(@RequestBody WxcxcProjectPointDto wxcxcProjectPointDto) {
+        WxcxcProjectPoint wxcxcProjectPoint = new WxcxcProjectPoint();
+
+        wxcxcProjectPoint.setName(wxcxcProjectPointDto.getName());
+        wxcxcProjectPoint.setPhotoFile(wxcxcProjectPointDto.getPhotoFile());
+        wxcxcProjectPoint.setProjectStructureId(wxcxcProjectPointDto.getProjectStructureId());
+        wxcxcProjectPoint.setPointGroupId(wxcxcProjectPointDto.getPointGroupId());
+        wxcxcProjectPoint.setAlarmFlag(wxcxcProjectPointDto.getAlarmFlag());
+        wxcxcProjectPoint.setMonitorType(wxcxcProjectPointDto.getMonitorType());
+        wxcxcProjectPoint.setMonitorData(wxcxcProjectPointDto.getMonitorData().toJSONString());
+        wxcxcProjectPoint.setDelFlag("0");
+
         return toAjax(wxcxcProjectPointService.insertWxcxcProjectPoint(wxcxcProjectPoint));
     }
 
@@ -121,7 +133,18 @@ public class WxcxcProjectPointController extends BaseController {
     @PreAuthorize("@ss.hasPermi('iot:projectPoint')")
     @Log(title = "项目测点", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody WxcxcProjectPoint wxcxcProjectPoint) {
+    public AjaxResult edit(@RequestBody WxcxcProjectPointDto wxcxcProjectPointDto) {
+        WxcxcProjectPoint wxcxcProjectPoint = new WxcxcProjectPoint();
+
+        wxcxcProjectPoint.setId(wxcxcProjectPointDto.getId());
+        wxcxcProjectPoint.setName(wxcxcProjectPointDto.getName());
+        wxcxcProjectPoint.setPhotoFile(wxcxcProjectPointDto.getPhotoFile());
+        wxcxcProjectPoint.setProjectStructureId(wxcxcProjectPointDto.getProjectStructureId());
+        wxcxcProjectPoint.setPointGroupId(wxcxcProjectPointDto.getPointGroupId());
+        wxcxcProjectPoint.setAlarmFlag(wxcxcProjectPointDto.getAlarmFlag());
+        wxcxcProjectPoint.setMonitorType(wxcxcProjectPointDto.getMonitorType());
+        wxcxcProjectPoint.setMonitorData(wxcxcProjectPointDto.getMonitorData().toJSONString());
+
         return toAjax(wxcxcProjectPointService.updateWxcxcProjectPoint(wxcxcProjectPoint));
     }
 

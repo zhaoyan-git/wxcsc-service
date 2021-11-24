@@ -1,5 +1,6 @@
 package com.ruoyi.wxcxc.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
@@ -110,6 +111,20 @@ public class WxcxcProjectController extends BaseController {
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(wxcxcProjectService.deleteWxcxcProjectByIds(ids));
     }
+
+    // 根据企业ID获取项目列表
+    @PreAuthorize("@ss.hasPermi('iot:integrate:project')")
+    @GetMapping("/getListByBusinessId")
+    public List<WxcxcProject> getListByBusinessId(WxcxcProject wxcxcProject) {
+        if (null == wxcxcProject || null == wxcxcProject.getBusinessId())
+            return new ArrayList<>();
+
+        wxcxcProject.setBusinessId(wxcxcProject.getBusinessId());
+
+        List<WxcxcProject> list = wxcxcProjectService.selectWxcxcProjectList(wxcxcProject);
+        return list;
+    }
+
 
     private Long getBusinessId() {
         // 获取用户

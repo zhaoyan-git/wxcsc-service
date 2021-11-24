@@ -1,18 +1,28 @@
 package com.ruoyi.wxcxc;
 
 import com.ruoyi.wxcxc.util.CRCUtils;
+import com.ruoyi.wxcxc.util.HexUtil;
 
 import java.io.*;
 
 public class Test {
 
 
-
     public static void main(String[] args) throws IOException {
 
-        System.out.println(Integer.toHexString(32));
-        byte[] bytes1 = hexToByte("030300000003");
+
+        Float f = Float.intBitsToFloat(Integer.parseInt("BF2FB6B5", 16));
+        System.out.println(f);
+
+        byte[] bytes1 = hexToByte("030300000018");
         System.out.println(CRCUtils.getCRC(bytes1));
+
+        byte[] b = HexUtil.hexToByte("0303000000184422");
+        byte[] b1 = "0303000000184422".getBytes();
+
+        System.out.println(HexUtil.byteToHex(b1));
+        System.out.println(HexUtil.byteToHex(b));
+        System.out.println(HexUtil.byteToHex(b));
 //
 ////        byte b = (byte)Integer.parseInt("FF",16);
 //        hexToByte("FF");

@@ -90,7 +90,6 @@ export default {
           }
         },
         legend: {
-          data: ['expected', 'actual']
         },
         series: [{
           name: 'expected', itemStyle: {

@@ -123,6 +123,14 @@
             v-hasPermi="['iot:deviceGateway']"
           >删除
           </el-button>
+          <el-button
+            v-if="1 == scope.row.onlineFlag"
+            size="mini"
+            type="text"
+            @click="handleManualGet(scope.row)"
+            v-hasPermi="['iot:deviceGateway']"
+          >手动采集
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -185,7 +193,8 @@
         delDeviceGateway,
         addDeviceGateway,
         updateDeviceGateway,
-        exportDeviceGateway
+        exportDeviceGateway,
+        manualGet
     } from "@/api/iot/deviceGateway";
 
     import {
@@ -411,6 +420,12 @@
 
                     this.getList();
                 }
+            },
+            handleManualGet(row) {
+                const id = row.id || this.ids
+                manualGet({id: id}).then(response => {
+                    this.$modal.msgSuccess("手动采集成功");
+                });
             }
         }
     };

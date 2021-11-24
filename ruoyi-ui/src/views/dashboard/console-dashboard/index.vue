@@ -10,7 +10,7 @@
             <div class="card-panel-text">总数据量</div>
             <count-to
               :start-val="0"
-              :end-val="businessDataList.dataCount.expectedData[businessDataList.dataCount.expectedData.length - 1]"
+              :end-val="businessDataList.dataCount.expectedData[businessDataList.dataCount.expectedData.length - 1][1]"
               :duration="1500"
               class="card-panel-num"
             />
@@ -26,7 +26,7 @@
             <div class="card-panel-text">发布项目数</div>
             <count-to
               :start-val="0"
-              :end-val="businessDataList.projectCount.expectedData[businessDataList.projectCount.expectedData.length - 1]"
+              :end-val="businessDataList.projectCount.expectedData[businessDataList.projectCount.expectedData.length - 1][1]"
               :duration="1500"
               class="card-panel-num"
             />
@@ -42,7 +42,7 @@
             <div class="card-panel-text">结构物数量</div>
             <count-to
               :start-val="0"
-              :end-val="businessDataList.structureCount.expectedData[businessDataList.structureCount.expectedData.length - 1]"
+              :end-val="businessDataList.structureCount.expectedData[businessDataList.structureCount.expectedData.length - 1][1]"
               :duration="1500"
               class="card-panel-num"
             />
@@ -58,7 +58,7 @@
             <div class="card-panel-text">设备总数</div>
             <count-to
               :start-val="0"
-              :end-val="businessDataList.deviceCount.expectedData[businessDataList.deviceCount.expectedData.length - 1]"
+              :end-val="businessDataList.deviceCount.expectedData[businessDataList.deviceCount.expectedData.length - 1][1]"
               :duration="1500"
               class="card-panel-num"
             />
@@ -109,22 +109,14 @@
             return {
                 lineChartData: {},
                 businessDataList: {
-                    dataCount: {expectedData: []},
-                    projectCount: {expectedData: []},
-                    structureCount: {expectedData: []},
-                    deviceCount: {expectedData: []}
+                    dataCount: {expectedData: [1,1]},
+                    projectCount: {expectedData: [1,1]},
+                    structureCount: {expectedData: [1,1]},
+                    deviceCount: {expectedData: [1,1]}
                 }
             };
         },
         mounted() {
-            // var capitals = [
-            //     {
-            //         citycode: "010",
-            //         adcode: "110000",
-            //         name: "北京市",
-            //         center: [116.407394, 39.904211],
-            //     }
-            // ];
             var capitals = [];
 
             dashboardBusiness().then(response => {
@@ -132,11 +124,30 @@
 
                 for (var i = 0; i < businessData.length; i++) {
                     var item = businessData[i]
-                    this.businessDataList.dataCount.expectedData.push(item.dataCount);
-                    this.businessDataList.projectCount.expectedData.push(item.projectCount);
-                    this.businessDataList.structureCount.expectedData.push(item.structureCount);
-                    this.businessDataList.deviceCount.expectedData.push(item.deviceCount);
+                    // this.businessDataList.dataCount.expectedData.push(item.dataCount);
+                    // this.businessDataList.projectCount.expectedData.push(item.projectCount);
+                    // this.businessDataList.structureCount.expectedData.push(item.structureCount);
+                    // this.businessDataList.deviceCount.expectedData.push(item.deviceCount);
+
+                    this.businessDataList.dataCount.expectedData.push([
+                        item.createTime,
+                        item.dataCount
+                    ]);
+                    this.businessDataList.projectCount.expectedData.push([
+                        item.createTime,
+                        item.projectCount
+                    ]);
+                    this.businessDataList.structureCount.expectedData.push([
+                        item.createTime,
+                        item.structureCount
+                    ]);
+                    this.businessDataList.deviceCount.expectedData.push([
+                        item.createTime,
+                        item.deviceCount
+                    ]);
                 }
+
+
                 this.lineChartData = this.businessDataList.dataCount;
 
                 var projectList = response.projectList;
@@ -178,7 +189,7 @@
         },
         methods: {
             handleSetLineChartData(type) {
-                this.lineChartData = lineChartData[type];
+                this.lineChartData = this.businessDataList[type];
             },
         },
     };

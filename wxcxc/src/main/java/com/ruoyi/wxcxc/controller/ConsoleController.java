@@ -7,9 +7,12 @@ import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.wxcxc.domain.*;
 import com.ruoyi.wxcxc.dto.BusinessMemberDto;
-import com.ruoyi.wxcxc.mapper.WxcxcConsoleMapper;
+import com.ruoyi.wxcxc.dto.ReportFormConditionDto;
+import com.ruoyi.wxcxc.dto.ReportFormDto;
+import com.ruoyi.wxcxc.mapper.*;
 import com.ruoyi.wxcxc.service.*;
 import com.ruoyi.wxcxc.util.PackDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,20 @@ public class ConsoleController extends BaseController {
     private IWxcxcDeviceService wxcxcDeviceService;
     @Autowired
     private IWxcxcDataBusinessService wxcxcDataBusinessService;
+    @Autowired
+    private IWxcxcProjectAlarmRecordService wxcxcProjectAlarmRecordService;
+    @Autowired
+    private WxcxcProjectAlarmRecordMapper wxcxcProjectAlarmRecordMapper;
+    @Autowired
+    private WxcxcProjectPointMapper wxcxcProjectPointMapper;
+    @Autowired
+    private WxcxcProjectStructureMapper wxcxcProjectStructureMapper;
+    @Autowired
+    private WxcxcProjectMapper wxcxcProjectMapper;
+    @Autowired
+    private WxcxcProjectPointDataMapper wxcxcProjectPointDataMapper;
+    @Autowired
+    private WxcxcProjectAlarmConfigMapper wxcxcProjectAlarmConfigMapper;
 
     // 获取企业全部项目
     @PreAuthorize("@ss.hasPermi('iot:console')")
@@ -188,9 +205,129 @@ public class ConsoleController extends BaseController {
         return map;
     }
 
-    // 获取设备数据
 
-    // 获取测点数据
+    /**
+     * 查询报警记录列表
+     */
+    @PreAuthorize("@ss.hasPermi('iot:console')")
+    @GetMapping("/projectAlarmRecord/list/byUser")
+    public TableDataInfo listByUser(WxcxcProjectAlarmRecord wxcxcProjectAlarmRecord) {
+        startPage();
+
+        List<WxcxcProjectAlarmRecord> list = null;
+
+        if (null == wxcxcProjectAlarmRecord.getProjectId()) {
+            SysUser user = SecurityUtils.getLoginUser().getUser();
+            WxcxcBusinessMember wxcxcBusinessMember = new WxcxcBusinessMember();
+            wxcxcBusinessMember.setSysUserId(user.getUserId());
+            List<WxcxcBusinessMember> businessMemberList = wxcxcBusinessMemberService.selectWxcxcBusinessMemberList(wxcxcBusinessMember);
+            if (null != businessMemberList && 1 == businessMemberList.size()) {
+                list = wxcxcProjectAlarmRecordMapper.selectWxcxcProjectAlarmRecordListByMemberId(businessMemberList.get(0).getId(), wxcxcProjectAlarmRecord);
+            } else {
+                list = wxcxcProjectAlarmRecordMapper.selectWxcxcProjectAlarmRecordListByMemberId(null, wxcxcProjectAlarmRecord);
+            }
+
+        } else {
+            list = wxcxcProjectAlarmRecordMapper.selectWxcxcProjectAlarmRecordListByMemberId(null, wxcxcProjectAlarmRecord);
+        }
+
+        return getDataTable(list);
+    }
+
+    // 生成报表
+    @PreAuthorize("@ss.hasPermi('iot:console')")
+    @GetMapping("/reportForm")
+    public AjaxResult listByUser(ReportFormConditionDto reportFormConditionDto) {
+        // 根据项目id获取所有测点
+        List<WxcxcProjectPoint> wxcxcProjectPointList = wxcxcProjectPointMapper.selectWxcxcProjectPointByProjectId(reportFormConditionDto.getProjectId());
+
+        List<ReportFormDto> list = new ArrayList<>();
+
+        if (null != wxcxcProjectPointList) {
+            for (WxcxcProjectPoint item : wxcxcProjectPointList) {
+                ReportFormDto reportFormDto = new ReportFormDto();
+
+                // 获取结构物名
+                WxcxcProjectStructure wxcxcProjectStructureItem = wxcxcProjectStructureMapper.selectWxcxcProjectStructureById(item.getProjectStructureId());
+                if (null == wxcxcProjectStructureItem) continue;
+
+                // 获取项目名
+                WxcxcProject wxcxcProjectItem = wxcxcProjectMapper.selectWxcxcProjectById(wxcxcProjectStructureItem.getProjectId());
+                if (null == wxcxcProjectItem) continue;
+
+                reportFormDto.setProjectName(wxcxcProjectItem.getName());
+                reportFormDto.setStructureName(wxcxcProjectStructureItem.getName());
+                reportFormDto.setPointName(item.getName());
+
+                SimpleDateFormat sdf = new SimpleDateFormat("YYYY-mm-dd HH-MM");
+
+                if (null != reportFormConditionDto.getAttrDataList()) {
+                    for (String attrStr : reportFormConditionDto.getAttrDataList()) {
+                        switch (attrStr) {
+                            case "1":
+                                // 上次沉降值（mm）
+                                WxcxcProjectPointData wxcxcProjectPointData1 = wxcxcProjectPointDataMapper.selectWxcxcProjectPointDataListReportForm(wxcxcProjectStructureItem.getId(), item.getId(),
+                                        reportFormConditionDto.getBeginTime(), reportFormConditionDto.getEndTime(), 1l);
+
+                                if (null != wxcxcProjectPointData1)
+                                    reportFormDto.setLastValue(wxcxcProjectPointData1.getData());
+                                break;
+                            case "2":
+                                // 当前沉降值（mm）
+                                WxcxcProjectPointData wxcxcProjectPointData2 = wxcxcProjectPointDataMapper.selectWxcxcProjectPointDataListReportForm(wxcxcProjectStructureItem.getId(), item.getId(),
+                                        reportFormConditionDto.getBeginTime(), reportFormConditionDto.getEndTime(), 0l);
+
+                                if (null != wxcxcProjectPointData2)
+                                    reportFormDto.setCurrentValue(wxcxcProjectPointData2.getData());
+                                break;
+                            case "3":
+                                // 变化速率（mm/d）
+                                break;
+                            case "4":
+                                // 控制值累计变化值（mm）
+                                WxcxcProjectAlarmConfig wxcxcProjectAlarmConfigCondition = new WxcxcProjectAlarmConfig();
+                                wxcxcProjectAlarmConfigCondition.setPointId(item.getId());
+                                List<WxcxcProjectAlarmConfig> wxcxcProjectAlarmConfigList = wxcxcProjectAlarmConfigMapper.selectWxcxcProjectAlarmConfigList(wxcxcProjectAlarmConfigCondition);
+                                if (null != wxcxcProjectAlarmConfigList) {
+                                    for (WxcxcProjectAlarmConfig wxcxcProjectAlarmConfigItem : wxcxcProjectAlarmConfigList) {
+                                        if (null == reportFormDto.getControlValue() || "".equals(reportFormDto.getControlValue())) {
+                                            reportFormDto.setControlValue(wxcxcProjectAlarmConfigItem.getThreshold().toString());
+                                        } else {
+                                            reportFormDto.setControlValue("," + wxcxcProjectAlarmConfigItem.getThreshold());
+                                        }
+                                    }
+                                }
+                                break;
+                            case "5":
+                                // 控制值变化速率值（mm/d）
+                                break;
+                            case "6":
+                                // 本次监测时间
+                                WxcxcProjectPointData wxcxcProjectPointData6 = wxcxcProjectPointDataMapper.selectWxcxcProjectPointDataListReportForm(wxcxcProjectStructureItem.getId(), item.getId(),
+                                        reportFormConditionDto.getBeginTime(), reportFormConditionDto.getEndTime(), 0l);
+
+                                if (null != wxcxcProjectPointData6)
+                                    reportFormDto.setCurrentDataTime(sdf.format(wxcxcProjectPointData6.getCreateTime()));
+                                break;
+                            case "7":
+                                // 上次检测时间
+                                WxcxcProjectPointData wxcxcProjectPointData7 = wxcxcProjectPointDataMapper.selectWxcxcProjectPointDataListReportForm(wxcxcProjectStructureItem.getId(), item.getId(),
+                                        reportFormConditionDto.getBeginTime(), reportFormConditionDto.getEndTime(), 1l);
+
+                                if (null != wxcxcProjectPointData7)
+                                    reportFormDto.setLastDataTime(sdf.format(wxcxcProjectPointData7.getCreateTime()));
+                                break;
+                        }
+                    }
+                }
+
+                list.add(reportFormDto);
+            }
+        }
+
+        ExcelUtil<ReportFormDto> util = new ExcelUtil<ReportFormDto>(ReportFormDto.class);
+        return util.exportExcel(list, "沉降数据报表");
+    }
 
     private Long getBusinessId() {
         // 获取用户

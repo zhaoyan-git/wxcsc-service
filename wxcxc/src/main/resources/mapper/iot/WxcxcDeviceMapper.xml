@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcDeviceMapper">
-    
+
     <resultMap type="WxcxcDevice" id="WxcxcDeviceResult">
         <result property="id"    column="id"    />
         <result property="projectId"    column="project_id"    />
@@ -56,7 +56,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectWxcxcDeviceList" parameterType="WxcxcDevice" resultMap="WxcxcDeviceResult">
         <include refid="selectWxcxcDeviceVo"/>
-        <where>  
+        <where>
+            and del_flag = '0'
             <if test="projectId != null "> and project_id = #{projectId}</if>
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
             <if test="manufacturer != null  and manufacturer != ''"> and manufacturer = #{manufacturer}</if>
@@ -70,15 +71,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="positionLng != null  and positionLng != ''"> and position_lng = #{positionLng}</if>
         </where>
     </select>
-    
+
     <select id="selectWxcxcDeviceById" parameterType="Long" resultMap="WxcxcDeviceWxcxcDeviceSensorResult">
         select a.id, a.project_id, a.name, a.manufacturer, a.gateway_id, a.model_number, a.photo_file, a.detail, a.online_flag, a.alarm_flag, a.position_lat, a.position_lng, a.del_flag, a.create_by, a.create_time, a.update_by, a.update_time,
             b.id as sub_id, b.device_id as sub_device_id, b.name as sub_name, b.icon_file as sub_icon_file, b.sort as sub_sort, b.unit as sub_unit, b.type as sub_type, b.slave_unit_id as sub_slave_unit_id, b.slave_code as sub_slave_code, b.slave_address_hi as sub_slave_address_hi, b.slave_address_lo as sub_slave_address_lo, b.slave_amount_hi as sub_slave_amount_hi, b.slave_amount_lo as sub_slave_amount_lo, b.cycle_time as sub_cycle_time, b.del_flag as sub_del_flag, b.create_by as sub_create_by, b.create_time as sub_create_time, b.update_by as sub_update_by, b.update_time as sub_update_time
         from wxcxc_device a
         left join wxcxc_device_sensor b on b.device_id = a.id
         where a.id = #{id}
+        and a.del_flag = '0'
+        and b.del_flag = '0'
     </select>
-        
+
     <insert id="insertWxcxcDevice" parameterType="WxcxcDevice" useGeneratedKeys="true" keyProperty="id">
         insert into wxcxc_device
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -143,14 +146,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteWxcxcDeviceById" parameterType="Long">
-        delete from wxcxc_device where id = #{id}
+        update wxcxc_device set del_flag = '2' where id = #{id};
+        update wxcxc_device_sensor set del_flag = '2' where device_id = #{id};
     </delete>
 
     <delete id="deleteWxcxcDeviceByIds" parameterType="String">
-        delete from wxcxc_device where id in 
+        update wxcxc_device set del_flag = '2' where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
+        </foreach>;
+
+        <foreach item="id" collection="array">
+            update wxcxc_device_sensor set del_flag = '2' where device_id = #{id};
         </foreach>
+
     </delete>
 
 <!--    <select id="selectWxcxcDeviceSensorList" parameterType="WxcxcDeviceSensor" resultMap="WxcxcDeviceSensorResult">-->
@@ -169,16 +178,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <!--            <if test="positionLng != null  and positionLng != ''"> and position_lng = #{positionLng}</if>-->
 <!--        </where>-->
 <!--    </select>-->
-    
-    <delete id="deleteWxcxcDeviceSensorByDeviceIds" parameterType="String">
-        delete from wxcxc_device_sensor where device_id in 
+
+    <update id="deleteWxcxcDeviceSensorByDeviceIds" parameterType="String">
+        update wxcxc_device_sensor set del_flag = '2' where device_id in
         <foreach item="deviceId" collection="array" open="(" separator="," close=")">
             #{deviceId}
         </foreach>
-    </delete>
+    </update>
 
     <delete id="deleteWxcxcDeviceSensorByDeviceId" parameterType="Long">
-        delete from wxcxc_device_sensor where device_id = #{deviceId}
+        update wxcxc_device_sensor set del_flag = '2' where device_id = #{deviceId}
     </delete>
 
     <insert id="batchWxcxcDeviceSensor">
@@ -189,6 +198,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </insert>
 
     <select id="selectWxcxcDeviceListByBusinessId" parameterType="Long" resultMap="WxcxcDeviceResult">
-        SELECT * FROM wxcxc_device WHERE del_flag = 0 AND project_id IN (SELECT id FROM wxcxc_project WHERE business_id = 1 AND del_flag = 0);
+        SELECT * FROM wxcxc_device WHERE del_flag = 0 AND project_id IN (SELECT id FROM wxcxc_project WHERE business_id = #{businessId} AND del_flag = 0);
     </select>
 </mapper>

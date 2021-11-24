@@ -32,7 +32,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectWxcxcDeviceSensorList" parameterType="WxcxcDeviceSensor" resultMap="WxcxcDeviceSensorResult">
         <include refid="selectWxcxcDeviceSensorVo"/>
-        <where>  
+        <where>
+            and del_flag = '0'
             <if test="deviceId != null "> and device_id = #{deviceId}</if>
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
             <if test="iconFile != null  and iconFile != ''"> and icon_file = #{iconFile}</if>
@@ -52,6 +53,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectWxcxcDeviceSensorById" parameterType="Long" resultMap="WxcxcDeviceSensorResult">
         <include refid="selectWxcxcDeviceSensorVo"/>
         where id = #{id}
+        and del_flag = '0'
     </select>
         
     <insert id="insertWxcxcDeviceSensor" parameterType="WxcxcDeviceSensor" useGeneratedKeys="true" keyProperty="id">
@@ -124,13 +126,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteWxcxcDeviceSensorById" parameterType="Long">
-        delete from wxcxc_device_sensor where id = #{id}
+        update wxcxc_device_sensor set del_flag = '2' where id = #{id}
     </delete>
 
     <delete id="deleteWxcxcDeviceSensorByIds" parameterType="String">
-        delete from wxcxc_device_sensor where id in 
+        update wxcxc_device_sensor set del_flag = '2' where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
+
+
+    <select id="selectWxcxcDeviceSensorByDtuAndSlaveUnitId" resultMap="WxcxcDeviceSensorResult">
+        <include refid="selectWxcxcDeviceSensorVo"/>
+        where slave_unit_id = #{slaveUnitId}
+        and device_id in (SELECT id FROM wxcxc_device WHERE gateway_id in (SELECT id FROM wxcxc_device_gateway WHERE id = #{gateWayId} and del_flag = '0') and del_flag = '0')
+        and del_flag = '0'
+    </select>
+
+    <select id="selectSlaveUnitIdByGatewayId" resultType="String">
+         SELECT slave_unit_id FROM wxcxc_device_sensor
+         WHERE device_id in
+         (SELECT id FROM wxcxc_device WHERE gateway_id in (SELECT id FROM wxcxc_device_gateway WHERE id = ${gatewayId} and del_flag = '0') and del_flag = '0')
+         and del_flag = '0'
+         GROUP BY slave_unit_id
+    </select>
 </mapper>

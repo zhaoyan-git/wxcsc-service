@@ -87,3 +87,21 @@ export function dashboardBusiness(query) {
     params: query
   })
 }
+
+export function projectAlarmRecordListByUser(query) {
+  return request({
+    url: '/iot/console/projectAlarmRecord/list/byUser',
+    method: 'get',
+    params: query
+  })
+}
+
+
+export function reportForm(query) {
+  return request({
+    url: '/iot/console/reportForm',
+    method: 'get',
+    params: query
+  })
+}
+

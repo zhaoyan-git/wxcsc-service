@@ -68,4 +68,22 @@
     <select id="getDataCount" parameterType="String" resultType="int">
         SELECT COUNT(*) FROM `wxcxc_project_point_data_${structureId}`;
 	</select>
+
+
+    <!--  获取单次结果  -->
+    <select id="selectWxcxcProjectPointDataListReportForm" resultMap="WxcxcProjectPointDataResult">
+        select id, point_id, data, create_time from wxcxc_project_point_data_${structureId}
+        <where>
+            <if test="pointId != null ">and point_id = #{pointId}</if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%Y%m%d%H%i') &gt;=
+                date_format(#{beginTime},'%Y%m%d%H%i')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%Y%m%d%H%i') &lt;=
+                date_format(#{endTime},'%Y%m%d%H%i')
+            </if>
+        </where>
+        ORDER BY create_time DESC limit #{position},1
+    </select>
 </mapper>
