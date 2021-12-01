@@ -47,4 +47,7 @@ public interface WxcxcProjectDeviceSensorDataMapper {
 
     // 获取数据数
     int getDataCount(@Param("deviceId") Long deviceId);
+
+    WxcxcProjectDeviceSensorData selectWxcxcProjectDeviceSensorDataBySensorId(@Param("deviceId") Long deviceId, @Param("sensorId") Long sensorId,
+                                                                              @Param("beginTime") String beginTime, @Param("endTime") String endTime, @Param("position") Long position);
 }

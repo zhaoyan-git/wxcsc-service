@@ -361,6 +361,7 @@
             handleAdd() {
                 this.reset();
                 this.open = true;
+                this.hasMngRole = false;
                 this.title = "添加企业人员";
             },
             /** 修改按钮操作 */
@@ -375,6 +376,18 @@
                     }
 
                     this.roleIdsChange()
+
+                    this.form.projectIds = [];
+
+                    if (null != this.form.businessMemberRoleList && 0 < this.form.businessMemberRoleList.length) {
+                        for (var i = 0; i < this.form.businessMemberRoleList.length; i++) {
+                            var item = this.form.businessMemberRoleList[i]
+
+                            this.form.projectIds.push({
+                                id: item.id
+                            })
+                        }
+                    }
 
                     this.open = true;
                     this.title = "修改企业人员";

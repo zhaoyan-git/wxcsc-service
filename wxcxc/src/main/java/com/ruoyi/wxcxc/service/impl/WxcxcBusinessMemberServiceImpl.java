@@ -102,6 +102,7 @@ public class WxcxcBusinessMemberServiceImpl implements IWxcxcBusinessMemberServi
         return wxcxcBusinessMemberMapper.deleteWxcxcBusinessMemberById(id);
     }
 
+    // 新增企业人员
     @Override
     public int insertWxcxcBusinessMember(BusinessMemberDto businessMemberDto) {
         SysUser user = businessMemberDto.getUser();
@@ -122,6 +123,7 @@ public class WxcxcBusinessMemberServiceImpl implements IWxcxcBusinessMemberServi
         return 1;
     }
 
+    // 更新企业人员
     @Override
     public int updateWxcxcBusinessMember(BusinessMemberDto businessMemberDto) {
         if (null == businessMemberDto.getId()) return 0;

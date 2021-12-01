@@ -156,25 +156,25 @@
         <el-form-item label="阈值" prop="threshold">
           <el-input v-model="form.threshold" placeholder="请输入阈值"/>
         </el-form-item>
-        <el-form-item label="报警等级" prop="threshold">
-          <el-select v-model="form.alarmLevel" placeholder="请选择报警等级">
-            <el-option
-              :key="'1'"
-              label="一级告警"
-              :value="'1'"
-            ></el-option>
-            <el-option
-              :key="'2'"
-              label="二级告警"
-              :value="'2'"
-            ></el-option>
-            <el-option
-              :key="'3'"
-              label="三级告警"
-              :value="'3'"
-            ></el-option>
-          </el-select>
-        </el-form-item>
+<!--        <el-form-item label="报警等级" prop="threshold">-->
+<!--          <el-select v-model="form.alarmLevel" placeholder="请选择报警等级">-->
+<!--            <el-option-->
+<!--              :key="'1'"-->
+<!--              label="一级告警"-->
+<!--              :value="'1'"-->
+<!--            ></el-option>-->
+<!--            <el-option-->
+<!--              :key="'2'"-->
+<!--              label="二级告警"-->
+<!--              :value="'2'"-->
+<!--            ></el-option>-->
+<!--            <el-option-->
+<!--              :key="'3'"-->
+<!--              label="三级告警"-->
+<!--              :value="'3'"-->
+<!--            ></el-option>-->
+<!--          </el-select>-->
+<!--        </el-form-item>-->
         <el-form-item label="计算方式" prop="computeType">
           <el-select v-model="form.computeType" placeholder="请选择计算方式">
             <el-option

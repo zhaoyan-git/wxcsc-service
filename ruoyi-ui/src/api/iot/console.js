@@ -105,3 +105,11 @@ export function reportForm(query) {
   })
 }
 
+// 根据当前企业获取项目列表
+export function getListByBusinessId(query) {
+  return request({
+    url: '/iot/console/getListByBusinessId',
+    method: 'get',
+    params: query
+  })
+}

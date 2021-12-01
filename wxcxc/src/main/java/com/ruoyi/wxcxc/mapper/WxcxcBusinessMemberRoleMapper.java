@@ -27,6 +27,9 @@ public interface WxcxcBusinessMemberRoleMapper {
      */
     public List<WxcxcBusinessMemberRole> selectWxcxcBusinessMemberRoleList(WxcxcBusinessMemberRole wxcxcBusinessMemberRole);
 
+    // 查询企业人员权限列表
+    public List<WxcxcBusinessMemberRole> selectWxcxcBusinessMemberRoleBybusinessMemberId(Long businessMemberId);
+
     /**
      * 新增企业人员权限
      *

@@ -76,7 +76,6 @@ public interface WxcxcDeviceMapper {
      */
     public int batchWxcxcDeviceSensor(List<WxcxcDeviceSensor> wxcxcDeviceSensorList);
 
-
     /**
      * 通过设备表主键删除设备传感器信息
      *
@@ -86,4 +85,14 @@ public interface WxcxcDeviceMapper {
     public int deleteWxcxcDeviceSensorByDeviceId(Long id);
 
     List<WxcxcDevice> selectWxcxcDeviceListByBusinessId(Long businessId);
+
+    // 更新设备传感器
+    public int updateWxcxcDeviceSensor(WxcxcDeviceSensor wxcxcDeviceSensor);
+
+    // 根据设备id获取传感器列表
+    List<WxcxcDeviceSensor> selectWxcxcDeviceSensorListByDeviceId(Long deviceId);
+
+    // 根据id删除设备传感器
+    public int deleteWxcxcDeviceSensorById(Long id);
+
 }

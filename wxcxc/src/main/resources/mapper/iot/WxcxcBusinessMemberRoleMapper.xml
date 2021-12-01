@@ -24,7 +24,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectWxcxcBusinessMemberRoleVo"/>
         where id = #{id}
     </select>
-        
+
+    <select id="selectWxcxcBusinessMemberRoleBybusinessMemberId" parameterType="Long" resultMap="WxcxcBusinessMemberRoleResult">
+        <include refid="selectWxcxcBusinessMemberRoleVo"/>
+        where business_member_id = #{businessMemberId}
+    </select>
+
     <insert id="insertWxcxcBusinessMemberRole" parameterType="WxcxcBusinessMemberRole" useGeneratedKeys="true" keyProperty="id">
         insert into wxcxc_business_member_role
         <trim prefix="(" suffix=")" suffixOverrides=",">

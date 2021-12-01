@@ -35,7 +35,7 @@ public class ReportFormDto {
     @Excel(name = "本次监测时间")
     private String lastDataTime;
 
-    // 上次检测时间
-    @Excel(name = "上次检测时间")
+    // 上次监测时间
+    @Excel(name = "上次监测时间")
     private String currentDataTime;
 }

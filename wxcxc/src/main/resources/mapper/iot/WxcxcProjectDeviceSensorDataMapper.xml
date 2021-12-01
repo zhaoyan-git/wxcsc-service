@@ -67,4 +67,20 @@
         SELECT COUNT(*) FROM `wxcxc_project_device_sensor_data_${deviceId}`;
 	</select>
 
+    <!--  获取单次结果  -->
+    <select id="selectWxcxcProjectDeviceSensorDataBySensorId" resultMap="WxcxcProjectDeviceSensorDataResult">
+        select id, sensor_id, original_data, data, create_time from wxcxc_project_device_sensor_data_${deviceId}
+        <where>
+            <if test="sensorId != null ">and sensor_id = #{sensorId}</if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%Y%m%d%H%i') &gt;=
+                date_format(#{beginTime},'%Y%m%d%H%i')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%Y%m%d%H%i') &lt;=
+                date_format(#{endTime},'%Y%m%d%H%i')
+            </if>
+        </where>
+        ORDER BY create_time DESC limit #{position},1
+    </select>
 </mapper>

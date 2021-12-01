@@ -329,6 +329,17 @@ public class ConsoleController extends BaseController {
         return util.exportExcel(list, "沉降数据报表");
     }
 
+    // 根据当前企业获取项目列表
+    @PreAuthorize("@ss.hasPermi('iot:integrate:project')")
+    @GetMapping("/getListByBusinessId")
+    public List<WxcxcProject> getListByBusinessId() {
+        WxcxcProject wxcxcProject = new WxcxcProject();
+        wxcxcProject.setBusinessId(getBusinessId());
+
+        List<WxcxcProject> list = wxcxcProjectService.selectWxcxcProjectList(wxcxcProject);
+        return list;
+    }
+
     private Long getBusinessId() {
         // 获取用户
         SysUser user = SecurityUtils.getLoginUser().getUser();

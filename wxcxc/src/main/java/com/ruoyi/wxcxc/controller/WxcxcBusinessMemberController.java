@@ -165,8 +165,6 @@ public class WxcxcBusinessMemberController extends BaseController {
         user.setCreateBy(getUsername());
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
 
-        // TODO 创建项目权限
-
         return toAjax(wxcxcBusinessMemberService.insertWxcxcBusinessMember(businessMemberDto));
     }
 

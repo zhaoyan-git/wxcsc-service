@@ -5,7 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ruoyi.wxcxc.domain.WxcxcDevice;
+import com.ruoyi.wxcxc.domain.WxcxcDeviceSensor;
 import com.ruoyi.wxcxc.dto.WxcxcProjectDeviceSensorDataDto;
+import com.ruoyi.wxcxc.dto.WxcxcProjectDeviceSensorDataListDto;
+import com.ruoyi.wxcxc.service.IWxcxcDeviceSensorService;
+import com.ruoyi.wxcxc.service.IWxcxcDeviceService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,11 +41,15 @@ import com.ruoyi.common.core.page.TableDataInfo;
 public class WxcxcProjectDeviceSensorDataController extends BaseController {
     @Autowired
     private IWxcxcProjectDeviceSensorDataService wxcxcProjectDeviceSensorDataService;
+    @Autowired
+    private IWxcxcDeviceService wxcxcDeviceService;
+    @Autowired
+    private IWxcxcDeviceSensorService wxcxcDeviceSensorService;
 
     // 获取设备数据
     @PreAuthorize("@ss.hasPermi('iot:console')")
     @PostMapping("/list")
-    public Map<Long, List<WxcxcProjectDeviceSensorData>> projectDeviceList(@RequestBody WxcxcProjectDeviceSensorDataDto wxcxcProjectDeviceSensorDataDto) {
+    public List<WxcxcProjectDeviceSensorDataListDto> projectDeviceList(@RequestBody WxcxcProjectDeviceSensorDataDto wxcxcProjectDeviceSensorDataDto) {
         if (null == wxcxcProjectDeviceSensorDataDto.getDeviceId()) {
             return null;
         }
@@ -50,18 +59,40 @@ public class WxcxcProjectDeviceSensorDataController extends BaseController {
 
         List<WxcxcProjectDeviceSensorData> list = wxcxcProjectDeviceSensorDataService.selectWxcxcProjectDeviceSensorDataList(wxcxcProjectDeviceSensorDataDto.getDeviceId(), wxcxcProjectDeviceSensorDataCondition);
 
-        Map<Long, List<WxcxcProjectDeviceSensorData>> resList = new HashMap<>();
+        Map<Long, List<WxcxcProjectDeviceSensorData>> resMap = new HashMap<>();
 
         for (WxcxcProjectDeviceSensorData item : list) {
             // 判断是否已经存在
-            List<WxcxcProjectDeviceSensorData> sensorDataList = resList.get(item.getSensorId());
+            List<WxcxcProjectDeviceSensorData> sensorDataList = resMap.get(item.getSensorId());
             if (null == sensorDataList) sensorDataList = new ArrayList<>();
 
             sensorDataList.add(item);
 
-            resList.put(item.getSensorId(), sensorDataList);
+            resMap.put(item.getSensorId(), sensorDataList);
         }
 
-        return resList;
+        List<WxcxcProjectDeviceSensorDataListDto> returnList = new ArrayList<>();
+
+        for (Map.Entry<Long, List<WxcxcProjectDeviceSensorData>> entry : resMap.entrySet()) {
+            WxcxcProjectDeviceSensorDataListDto wxcxcProjectDeviceSensorDataListDto = new WxcxcProjectDeviceSensorDataListDto();
+
+            WxcxcDeviceSensor wxcxcDeviceSensor = wxcxcDeviceSensorService.selectWxcxcDeviceSensorById(entry.getKey());
+
+            if (null == wxcxcDeviceSensor) continue;
+
+            wxcxcProjectDeviceSensorDataListDto.setId(wxcxcDeviceSensor.getId());
+            wxcxcProjectDeviceSensorDataListDto.setDeviceId(wxcxcDeviceSensor.getDeviceId());
+            wxcxcProjectDeviceSensorDataListDto.setName(wxcxcDeviceSensor.getName());
+            wxcxcProjectDeviceSensorDataListDto.setIconFile(wxcxcDeviceSensor.getIconFile());
+            wxcxcProjectDeviceSensorDataListDto.setSort(wxcxcDeviceSensor.getSort());
+            wxcxcProjectDeviceSensorDataListDto.setUnit(wxcxcDeviceSensor.getUnit());
+            wxcxcProjectDeviceSensorDataListDto.setType(wxcxcDeviceSensor.getType());
+
+            wxcxcProjectDeviceSensorDataListDto.setDataList(entry.getValue());
+
+            returnList.add(wxcxcProjectDeviceSensorDataListDto);
+        }
+
+        return returnList;
     }
 }

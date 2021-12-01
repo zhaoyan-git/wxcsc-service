@@ -119,7 +119,7 @@
                     },
                     {
                         key: 7,
-                        label: `上次检测时间`
+                        label: `上次监测时间`
                     }],
                 daterangeReleaseTime: [],
                 projectList: []

@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
+      <!--      <el-form-item>-->
+      <!--        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>-->
+      <!--        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>-->
+      <!--      </el-form-item>-->
     </el-form>
 
     <el-row :gutter="10" class="mb8">
@@ -159,18 +159,28 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12">
-
-          </el-col>
           <el-col :span="12" v-if="name != form.user.userName">
             <el-form-item label="用户角色" prop="user.roleIds">
-              <el-select v-model="form.user.roleIds" placeholder="请选择" multiple :multiple-limit="1">
+              <el-select v-model="form.user.roleIds" placeholder="请选择" multiple :multiple-limit="1"
+                         @change="roleIdsChange">
                 <el-option
                   v-for="dict in dict.type.iot_business_member_role"
                   :key="dict.value"
                   :label="dict.label"
                   :value="dict.value"
                 ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="项目权限" prop="businessMemberRoleList" v-if="hasMngRole">
+              <el-select v-model="form.projectIds" multiple placeholder="请选择">
+                <el-option
+                  v-for="item in projectData"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -201,7 +211,8 @@
     } from "@/api/iot/businessMember";
 
     import {
-        consoleListBusinessMemberDto
+        consoleListBusinessMemberDto,
+        getListByBusinessId
     } from "@/api/iot/console";
 
     import {mapGetters} from "vuex";
@@ -209,7 +220,7 @@
     export default {
         name: "BusinessMember",
         computed: {
-            ...mapGetters(["roles","name"]),
+            ...mapGetters(["roles", "name"]),
         },
         data() {
             return {
@@ -271,12 +282,19 @@
                             trigger: "blur"
                         }
                     ]
-                }
+                },
+                projectData: [],
+                hasMngRole: false
             };
         },
         dicts: ['sys_normal_disable', 'sys_user_sex', 'iot_business_member_role'],
         created() {
-          this.getList();
+            this.getList();
+
+            // 获取项目列表
+            getListByBusinessId().then(response => {
+                this.projectData = response;
+            });
         },
         methods: {
             /** 查询企业人员列表 */
@@ -335,6 +353,7 @@
             handleAdd() {
                 this.reset();
                 this.open = true;
+                this.hasMngRole = false;
                 this.title = "添加企业人员";
             },
             /** 修改按钮操作 */
@@ -347,6 +366,21 @@
                         this.form.user.roleIds = [];
                         this.form.user.roleIds.push(this.form.user.roles[0].roleId.toString());
                     }
+
+                    this.roleIdsChange()
+
+                    this.form.projectIds = [];
+
+                    if (null != this.form.businessMemberRoleList && 0 < this.form.businessMemberRoleList.length) {
+                        for (var i = 0; i < this.form.businessMemberRoleList.length; i++) {
+                            var item = this.form.businessMemberRoleList[i]
+
+                            this.form.projectIds.push({
+                                id: item.id
+                            })
+                        }
+                    }
+
                     this.open = true;
                     this.title = "修改企业人员";
                 });
@@ -355,6 +389,18 @@
             submitForm() {
                 this.$refs["form"].validate(valid => {
                     if (valid) {
+                        this.form.businessMemberRoleList = []
+
+                        if (null != this.form.projectIds && 0 < this.form.projectIds.length) {
+                            for (var i = 0; i < this.form.projectIds.length; i++) {
+                                var item = this.form.projectIds[i]
+
+                                this.form.businessMemberRoleList.push({
+                                    projectId: item
+                                })
+                            }
+                        }
+
                         if (this.form.id != null) {
                             updateBusinessMemberDto(this.form).then(response => {
                                 this.$modal.msgSuccess("修改成功");
@@ -409,6 +455,13 @@
                 }).catch(() => {
                 });
             },
+            roleIdsChange() {
+                if (0 < this.form.user.roleIds.length && 5 == this.form.user.roleIds[0]) {
+                    this.hasMngRole = true;
+                } else {
+                    this.hasMngRole = false;
+                }
+            }
         }
     };
 </script>

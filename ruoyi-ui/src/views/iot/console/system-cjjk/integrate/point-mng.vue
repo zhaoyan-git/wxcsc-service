@@ -79,6 +79,7 @@
 
     <el-table v-loading="loading"
               :data="projectPointList"
+              default-expand-all
               row-key="id"
               @selection-change="handleSelectionChange"
               :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
@@ -180,7 +181,7 @@
               >
                 <el-option
                   v-for="item in projectData"
-                  v-bind:key="item.id"
+                  :key="item.id"
                   :label="item.name"
                   :value="item.id"
                 ></el-option>
@@ -195,7 +196,7 @@
               >
                 <el-option
                   v-for="item in formProjectStructureData"
-                  v-bind:key="item.id"
+                  :key="item.id"
                   :label="item.name"
                   :value="item.id"
                 ></el-option>
@@ -225,10 +226,11 @@
           </el-select>
         </el-form-item>
         <block v-if="1 == form.monitorType">
-          <el-form-item label="选择数据来源" prop="monitorData.data_source_point">
+
+          <el-form-item label="选择数据来源" prop="monitorData.data_source_sensor">
             <el-cascader
-              v-model="form.monitorData.data_source_point"
-              :options="optionsPointData"
+              v-model="form.monitorData.data_source_sensor"
+              :options="optionsDeviceData"
               :props="{ expandTrigger: 'hover' }"></el-cascader>
           </el-form-item>
           <el-row>
@@ -237,7 +239,7 @@
                 <el-select v-model="form.monitorData.type" placeholder="选择基准值数据来源">
                   <el-option
                     :key="1"
-                    label="基准测点"
+                    label="基准点"
                     :value="1"
                   ></el-option>
                   <el-option
@@ -249,14 +251,16 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="选择基准测点" prop="monitorData.data_source_standard_point"
-                            v-if="1 == form.monitorData.type">
+              <el-form-item label="选择基准点"
+                            prop="monitorData.data_source_standard_sensor" v-if="1 == form.monitorData.type">
                 <el-cascader
-                  v-model="form.monitorData.data_source_standard_point"
-                  :options="optionsPointData"
+                  v-model="form.monitorData.data_source_standard_sensor"
+                  :options="optionsDeviceData"
                   :props="{ expandTrigger: 'hover' }"></el-cascader>
               </el-form-item>
-              <el-form-item label="初始值" prop="monitorData.data_source_standard_value" v-if="2 == form.monitorData.type">
+
+              <el-form-item label="初始值"
+                            prop="monitorData.data_source_standard_value" v-if="2 == form.monitorData.type">
                 <el-input v-model="form.monitorData.data_source_standard_value" type="input" placeholder="请输入初始值"/>
               </el-form-item>
             </el-col>
@@ -325,7 +329,8 @@
         projectStructureTypeList,
         projectListBusiness,
         projectStructureListByProjectId,
-        projectPointGroup
+        projectPointGroup,
+        projectDeviceList
     } from "@/api/iot/console";
 
     import {
@@ -365,6 +370,8 @@
                     }).then((response) => {
                         this.projectStructureData = response;
                     });
+
+                    this.getList()
                 }
             },
         },
@@ -405,25 +412,25 @@
                 form: {},
                 // 表单校验
                 rules: {
-                    name: [
+                    'name': [
                         {required: true, message: "名称不能为空", trigger: "blur"}
                     ],
-                    projectStructureId: [
+                    'projectStructureId': [
                         {required: true, message: "所属结构物不能为空", trigger: "change"}
                     ],
-                    projectId: [
+                    'projectId': [
                         {required: true, message: "所属项目不能为空", trigger: "change"}
                     ],
-                    monitorType: [
+                    'monitorType': [
                         {required: true, message: "监测因素不能为空", trigger: "change"}
                     ],
-                    'monitorData.data_source_point': [
+                    'monitorData.data_source_sensor': [
                         {required: true, message: "数据来源不能为空", trigger: "change"}
                     ],
                     'monitorData.type': [
                         {required: true, message: "基准值数据来源不能为空", trigger: "change"}
                     ],
-                    'monitorData.data_source_standard_point': [
+                    'monitorData.data_source_standard_sensor': [
                         {required: true, message: "基准点不能为空", trigger: "change"}
                     ],
                     'monitorData.data_source_standard_value': [
@@ -446,8 +453,7 @@
                 },
                 titleGroup: "",
                 formGroupProjectStructureData: [],
-                optionsPointData: [],
-                titleGroup: ""
+                optionsDeviceData: []
             };
         },
         created() {
@@ -477,6 +483,13 @@
                     this.total = response.total;
                     this.loading = false;
                 });
+
+
+                projectStructureListByProjectId({
+                    projectId: this.queryParams.projectId,
+                }).then((response) => {
+                    this.projectStructureData = response;
+                });
             },
             // 取消按钮
             cancel() {
@@ -486,6 +499,7 @@
             // 表单重置
             reset() {
                 this.form = {
+                    projectId: null,
                     id: null,
                     name: null,
                     photoFile: null,
@@ -494,15 +508,21 @@
                     alarmFlag: null,
                     monitorType: null,
                     delFlag: null,
-                    monitorData: {},
+                    monitorData: {
+                        // data_source_sensor: null,
+                        // type: null,
+                        // data_source_standard_sensor: null,
+                        // data_source_standard_value: null
+                    },
                     createBy: null,
                     createTime: null,
                     updateBy: null,
-                    updateTime: null
+                    updateTime: null,
                 };
 
                 this.formProjectStructureData = this.projectStructureData;
                 this.formProjectPointGroupData = this.projectPointGroupData;
+                this.optionsDeviceData = []
                 this.resetForm("form");
             },
             /** 搜索按钮操作 */
@@ -528,6 +548,9 @@
                 this.form.projectId = this.queryParams.projectId
                 this.form.projectStructureId = this.queryParams.projectStructureId
 
+                // 获取设备列表
+                this.getDeviceAndSensor(this.queryParams.projectId)
+
                 this.open = true;
                 this.title = "添加项目测点";
             },
@@ -546,20 +569,62 @@
                         }
                     }
 
-                    // 数据回填
-                    var resMonitorData = JSON.parse(response.data.monitorData)
-                    var monitorData = {}
+                    // 获取设备及传感器
+                    var projectDeviceData = [];
 
-                    monitorData.data_source_point = this.getProjectPointDataIdByPointId(resMonitorData.data_source_point)
-                    monitorData.data_source_standard_point = this.getProjectPointDataIdByPointId(resMonitorData.data_source_standard_point)
-                    monitorData.type = resMonitorData.type
+                    projectDeviceList({
+                        projectId: this.form.projectId
+                    }).then(res => {
+                        for (var i = 0; i < res.length; i++) {
+                            var item = res[i];
+                            var children = [];
 
-                    this.form.monitorData = monitorData
+                            if (null != item.wxcxcDeviceSensorList) {
+                                for (var j = 0; j < item.wxcxcDeviceSensorList.length; j++) {
+                                    var sensorItem = item.wxcxcDeviceSensorList[j]
+                                    children.push({
+                                        value: sensorItem.id,
+                                        label: sensorItem.name,
+                                    })
+                                }
+                            }
 
-                    console.log(this.getProjectPointDataIdByPointId(resMonitorData.data_source_point))
+                            projectDeviceData.push({
+                                value: item.id,
+                                label: item.name,
+                                children: children
+                            })
+                        }
 
-                    this.open = true;
-                    this.title = "修改项目测点";
+                        this.optionsDeviceData = projectDeviceData
+
+                        // 数据回填
+                        if (1 == response.data.monitorType && null != response.data.monitorData && "" != response.data.monitorData) {
+                            var resMonitorData = JSON.parse(response.data.monitorData)
+                            var monitorData = {}
+
+                            monitorData.data_source_sensor = this.getProjectDeviceDataIdBySensorId(resMonitorData.data_source_sensor)
+                            monitorData.type = resMonitorData.type
+                            if (1 == monitorData.type) {
+                                monitorData.data_source_standard_sensor = this.getProjectDeviceDataIdBySensorId(resMonitorData.data_source_standard_sensor)
+                            } else if (2 == monitorData.type) {
+                                monitorData.data_source_standard_value = resMonitorData.data_source_standard_value
+                            }
+
+                            this.form.monitorData = monitorData
+                        }
+
+                        if (null == response.data.monitorData || "" == response.data.monitorData) {
+                            this.form.monitorData = {}
+                        }
+
+                        console.log(this.form)
+
+                        this.open = true;
+                        this.title = "修改项目测点";
+                    });
+
+
                 });
             },
             /** 提交按钮 */
@@ -569,13 +634,12 @@
                         var formData = JSON.parse(JSON.stringify(this.form))
                         // 处理检测因素
                         var monitorData = {};
-                        console.log(formData)
 
                         if (1 == formData.monitorType) {
-                            monitorData.data_source_point = formData.monitorData.data_source_point[1]
+                            monitorData.data_source_sensor = formData.monitorData.data_source_sensor[1]
                             monitorData.type = formData.monitorData.type
                             if (1 == formData.monitorData.type) {
-                                monitorData.data_source_standard_point = formData.monitorData.data_source_standard_point[1]
+                                monitorData.data_source_standard_sensor = formData.monitorData.data_source_standard_sensor[1]
                             } else if (2 == formData.monitorData.type) {
                                 monitorData.data_source_standard_value = formData.monitorData.data_source_standard_value
                             }
@@ -622,6 +686,7 @@
                 }).catch(() => {
                 });
             },
+            // 筛选项目
             conditionProjectChange() {
                 if (null != this.queryParams.projectId) {
                     this.$emit('projectCurrent', this.queryParams.projectId);
@@ -650,11 +715,9 @@
                     });
 
                     this.getList();
-
-                    // 获取测点及分组
-                    this.getPointAndGroup(this.queryParams.projectStructureId)
                 }
             },
+            // 测点dialog 项目变化
             dialogFormProjectChange() {
                 if (null != this.form.projectId) {
                     projectStructureListByProjectId({
@@ -664,6 +727,9 @@
                         this.form.projectStructureId = null;
                         this.form.pointGroupId = null;
                     });
+
+                    // 获取设备列表
+                    this.getDeviceAndSensor(this.form.projectId)
                 }
             },
             // 测点dialog 结构物变化
@@ -681,9 +747,6 @@
                         })
                         this.form.pointGroupId = null;
                     });
-
-                    // 获取测点和分组
-                    this.getPointAndGroup(this.form.projectStructureId)
 
                 }
             },
@@ -769,51 +832,54 @@
                     });
                 }
             },
-            getProjectPointDataIdByPointId(pointId) {
-                for (var i = 0; i < this.optionsPointData.length; i++) {
-                    var item = this.optionsPointData[i]
+            getProjectDeviceDataIdBySensorId(sensorId) {
+                for (var i = 0; i < this.optionsDeviceData.length; i++) {
+                    var item = this.optionsDeviceData[i]
 
                     for (var j = 0; j < item.children.length; j++) {
                         var childrenItem = item.children[j]
+                        console.log(childrenItem.value)
 
-                        if (pointId == childrenItem.value) {
+                        if (sensorId == childrenItem.value) {
                             return [item.value, childrenItem.value]
                         }
                     }
-
                 }
-            },
-            getPointAndGroup(projectStructureId) {
-                // 获取测点及分组
-                var projectPointData = [];
 
-                listProjectPoint({
-                    projectStructureId: projectStructureId
+                return null
+            },
+            getDeviceAndSensor(projectId) {
+                // 获取设备及传感器
+                var projectDeviceData = [];
+
+                projectDeviceList({
+                    projectId: projectId
                 }).then(response => {
-                    for (var i = 0; i < response.rows.length; i++) {
-                        var item = response.rows[i];
+                    for (var i = 0; i < response.length; i++) {
+                        var item = response[i];
                         var children = [];
 
-                        if (null != item.children) {
-                            for (var j = 0; j < item.children.length; j++) {
-                                var childrenItem = item.children[j]
+                        if (null != item.wxcxcDeviceSensorList) {
+                            for (var j = 0; j < item.wxcxcDeviceSensorList.length; j++) {
+                                var sensorItem = item.wxcxcDeviceSensorList[j]
                                 children.push({
-                                    value: childrenItem.id,
-                                    label: childrenItem.name,
+                                    value: sensorItem.id,
+                                    label: sensorItem.name,
                                 })
                             }
                         }
 
-                        projectPointData.push({
+                        projectDeviceData.push({
                             value: item.id,
                             label: item.name,
                             children: children
                         })
                     }
 
-                    this.optionsPointData = projectPointData
+                    this.optionsDeviceData = projectDeviceData
                 });
             }
+
 
         }
     };

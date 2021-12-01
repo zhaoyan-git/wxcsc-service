@@ -63,11 +63,17 @@
           <!-- 筛选 END -->
         </el-header>
         <el-main>
+          <div v-if="0 == echartsArray.length" style="text-align: center">
+            <h4>无数据</h4>
+          </div>
           <div
-            ref="chart"
+            v-for="item in echartsArray"
+            :ref="'chart' + item.index"
             :style="{ height: height, width: width }"
             style="padding: 50px 0 0 25px"
-          />
+          >
+            {{item.index}}
+          </div>
         </el-main>
         <el-footer></el-footer>
       </el-container>
@@ -75,14 +81,10 @@
   </div>
 </template>
 <script>
-    // import { getList, save, del } from "@/api/plugin/article";
     import {parseTime} from "@/utils";
-    // import md5 from "blueimp-md5";
     import echarts from "echarts";
 
-    require("echarts/theme/macarons"); // echarts theme
-    // import resize from "./mixins/resize";
-    // import Tinymce from "@/components/Tinymce";
+    require("echarts/theme/macarons");
 
     import {
         listProjectPoint
@@ -120,7 +122,7 @@
                     },
                 },
                 width: "100%",
-                height: "100%",
+                height: "50%",
                 pickerOptions: {
                     shortcuts: [
                         {
@@ -157,6 +159,7 @@
                 currentProjectId: "",
                 pointOrDeviceData: [],
                 daterangeReleaseTime: [],
+                echartsArray: []
             };
         },
         mounted() {
@@ -169,12 +172,11 @@
                 projectListByUserRole().then((response) => {
                     this.tableData = response;
                 });
-
-                this.$nextTick(() => {
-                    this.initChart();
-                });
             },
             loadPage() {
+                var that = this
+                this.echartsArray = []
+
                 if (this.pageLoading) {
                     return;
                 }
@@ -200,30 +202,31 @@
                     condition.deviceId = this.pointOrDeviceData[1]
 
                     listProjectDeivceSensorData(condition).then((response) => {
-                            var data = [];
+                            if (null != response && 0 < response.length) {
 
-                            for (var i = 0; i < response.length; i++) {
-                                var item = response[i]
-                                var itemData = []
+                                for (var i = 0; i < response.length; i++) {
+                                    var item = response[i]
+                                    var itemData = []
 
-                                for (var j = 0; j < item.length; j++) {
-                                    itemData.push([
-                                        item[j].createTime,
-                                        item[j].data
-                                    ])
+                                    for (var j = 0; j < item.dataList.length; j++) {
+                                        itemData.push([
+                                            item.dataList[j].createTime,
+                                            item.dataList[j].data
+                                        ])
+                                    }
+
+                                    this.echartsArray.push(
+                                        {
+                                            index: i,
+                                            option: that.generateOptions(item.name, "单位：" + item.unit, itemData)
+                                        }
+                                    )
                                 }
 
-                                data.push({
-                                    name: item.id,
-                                    data: itemData,
-                                    type:
-                                        'line',
-                                    smooth:
-                                        true
-                                })
+                                this.showCharts()
                             }
 
-                            this.setOptions(data)
+
                             this.pageLoading = false;
                         }
                     )
@@ -237,23 +240,40 @@
                     condition.pointId = this.pointOrDeviceData[2]
 
                     listStructurePointData(condition).then((response) => {
-                        var data = [];
+                        if (null != response && 0 < response.length) {
+                            // 累计沉降数据
+                            var data = [];
+                            // 与上次数据差值
+                            var data2 = [];
 
-                        for (var i = 0; i < response.length; i++) {
-                            var item = response[i]
-                            data.push([
-                                item.createTime,
-                                item.data
-                            ])
+                            for (var i = 0; i < response.length; i++) {
+                                // 累计沉降数据
+                                var item = response[i]
+                                data.push([
+                                    item.createTime,
+                                    item.data
+                                ])
+
+                                // 与上次数据差值
+                                if (i != 0) {
+                                    data2.push([
+                                        item.createTime,
+                                        (item.data - response[i - 1].data).toFixed(2)
+                                    ])
+                                }
+                            }
+
+
+                            this.echartsArray = [{
+                                index: "0",
+                                option: that.generateOptions("累计沉降值", "单位：mm", data)
+                            },
+                                {
+                                    index: "1",
+                                    option: that.generateOptions("与上次数据差值", "单位：mm", data2)
+                                }]
+                            this.showCharts()
                         }
-
-                        this.setOptions([{
-                            data: data,
-                            type:
-                                'line',
-                            smooth:
-                                true
-                        }])
 
                         this.pageLoading = false;
                     });
@@ -266,28 +286,14 @@
                 }
 
                 this.loadPage();
-            }
-            ,
-            sortChange(val) {
-                var orderBy = val.prop;
-                var sort = val.order;
-                if (sort === "ascending") {
-                    this.condition.page.sort = "ASC";
-                } else {
-                    this.condition.page.sort = "DESC";
-                }
-                this.condition.page.orderBy = orderBy;
-                this.loadPage();
-            }
-            ,
-            initChart() {
-                this.chart = echarts.init(this.$refs.chart, "macarons");
-                this.setOptions(this.chartData);
-            }
-            ,
-            setOptions(expectedData) {
-                var option = {
+            },
+            generateOptions(title, yAxisName, expectedData) {
+                return {
+                    title: {
+                        text: title
+                    },
                     xAxis: {
+                        boundaryGap: true,
                         type: 'category'
                     },
                     tooltip: {
@@ -298,14 +304,44 @@
                         padding: [5, 10],
                     },
                     yAxis: {
+                        name: yAxisName,
+                        boundaryGap: true,
                         type: 'value'
                     },
-                    series: expectedData
-
+                    series: [{
+                        data: expectedData,
+                        type:
+                            'line',
+                        smooth:
+                            true
+                    }],
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            saveAsImage: {
+                                show: true,
+                                excludeComponents: ['toolbox'],
+                                pixelRatio: 2
+                            }
+                        }
+                    }
                 }
-
-                this.chart.setOption(option)
             },
+            // 展示图表
+            showCharts() {
+                if (null != this.echartsArray.length && 0 < this.echartsArray.length) {
+                    this.$nextTick(() => {
+                        for (var i = 0; i < this.echartsArray.length; i++) {
+                            console.log(this.$refs.chart0)
+
+                            console.log(eval('this.$refs.chart' + this.echartsArray[i].index))
+                            var chart = echarts.init(eval('this.$refs.chart' + this.echartsArray[i].index)[0], "macarons");
+                            chart.setOption(this.echartsArray[i].option);
+                        }
+                    });
+                }
+            },
+            // 选择当前项目
             handleCurrentChange(val) {
                 this.currentProjectId = val.id;
                 projectStructureListByProjectId({
@@ -376,7 +412,7 @@
                 })
             },
             pointOrDeviceChange(val) {
-                console.log(val)
+                // console.log(val)
             },
             formatDate(date) {
                 // var date = new Date(time);
