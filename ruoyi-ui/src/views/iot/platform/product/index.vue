@@ -52,7 +52,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['iot:product:add']"
+          v-hasPermi="['iot:product']"
         >新增
         </el-button>
       </el-col>
@@ -64,7 +64,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['iot:product:edit']"
+          v-hasPermi="['iot:product']"
         >修改
         </el-button>
       </el-col>
@@ -76,7 +76,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['iot:product:remove']"
+          v-hasPermi="['iot:product']"
         >删除
         </el-button>
       </el-col>
@@ -113,7 +113,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['iot:product:edit']"
+            v-hasPermi="['iot:product']"
           >修改
           </el-button>
           <el-button
@@ -121,7 +121,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['iot:product:remove']"
+            v-hasPermi="['iot:product']"
           >删除
           </el-button>
         </template>
@@ -164,54 +164,57 @@
         <el-form-item label="产品说明" prop="detail">
           <el-input v-model="form.detail" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
-        <el-divider content-position="center">产品传感器管理信息</el-divider>
-        <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
-            <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAddWxcxcProductSensor">添加
-            </el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDeleteWxcxcProductSensor">删除
-            </el-button>
-          </el-col>
-        </el-row>
-        <el-table :data="wxcxcProductSensorList" :row-class-name="rowWxcxcProductSensorIndex"
-                  @selection-change="handleWxcxcProductSensorSelectionChange" ref="wxcxcProductSensor">
-          <el-table-column type="selection" width="50" align="center"/>
-          <el-table-column label="序号" align="center" prop="index" width="50"/>
-          <el-table-column label="传感器名称" prop="name">
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.name" placeholder="请输入传感器名称"/>
-            </template>
-          </el-table-column>
-          <el-table-column label="传感器图标" prop="iconFile">
-            <template slot-scope="scope">
-              <imageUpload v-model="scope.row.iconFile" :limit="1" class="sensorPhoto" />
-            </template>
-          </el-table-column>
-          <el-table-column label="排序编号" prop="sort">
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.sort" placeholder="请输入排序编号"/>
-            </template>
-          </el-table-column>
-          <el-table-column label="单位" prop="unit">
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.unit" placeholder="请输入单位"/>
-            </template>
-          </el-table-column>
-          <el-table-column label="传感器类型" prop="type">
-            <template slot-scope="scope">
-              <el-select v-model="scope.row.type" placeholder="请选择传感器类型">
-                <el-option
-                  v-for="dict in dict.type.iot_device_sensor_type"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-                ></el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-        </el-table>
+        <div v-if="1 == form.type">
+          <el-divider content-position="center">产品传感器管理信息</el-divider>
+          <el-row :gutter="10" class="mb8">
+            <el-col :span="1.5">
+              <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAddWxcxcProductSensor">添加
+              </el-button>
+            </el-col>
+            <el-col :span="1.5">
+              <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDeleteWxcxcProductSensor">删除
+              </el-button>
+            </el-col>
+          </el-row>
+          <el-table :data="wxcxcProductSensorList" :row-class-name="rowWxcxcProductSensorIndex"
+                    @selection-change="handleWxcxcProductSensorSelectionChange" ref="wxcxcProductSensor">
+            <el-table-column type="selection" width="50" align="center"/>
+            <el-table-column label="序号" align="center" prop="index" width="50"/>
+            <el-table-column label="传感器名称" prop="name">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.name" placeholder="请输入传感器名称"/>
+              </template>
+            </el-table-column>
+            <el-table-column label="传感器图标" prop="iconFile">
+              <template slot-scope="scope">
+                <imageUpload v-model="scope.row.iconFile" :limit="1" class="sensorPhoto"/>
+              </template>
+            </el-table-column>
+            <el-table-column label="排序编号" prop="sort">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.sort" placeholder="请输入排序编号"/>
+              </template>
+            </el-table-column>
+            <el-table-column label="单位" prop="unit">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.unit" placeholder="请输入单位"/>
+              </template>
+            </el-table-column>
+            <el-table-column label="传感器类型" prop="type">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.type" placeholder="请选择传感器类型">
+                  <el-option
+                    v-for="dict in dict.type.iot_device_sensor_type"
+                    :key="dict.value"
+                    :label="dict.label"
+                    :value="dict.value"
+                  ></el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -438,16 +441,16 @@
     margin-top: 10px;
   }
 
-  .sensorPhoto .el-upload__tip{
+  .sensorPhoto .el-upload__tip {
     display: none;
   }
 
-  .sensorPhoto .el-upload-list__item{
-    width: 100px!important;
-    height: 50px!important;
+  .sensorPhoto .el-upload-list__item {
+    width: 100px !important;
+    height: 50px !important;
   }
 
-  .sensorPhoto .el-upload-list__item-thumbnail{
+  .sensorPhoto .el-upload-list__item-thumbnail {
     width: 50px !important;
     height: 50px !important;
     margin-left: 25px;

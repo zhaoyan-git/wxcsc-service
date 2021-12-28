@@ -43,7 +43,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['iot:projectStructureType:add']"
+          v-hasPermi="['iot:projectStructureType']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -54,7 +54,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['iot:projectStructureType:edit']"
+          v-hasPermi="['iot:projectStructureType']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -65,7 +65,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['iot:projectStructureType:remove']"
+          v-hasPermi="['iot:projectStructureType']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -86,7 +86,6 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="结构物选项ID" align="center" prop="id" />
       <el-table-column label="名称" align="center" prop="name" />
-      <el-table-column label="示意图" align="center" prop="photo" />
       <el-table-column label="是否禁用" align="center" prop="disableFlag">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.iot_project_structure_type_disable_flag" :value="scope.row.disableFlag"/>
@@ -99,14 +98,14 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['iot:projectStructureType:edit']"
+            v-hasPermi="['iot:projectStructureType']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['iot:projectStructureType:remove']"
+            v-hasPermi="['iot:projectStructureType']"
           >删除</el-button>
         </template>
       </el-table-column>

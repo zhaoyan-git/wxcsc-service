@@ -362,8 +362,8 @@
                 }
             },
             projectId: function (newObject, oldObject) {
+                this.queryParams.projectId = this.projectId;
                 if (this.projectId) {
-                    this.queryParams.projectId = this.projectId;
 
                     projectStructureListByProjectId({
                         projectId: this.queryParams.projectId,
@@ -371,6 +371,9 @@
                         this.projectStructureData = response;
                     });
 
+                    this.getList()
+                } else {
+                    this.queryParams.projectStructureId = null
                     this.getList()
                 }
             },
@@ -450,6 +453,12 @@
                     name: [
                         {required: true, message: "分组名称不能为空", trigger: "blur"}
                     ],
+                    'formGroup.projectId': [
+                        {required: true, message: "所属项目不能为空", trigger: "blur"}
+                    ],
+                    'formGroup.structureId': [
+                        {required: true, message: "所属结构物不能为空", trigger: "blur"}
+                    ]
                 },
                 titleGroup: "",
                 formGroupProjectStructureData: [],
@@ -532,7 +541,17 @@
             },
             /** 重置按钮操作 */
             resetQuery() {
-                this.resetForm("queryForm");
+                this.queryParams = {
+                    pageNum: 1,
+                    pageSize: 10,
+                    pointId: null,
+                    threshold: null,
+                    computeType: null,
+                    title: null,
+                    content: null,
+                };
+                this.resetForm("queryParams");
+                this.$emit('projectCurrent', null);
                 this.handleQuery();
             },
             // 多选框选中数据

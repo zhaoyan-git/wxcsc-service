@@ -29,13 +29,24 @@
 
     <el-table v-loading="loading" :data="projectAlarmRecordList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column label="是否已读" align="center" prop="id"/>
+      <el-table-column label="ID" align="center" prop="id"/>
       <el-table-column label="标题" align="center" prop="title"/>
       <el-table-column label="内容" align="center" prop="content"/>
-      <el-table-column label="所属项目" align="center" prop="projectId"/>
+      <el-table-column label="所属项目" align="center" prop="projectId">
+        <template slot-scope="scope">
+          <span
+            v-for="item in projectList"
+            :key="item.id"
+            :value="item.id"
+            v-if="item.id == scope.row.projectId"
+          >
+            {{ item.name }}
+          </span>
+        </template>
+      </el-table-column>
       <el-table-column label="是否已读" align="center" prop="readFlag">
         <template slot-scope="scope">
-          <dict-tag :options="dict.type.sys_yes_no" :value="scope.row.readFlag"/>
+          <dict-tag :options="dict.type.iot_read_flag" :value="scope.row.readFlag"/>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -44,18 +55,26 @@
             size="mini"
             type="text"
             icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['iot:projectAlarmRecord:edit']"
-          >修改
+            @click="handleLook(scope.row)"
+            v-hasPermi="['iot:console']"
+          >查看
           </el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['iot:projectAlarmRecord:remove']"
-          >删除
-          </el-button>
+          <!--          <el-button-->
+          <!--            size="mini"-->
+          <!--            type="text"-->
+          <!--            icon="el-icon-edit"-->
+          <!--            @click="handleUpdate(scope.row)"-->
+          <!--            v-hasPermi="['iot:projectAlarmRecord:edit']"-->
+          <!--          >修改-->
+          <!--          </el-button>-->
+          <!--          <el-button-->
+          <!--            size="mini"-->
+          <!--            type="text"-->
+          <!--            icon="el-icon-delete"-->
+          <!--            @click="handleDelete(scope.row)"-->
+          <!--            v-hasPermi="['iot:projectAlarmRecord:remove']"-->
+          <!--          >删除-->
+          <!--          </el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -69,19 +88,27 @@
     />
 
     <!-- 添加或修改报警记录对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="标题" prop="title">
-          <el-input v-model="form.title" type="textarea" placeholder="请输入内容"/>
+          <el-input v-model="form.title" :readonly="true"/>
         </el-form-item>
         <el-form-item label="内容">
-          <editor v-model="form.content" :min-height="192"/>
+          <el-input v-model="form.content" type="textarea" :readonly="true"/>
         </el-form-item>
         <el-form-item label="所属项目" prop="projectId">
-          <el-input v-model="form.projectId" placeholder="请输入所属项目"/>
+          <span
+            v-for="item in projectList"
+            :key="item.id"
+            :value="item.id"
+            v-if="item.id == form.projectId"
+
+          >
+            {{ item.name }}
+          </span>
         </el-form-item>
         <el-form-item label="是否已读" prop="readFlag">
-          <el-input v-model="form.readFlag" placeholder="请输入是否已读"/>
+          <dict-tag :options="dict.type.iot_read_flag" :value="form.readFlag"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -102,7 +129,7 @@
         exportProjectAlarmRecord
     } from "@/api/iot/projectAlarmRecord";
 
-    import {projectAlarmRecordListByUser, projectListByUserRole} from "@/api/iot/console";
+    import {projectAlarmRecordListByUser, projectListByUserRole, getProjectAlarmRecordInfo} from "@/api/iot/console";
 
     export default {
         name: "ProjectAlarmRecord",
@@ -203,6 +230,16 @@
                 this.reset();
                 this.open = true;
                 this.title = "添加报警记录";
+            },
+            handleLook(row) {
+                this.reset();
+                const id = row.id || this.ids
+                getProjectAlarmRecordInfo(id).then(response => {
+                    this.form = response.data;
+                    this.getList();
+                    this.open = true;
+                    this.title = "查看报警记录";
+                });
             },
             /** 修改按钮操作 */
             handleUpdate(row) {

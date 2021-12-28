@@ -13,13 +13,21 @@
           <el-table-column
             class="project-list-table"
             prop="name"
-            label="项目名"
-          />
+            label="项目名">
+            <template slot-scope="scope">
+              {{ scope.row.name }}
+              <el-badge is-dot :class="'alarmFlag' + scope.row.alarmFlag"
+                        style="margin: 10px;">
+              </el-badge>
+            </template>
+
+          </el-table-column>
+
           <!-- 表头及数据 END -->
         </el-table>
       </el-aside>
       <el-container>
-        <el-header>
+        <el-header style="height: auto !important;">
           <!-- 筛选 START -->
           <el-form :inline="true" class="top-form-inline">
             <el-form-item label="结构物">
@@ -30,7 +38,12 @@
                   :value="item.id"
                   v-for="item in projectStructureData"
                   :key="item.id"
-                ></el-option>
+                >
+                  <span>{{ item.name }}</span>
+                  <el-badge is-dot :class="'alarmFlag' + item.alarmFlag" style="margin: 10px;">
+                  </el-badge>
+                </el-option>
+
               </el-select>
             </el-form-item>
             <el-form-item label="测点/设备">
@@ -38,7 +51,27 @@
                 v-model="pointOrDeviceData"
                 @change="pointOrDeviceChange"
                 :options="optionsPointOrDeviceData"
-                :props="{ expandTrigger: 'hover' }"></el-cascader>
+                :props="{ expandTrigger: 'hover',multiple: true }">
+                <template slot-scope="{ node, data }">
+                  <span>{{ data.label }}</span>
+                  <!--                  <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>-->
+                  <el-badge v-if="null != data.alarmFlag" is-dot :class="'alarmFlag' + data.alarmFlag"
+                            style="margin: 10px;">
+                  </el-badge>
+                </template>
+              </el-cascader>
+            </el-form-item>
+            <el-form-item label="数据类型" v-if="2 != pointOrDeviceData.length">
+              <el-select v-model="condition.gatherType" size="small">
+                <el-option
+                  :label="'实时数据'"
+                  :value="'1'"
+                  :key="1"/>
+                <el-option
+                  :label="'聚集数据'"
+                  :value="'2'"
+                  :key="2"/>
+              </el-select>
             </el-form-item>
             <el-form-item label="查询时间">
               <el-date-picker
@@ -50,6 +83,7 @@
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
                 :picker-options="pickerOptions"
+                :default-time="['00:00:00', '23:59:59']"
               >
               </el-date-picker>
             </el-form-item>
@@ -64,7 +98,8 @@
         </el-header>
         <el-main>
           <div v-if="0 == echartsArray.length" style="text-align: center">
-            <h4>无数据</h4>
+            无数据
+            <!--            <el-empty description="无数据"></el-empty>-->
           </div>
           <div
             v-for="item in echartsArray"
@@ -81,7 +116,7 @@
   </div>
 </template>
 <script>
-    import {parseTime} from "@/utils";
+    import {parseTime} from '@/utils/ruoyi'
     import echarts from "echarts";
 
     require("echarts/theme/macarons");
@@ -113,6 +148,7 @@
                 pageLoading: false,
                 tableData: [],
                 condition: {
+                    gatherType: '1',
                     page: {
                         orderBy: "id",
                         sort: "DESC",
@@ -194,6 +230,8 @@
                         'beginReleaseTime': this.formatDate(this.daterangeReleaseTime[0]),
                         'endReleaseTime': this.formatDate(this.daterangeReleaseTime[1])
                     }
+                    condition.params.beginTime = condition.params.beginReleaseTime
+                    condition.params.endTime = condition.params.endReleaseTime
                 }
 
                 // 获取设备数据
@@ -210,7 +248,7 @@
 
                                     for (var j = 0; j < item.dataList.length; j++) {
                                         itemData.push([
-                                            item.dataList[j].createTime,
+                                            parseTime(item.dataList[j].createTime, '{y}-{m}-{d} {h}:{i}:{s}'),
                                             item.dataList[j].data
                                         ])
                                     }
@@ -238,6 +276,7 @@
                 if (3 == this.pointOrDeviceData.length) {
                     condition.structureId = this.condition.projectStructureId
                     condition.pointId = this.pointOrDeviceData[2]
+                    condition.gatherType = this.condition.gatherType
 
                     listStructurePointData(condition).then((response) => {
                         if (null != response && 0 < response.length) {
@@ -249,15 +288,16 @@
                             for (var i = 0; i < response.length; i++) {
                                 // 累计沉降数据
                                 var item = response[i]
+
                                 data.push([
-                                    item.createTime,
+                                    parseTime(item.createTime, '{y}-{m}-{d} {h}:{i}:{s}'),
                                     item.data
                                 ])
 
                                 // 与上次数据差值
                                 if (i != 0) {
                                     data2.push([
-                                        item.createTime,
+                                        parseTime(item.createTime, '{y}-{m}-{d} {h}:{i}:{s}'),
                                         (item.data - response[i - 1].data).toFixed(2)
                                     ])
                                 }
@@ -332,9 +372,6 @@
                 if (null != this.echartsArray.length && 0 < this.echartsArray.length) {
                     this.$nextTick(() => {
                         for (var i = 0; i < this.echartsArray.length; i++) {
-                            console.log(this.$refs.chart0)
-
-                            console.log(eval('this.$refs.chart' + this.echartsArray[i].index))
                             var chart = echarts.init(eval('this.$refs.chart' + this.echartsArray[i].index)[0], "macarons");
                             chart.setOption(this.echartsArray[i].option);
                         }
@@ -388,6 +425,7 @@
                                 children.push({
                                     value: childrenItem.id,
                                     label: childrenItem.name,
+                                    alarmFlag: childrenItem.alarmFlag,
                                 })
                             }
                         }
@@ -412,20 +450,17 @@
                 })
             },
             pointOrDeviceChange(val) {
-                // console.log(val)
             },
             formatDate(date) {
-                // var date = new Date(time);
-
                 var year = date.getFullYear(),
                     month = date.getMonth() + 1,//月份是从0开始的
                     day = date.getDate(),
                     hour = date.getHours(),
                     min = date.getMinutes();
-                var newTime = '' + year +
-                    (month < 10 ? '0' + month : month) +
-                    (day < 10 ? '0' + day : day) +
-                    (hour < 10 ? '0' + hour : hour) +
+                var newTime = '' + year + '-' +
+                    (month < 10 ? '0' + month : month) + '-' +
+                    (day < 10 ? '0' + day : day) + ' ' +
+                    (hour < 10 ? '0' + hour : hour) + ':' +
                     (min < 10 ? '0' + min : min);
 
                 return newTime;
@@ -465,6 +500,26 @@
     padding-left: 22px;
     background: #eee;
     align-items: center;
+  }
+
+  .el-select-dropdown__item {
+    height: 53px;
+  }
+
+  .alarmFlag0 .el-badge__content {
+    background-color: rgba(255, 255, 255, 0);
+  }
+
+  .alarmFlag1 .el-badge__content {
+    background-color: #ff0000;
+  }
+
+  .alarmFlag2 .el-badge__content {
+    background-color: #ffad00;
+  }
+
+  .alarmFlag3 .el-badge__content {
+    background-color: #fff700;
   }
 
   // page end

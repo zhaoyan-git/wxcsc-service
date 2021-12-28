@@ -26,11 +26,17 @@ public class ReportFormDto {
     private String currentValue;
 
     // 变化速率（mm/d）
+    @Excel(name = "变化速率（mm/d）")
+    private String currentRateValue;
+
     // 控制值累计变化值（mm）
     @Excel(name = "控制值累计变化值（mm）")
     private String controlValue;
 
     // 控制值变化速率值（mm/d）
+    @Excel(name = "控制值变化速率值（mm/d）")
+    private String controlRateValue;
+
     // 本次监测时间
     @Excel(name = "本次监测时间")
     private String lastDataTime;

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wxcxc.mapper.WxcxcProjectPointGatherConfigMapper">
+
+    <resultMap type="WxcxcProjectPointGatherConfig" id="WxcxcProjectPointGatherConfigResult">
+        <result property="id" column="id"/>
+        <result property="pointId" column="point_id"/>
+        <result property="calcType" column="calc_type"/>
+        <result property="cycle" column="cycle"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectWxcxcProjectPointGatherConfigVo">
+        select id, point_id, calc_type, cycle, create_time, update_time from wxcxc_project_point_gather_config
+    </sql>
+
+    <select id="selectWxcxcProjectPointGatherConfigList"
+            parameterType="com.ruoyi.wxcxc.dto.WxcxcProjectPointGatherConfigDto"
+            resultMap="WxcxcProjectPointGatherConfigResult">
+        <include refid="selectWxcxcProjectPointGatherConfigVo"/>
+        <where>
+            <if test="projectId != null ">and point_id in (SELECT id FROM wxcxc_project_point WHERE del_flag = 0 AND
+                project_structure_id in
+                (SELECT id FROM wxcxc_project_structure WHERE del_flag = 0 AND project_id = #{projectId}))
+            </if>
+            <if test="structureId != null ">and point_id in (SELECT id FROM wxcxc_project_point WHERE del_flag =
+                0 AND project_structure_id = #{structureId})
+            </if>
+            <if test="pointId != null ">and point_id = #{pointId}</if>
+            <if test="calcType != null  and calcType != ''">and calc_type = #{calcType}</if>
+            <if test="cycle != null  and cycle != ''">and cycle = #{cycle}</if>
+        </where>
+    </select>
+
+    <select id="selectWxcxcProjectPointGatherConfigById" parameterType="Long"
+            resultMap="WxcxcProjectPointGatherConfigResult">
+        <include refid="selectWxcxcProjectPointGatherConfigVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertWxcxcProjectPointGatherConfig" parameterType="WxcxcProjectPointGatherConfig"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into wxcxc_project_point_gather_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pointId != null">point_id,</if>
+            <if test="calcType != null and calcType != ''">calc_type,</if>
+            <if test="cycle != null and cycle != ''">cycle,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pointId != null">#{pointId},</if>
+            <if test="calcType != null and calcType != ''">#{calcType},</if>
+            <if test="cycle != null and cycle != ''">#{cycle},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateWxcxcProjectPointGatherConfig" parameterType="WxcxcProjectPointGatherConfig">
+        update wxcxc_project_point_gather_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="pointId != null">point_id = #{pointId},</if>
+            <if test="calcType != null and calcType != ''">calc_type = #{calcType},</if>
+            <if test="cycle != null and cycle != ''">cycle = #{cycle},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWxcxcProjectPointGatherConfigById" parameterType="Long">
+        delete from wxcxc_project_point_gather_config where id = #{id}
+    </delete>
+
+    <delete id="deleteWxcxcProjectPointGatherConfigByIds" parameterType="String">
+        delete from wxcxc_project_point_gather_config where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

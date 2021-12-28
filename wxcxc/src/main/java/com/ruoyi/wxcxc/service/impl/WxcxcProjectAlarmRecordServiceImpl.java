@@ -94,7 +94,7 @@ public class WxcxcProjectAlarmRecordServiceImpl implements IWxcxcProjectAlarmRec
         return wxcxcProjectAlarmRecordMapper.deleteWxcxcProjectAlarmRecordById(id);
     }
 
-    // 发送告警
+    // TODO 发送告警
     @Override
     public void sendAlarm(Long pointId,Long alarmConfigId){
 

@@ -221,9 +221,9 @@
                 }
             },
             projectId: function (newObject, oldObject) {
-                if (this.projectId) {
+                // if (this.projectId) {
                     this.queryParams.projectId = this.projectId;
-                }
+                // }
             }
         },
         data() {
@@ -346,7 +346,17 @@
             },
             /** 重置按钮操作 */
             resetQuery() {
-                this.resetForm("queryForm");
+                this.queryParams = {
+                    pageNum: 1,
+                    pageSize: 10,
+                    pointId: null,
+                    threshold: null,
+                    computeType: null,
+                    title: null,
+                    content: null,
+                };
+                this.resetForm("queryParams");
+                this.$emit('projectCurrent', null);
                 this.handleQuery();
             },
             // 多选框选中数据

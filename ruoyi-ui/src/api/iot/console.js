@@ -113,3 +113,10 @@ export function getListByBusinessId(query) {
     params: query
   })
 }
+
+export function getProjectAlarmRecordInfo(id) {
+  return request({
+    url: '/iot/console/projectAlarmRecord/' + id,
+    method: 'get'
+  })
+}

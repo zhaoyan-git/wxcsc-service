@@ -61,4 +61,6 @@ public interface WxcxcProjectAlarmRecordMapper {
     public int deleteWxcxcProjectAlarmRecordByIds(Long[] ids);
 
     List<WxcxcProjectAlarmRecord> selectWxcxcProjectAlarmRecordListByMemberId(@Param("businessMemberId") Long businessMemberId, @Param("wxcxcProjectAlarmRecord") WxcxcProjectAlarmRecord wxcxcProjectAlarmRecord);
+
+    List<WxcxcProjectAlarmRecord> selectWxcxcProjectAlarmRecordListByMemberIdProject(@Param("businessId") Long businessId, @Param("wxcxcProjectAlarmRecord") WxcxcProjectAlarmRecord wxcxcProjectAlarmRecord);
 }

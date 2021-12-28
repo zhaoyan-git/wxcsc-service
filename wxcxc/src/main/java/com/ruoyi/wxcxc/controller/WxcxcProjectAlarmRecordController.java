@@ -61,7 +61,7 @@ public class WxcxcProjectAlarmRecordController extends BaseController
     /**
      * 获取报警记录详细信息
      */
-    @PreAuthorize("@ss.hasPermi('iot:projectAlarmRecord:query')")
+    @PreAuthorize("@ss.hasPermi('iot:projectAlarmRecord')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {

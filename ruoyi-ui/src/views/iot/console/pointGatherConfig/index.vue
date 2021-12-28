@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="88px">
+
       <el-form-item label="项目">
         <el-select v-model="queryParams.projectId"
                    placeholder="请选择项目"
@@ -14,8 +15,8 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="所属结构物" prop="structureId">
-        <el-select v-model="queryParams.structureId" placeholder="请选择所属结构物" clearable size="small"
+      <el-form-item label="所属结构物" prop="projectStructureId">
+        <el-select v-model="queryParams.projectStructureId" placeholder="请选择所属结构物" clearable size="small"
                    @change="conditionProjectStructureChange">
           <el-option
             :label="item.name"
@@ -39,7 +40,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['iot:projectAlarmConfig']"
+          v-hasPermi="['iot:pointGatherConfig']"
         >新增
         </el-button>
       </el-col>
@@ -51,7 +52,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['iot:projectAlarmConfig']"
+          v-hasPermi="['iot:pointGatherConfig']"
         >修改
         </el-button>
       </el-col>
@@ -63,30 +64,39 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['iot:projectAlarmConfig']"
+          v-hasPermi="['iot:pointGatherConfig']"
         >删除
         </el-button>
       </el-col>
+      <!--      <el-col :span="1.5">-->
+      <!--        <el-button-->
+      <!--          type="warning"-->
+      <!--          plain-->
+      <!--          icon="el-icon-download"-->
+      <!--          size="mini"-->
+      <!--          :loading="exportLoading"-->
+      <!--          @click="handleExport"-->
+      <!--          v-hasPermi="['iot:pointGatherConfig']"-->
+      <!--        >导出-->
+      <!--        </el-button>-->
+      <!--      </el-col>-->
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="projectAlarmConfigList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="pointGatherConfigList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column label="ID" align="center" prop="id"/>
-      <el-table-column label="所属测点" align="center" prop="point">
+      <el-table-column label="周期" align="center" prop="id"/>
+      <el-table-column label="所属测点" align="center" prop="pointId"/>
+      <el-table-column label="计算方式" align="center" prop="calcType">
         <template slot-scope="scope">
-          <block>
-            {{ scope.row.point.name }}
-          </block>
+          <dict-tag :options="dict.type.iot_gather_calc_type" :value="scope.row.calcType"/>
         </template>
       </el-table-column>
-      <el-table-column label="阈值" align="center" prop="threshold"/>
-      <el-table-column label="计算方式" align="center" prop="computeType">
+      <el-table-column label="周期" align="center" prop="cycle">
         <template slot-scope="scope">
-          <dict-tag :options="dict.type.iot_compute_type" :value="scope.row.computeType"/>
+          <dict-tag :options="dict.type.iot_gather_cycle" :value="scope.row.cycle"/>
         </template>
       </el-table-column>
-      <el-table-column label="报警标题" align="center" prop="title"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -94,7 +104,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['iot:projectAlarmConfig']"
+            v-hasPermi="['iot:pointGatherConfig']"
           >修改
           </el-button>
           <el-button
@@ -102,7 +112,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['iot:projectAlarmConfig']"
+            v-hasPermi="['iot:pointGatherConfig']"
           >删除
           </el-button>
         </template>
@@ -117,14 +127,14 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改报警配置对话框 -->
+    <!-- 添加或修改聚集配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="所属项目" prop="projectId">
           <el-select
             v-model="form.projectId"
             placeholder="请选择所属项目"
-            @change="dialogFormProjectChange"
+            @change="dialogFormGroupProjectChange"
           >
             <el-option
               v-for="item in projectData"
@@ -137,59 +147,49 @@
         <el-form-item label="所属结构物" prop="structureId">
           <el-select v-model="form.structureId"
                      placeholder="请选择所属结构物"
-                     @change="dialogFormProjectStructureChange"
+                     @change="dialogFormGroupProjectStructureChange"
           >
             <el-option
-              v-for="item in formProjectStructureData"
+              v-for="item in formGroupProjectStructureData"
               v-bind:key="item.id"
               :label="item.name"
               :value="item.id"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="所属测点" prop="selectedPointId">
+        <el-form-item label="所属测点" prop="pointId">
           <el-cascader
-            v-model="form.selectedPointId"
+            v-model="form.pointId"
             :options="optionsPointOrDeviceData"
-            :props="{ expandTrigger: 'hover' }"></el-cascader>
+            :props="{ expandTrigger: 'hover' }">
+            <template slot-scope="{ node, data }">
+              <span>{{ data.label }}</span>
+              <el-badge v-if="null != data.alarmFlag" is-dot :class="'alarmFlag' + data.alarmFlag"
+                        style="margin: 10px;">
+              </el-badge>
+            </template>
+          </el-cascader>
         </el-form-item>
-        <el-form-item label="阈值" prop="threshold">
-          <el-input v-model="form.threshold" placeholder="请输入阈值"/>
-        </el-form-item>
-        <!--        <el-form-item label="报警等级" prop="threshold">-->
-        <!--          <el-select v-model="form.alarmLevel" placeholder="请选择报警等级">-->
-        <!--            <el-option-->
-        <!--              :key="'1'"-->
-        <!--              label="一级告警"-->
-        <!--              :value="'1'"-->
-        <!--            ></el-option>-->
-        <!--            <el-option-->
-        <!--              :key="'2'"-->
-        <!--              label="二级告警"-->
-        <!--              :value="'2'"-->
-        <!--            ></el-option>-->
-        <!--            <el-option-->
-        <!--              :key="'3'"-->
-        <!--              label="三级告警"-->
-        <!--              :value="'3'"-->
-        <!--            ></el-option>-->
-        <!--          </el-select>-->
-        <!--        </el-form-item>-->
-        <el-form-item label="计算方式" prop="computeType">
-          <el-select v-model="form.computeType" placeholder="请选择计算方式">
+
+        <el-form-item label="计算方式" prop="calcType">
+          <el-select v-model="form.calcType" placeholder="请选择计算方式">
             <el-option
-              v-for="dict in dict.type.iot_compute_type"
+              v-for="dict in dict.type.iot_gather_calc_type"
               :key="dict.value"
               :label="dict.label"
               :value="dict.value"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="报警标题" prop="title">
-          <el-input v-model="form.title" type="input" placeholder="请输入报警标题"/>
-        </el-form-item>
-        <el-form-item label="报警内容">
-          <el-input v-model="form.content" type="textarea" placeholder="请输入报警内容"/>
+        <el-form-item label="周期" prop="cycle">
+          <el-select v-model="form.cycle" placeholder="请选择周期">
+            <el-option
+              v-for="dict in dict.type.iot_gather_cycle"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -202,28 +202,29 @@
 
 <script>
     import {
-        listProjectAlarmConfig,
-        getProjectAlarmConfig,
-        delProjectAlarmConfig,
-        addProjectAlarmConfig,
-        updateProjectAlarmConfig,
-        exportProjectAlarmConfig
-    } from "@/api/iot/projectAlarmConfig";
+        listProjectPoint
+    } from "@/api/iot/projectPoint";
+
+    import {
+        listPointGatherConfig,
+        getPointGatherConfig,
+        delPointGatherConfig,
+        addPointGatherConfig,
+        updatePointGatherConfig,
+        exportPointGatherConfig
+    } from "@/api/iot/pointGatherConfig";
 
     import {
         projectStructureTypeList,
         projectListBusiness,
         projectStructureListByProjectId,
-        projectPointGroup
+        projectPointGroup,
+        projectDeviceList
     } from "@/api/iot/console";
 
-    import {
-        listProjectPoint
-    } from "@/api/iot/projectPoint";
-
     export default {
-        name: "ProjectAlarmConfig",
-        dicts: ['iot_compute_type', 'iot_alarm'],
+        name: "PointGatherConfig",
+        dicts: ['iot_gather_calc_type', 'iot_gather_cycle'],
         data() {
             return {
                 // 遮罩层
@@ -240,8 +241,8 @@
                 showSearch: true,
                 // 总条数
                 total: 0,
-                // 报警配置表格数据
-                projectAlarmConfigList: [],
+                // 聚集配置表格数据
+                pointGatherConfigList: [],
                 // 弹出层标题
                 title: "",
                 // 是否显示弹出层
@@ -251,41 +252,32 @@
                     pageNum: 1,
                     pageSize: 10,
                     pointId: null,
-                    threshold: null,
-                    computeType: null,
-                    title: null,
-                    content: null,
+                    calcType: null,
+                    cycle: null,
                 },
                 // 表单参数
                 form: {},
                 // 表单校验
                 rules: {
-                    selectedPointId: [
+                    pointId: [
                         {required: true, message: "所属测点不能为空", trigger: "blur"}
                     ],
-                    threshold: [
-                        {required: true, message: "阈值不能为空", trigger: "blur"}
-                    ],
-                    computeType: [
+                    calcType: [
                         {required: true, message: "计算方式不能为空", trigger: "change"}
                     ],
-                    title: [
-                        {required: true, message: "报警标题不能为空", trigger: "blur"}
+                    cycle: [
+                        {required: true, message: "周期不能为空", trigger: "change"}
                     ],
                     projectId: [
-                        {required: true, message: "所属项目不能为空", trigger: "blur"}
+                        {required: true, message: "所属项目不能为空", trigger: "change"}
                     ],
-                    structureId: [
-                        {required: true, message: "所属结构物不能为空", trigger: "blur"}
-                    ],
-                    alarmLevel: [
-                        {required: true, message: "告警等级不能为空", trigger: "blur"}
-                    ],
-
+                    'structureId': [
+                        {required: true, message: "所属结构物不能为空", trigger: "change"}
+                    ]
                 },
                 projectData: [],
                 projectStructureData: [],
-                formProjectStructureData: [],
+                formGroupProjectStructureData: [],
                 optionsPointOrDeviceData: []
             };
         },
@@ -293,7 +285,7 @@
             this.getList();
         },
         methods: {
-            /** 查询报警配置列表 */
+            /** 查询聚集配置列表 */
             getList() {
                 this.loading = true;
 
@@ -312,8 +304,16 @@
                     }
                 });
 
-                listProjectAlarmConfig(this.queryParams).then(response => {
-                    this.projectAlarmConfigList = response.rows;
+                if (null != this.queryParams.projectId && "" != this.queryParams.projectId) {
+                    projectStructureListByProjectId({
+                        projectId: this.queryParams.projectId,
+                    }).then((response) => {
+                        this.projectStructureData = response;
+                    });
+                }
+
+                listPointGatherConfig(this.queryParams).then(response => {
+                    this.pointGatherConfigList = response.rows;
                     this.total = response.total;
                     this.loading = false;
                 });
@@ -327,20 +327,18 @@
             reset() {
                 this.form = {
                     id: null,
-                    pointId: null,
-                    threshold: null,
-                    computeType: null,
-                    title: null,
-                    content: null,
-                    createTime: null,
-                    updateTime: null,
-                    selectedPointId: null,
-                    projectId: null,
                     structureId: null,
-                    alarmLevel: null
+                    projectId: null,
+                    pointId: null,
+                    calcType: null,
+                    cycle: null,
+                    createTime: null,
+                    updateTime: null
                 };
 
-                this.formProjectStructureData = this.projectStructureData;
+                this.formGroupProjectStructureData = [];
+                this.optionsPointOrDeviceData = [];
+
                 this.resetForm("form");
             },
             /** 搜索按钮操作 */
@@ -354,11 +352,9 @@
                     pageNum: 1,
                     pageSize: 10,
                     pointId: null,
-                    threshold: null,
-                    computeType: null,
-                    title: null,
-                    content: null,
-                };
+                    calcType: null,
+                    cycle: null,
+                }
                 this.resetForm("queryParams");
                 this.handleQuery();
             },
@@ -372,72 +368,45 @@
             handleAdd() {
                 this.reset();
                 this.open = true;
-                this.title = "添加报警配置";
+                this.title = "添加聚集配置";
             },
             /** 修改按钮操作 */
             handleUpdate(row) {
-                var that = this
-
                 this.reset();
                 const id = row.id || this.ids
-                getProjectAlarmConfig(id).then(response => {
+                getPointGatherConfig(id).then(response => {
                     this.form = response.data;
-                    // 回显 所属结构物 选项
+
                     projectStructureListByProjectId({
                         projectId: this.form.projectId,
                     }).then((response) => {
-                        this.formProjectStructureData = response;
+                        this.formGroupProjectStructureData = response;
+                        this.form.structureId = this.form.structureId
                     });
 
-                    // 回显 所属测点 选项
-                    this.optionsPointOrDeviceData = [];
-                    this.form.selectedPointId = [this.form.point.pointGroupId, this.form.point.id]
+                    this.optionsPointOrDeviceData = this.getFormProjectPointData(this.form.structureId)
 
-                    listProjectPoint({
-                        projectStructureId: this.form.structureId
-                    }).then(response => {
-                        for (var i = 0; i < response.rows.length; i++) {
-                            var item = response.rows[i];
-                            var children = [];
-
-                            if (null != item.children) {
-                                for (var j = 0; j < item.children.length; j++) {
-                                    var childrenItem = item.children[j]
-                                    children.push({
-                                        value: childrenItem.id,
-                                        label: childrenItem.name,
-                                    })
-                                }
-                            }
-
-                            that.optionsPointOrDeviceData.push({
-                                value: item.id,
-                                label: item.name,
-                                children: children
-                            })
-
-                            this.form.pointId = this.getProjectPointDataIdByPointId(this.form.pointId)
-                        }
-                    });
-
+                    console.log(this.form)
+                    console.log(this.formGroupProjectStructureData)
 
                     this.open = true;
-                    this.title = "修改报警配置";
+                    this.title = "修改聚集配置";
                 });
             },
             /** 提交按钮 */
             submitForm() {
-                this.form.pointId = this.form.selectedPointId[1]
                 this.$refs["form"].validate(valid => {
                     if (valid) {
+                        this.form.pointId = this.form.pointId[1]
+
                         if (this.form.id != null) {
-                            updateProjectAlarmConfig(this.form).then(response => {
+                            updatePointGatherConfig(this.form).then(response => {
                                 this.$modal.msgSuccess("修改成功");
                                 this.open = false;
                                 this.getList();
                             });
                         } else {
-                            addProjectAlarmConfig(this.form).then(response => {
+                            addPointGatherConfig(this.form).then(response => {
                                 this.$modal.msgSuccess("新增成功");
                                 this.open = false;
                                 this.getList();
@@ -449,8 +418,8 @@
             /** 删除按钮操作 */
             handleDelete(row) {
                 const ids = row.id || this.ids;
-                this.$modal.confirm('是否确认删除报警配置编号为"' + ids + '"的数据项？').then(function () {
-                    return delProjectAlarmConfig(ids);
+                this.$modal.confirm('是否确认删除聚集配置编号为"' + ids + '"的数据项？').then(function () {
+                    return delPointGatherConfig(ids);
                 }).then(() => {
                     this.getList();
                     this.$modal.msgSuccess("删除成功");
@@ -460,19 +429,19 @@
             /** 导出按钮操作 */
             handleExport() {
                 const queryParams = this.queryParams;
-                this.$modal.confirm('是否确认导出所有报警配置数据项？').then(() => {
+                this.$modal.confirm('是否确认导出所有聚集配置数据项？').then(() => {
                     this.exportLoading = true;
-                    return exportProjectAlarmConfig(queryParams);
+                    return exportPointGatherConfig(queryParams);
                 }).then(response => {
                     this.$download.name(response.msg);
                     this.exportLoading = false;
                 }).catch(() => {
                 });
             },
+            // 筛选项目
             conditionProjectChange() {
                 if (null != this.queryParams.projectId) {
                     this.$emit('projectCurrent', this.queryParams.projectId);
-                    this.projectStructureData = [];
 
                     projectStructureListByProjectId({
                         projectId: this.queryParams.projectId,
@@ -483,27 +452,47 @@
                     this.getList();
                 }
             },
+            // 筛选结构物
             conditionProjectStructureChange() {
+                if (null != this.queryParams.projectStructureId) {
+                    projectPointGroup({
+                        structureId: this.queryParams.projectStructureId,
+                    }).then((response) => {
+                        this.projectPointGroupData = response;
+                        this.projectPointGroupData.unshift({
+                            id: -1,
+                            name: "未分组",
+                            structureId: this.queryParams.projectStructureId
+                        })
+                    });
+
+                    this.getList();
+                }
             },
-            dialogFormProjectChange() {
+            dialogFormGroupProjectChange() {
                 if (null != this.form.projectId) {
                     projectStructureListByProjectId({
                         projectId: this.form.projectId,
                     }).then((response) => {
-                        this.formProjectStructureData = response;
-
-                        this.form.structureId = "";
-                        this.form.selectedPointId = ""
+                        this.formGroupProjectStructureData = response;
                         this.optionsPointOrDeviceData = [];
+                        this.form.structureId = "";
+                        this.form.pointId = "";
                     });
                 }
             },
-            dialogFormProjectStructureChange() {
-                var that = this
-                this.optionsPointOrDeviceData = [];
+            dialogFormGroupProjectStructureChange() {
+                if (null != this.form.structureId) {
+                    this.optionsPointOrDeviceData = this.getFormProjectPointData(this.form.structureId)
+                }
+
+            },
+            getFormProjectPointData(projectStructureId) {
+                // 获取该项目测点及分组
+                var projectPointData = [];
 
                 listProjectPoint({
-                    projectStructureId: this.form.structureId
+                    projectStructureId: projectStructureId
                 }).then(response => {
                     for (var i = 0; i < response.rows.length; i++) {
                         var item = response.rows[i];
@@ -515,32 +504,21 @@
                                 children.push({
                                     value: childrenItem.id,
                                     label: childrenItem.name,
+                                    alarmFlag: childrenItem.alarmFlag,
                                 })
                             }
                         }
 
-                        that.optionsPointOrDeviceData.push({
+                        projectPointData.push({
                             value: item.id,
                             label: item.name,
                             children: children
                         })
                     }
                 });
-            },
-            getProjectPointDataIdByPointId(pointId) {
-                for (var i = 0; i < this.optionsPointOrDeviceData.length; i++) {
-                    var item = this.optionsPointOrDeviceData[i]
 
-                    for (var j = 0; j < item.children.length; j++) {
-                        var childrenItem = item.children[j]
-
-                        if (pointId == childrenItem.value) {
-                            return [item.value, childrenItem.value]
-                        }
-                    }
-
-                }
-            },
+                return projectPointData;
+            }
         }
     };
 </script>

@@ -82,20 +82,12 @@
                         padding: [5, 10]
                     },
                     yAxis: {
+                        name: '时间',
                         axisTick: {
                             show: false
                         }
                     },
                     series: [{
-                        name: 'expected', itemStyle: {
-                            normal: {
-                                color: '#FF005A',
-                                lineStyle: {
-                                    color: '#FF005A',
-                                    width: 2
-                                }
-                            }
-                        },
                         smooth: true,
                         type: 'line',
                         data: expectedData,

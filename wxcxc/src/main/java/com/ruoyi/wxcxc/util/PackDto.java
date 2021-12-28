@@ -2,13 +2,14 @@ package com.ruoyi.wxcxc.util;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.system.service.ISysUserService;
-import com.ruoyi.wxcxc.domain.WxcxcBusinessMember;
-import com.ruoyi.wxcxc.domain.WxcxcBusinessMemberRole;
-import com.ruoyi.wxcxc.domain.WxcxcProjectAlarmConfig;
-import com.ruoyi.wxcxc.domain.WxcxcProjectStructure;
+import com.ruoyi.wxcxc.domain.*;
 import com.ruoyi.wxcxc.dto.BusinessMemberDto;
 import com.ruoyi.wxcxc.dto.WxcxcProjectAlarmConfigDto;
+import com.ruoyi.wxcxc.dto.WxcxcProjectPointGatherConfigDto;
 import com.ruoyi.wxcxc.mapper.WxcxcBusinessMemberRoleMapper;
+import com.ruoyi.wxcxc.mapper.WxcxcProjectPointGatherConfigMapper;
+import com.ruoyi.wxcxc.mapper.WxcxcProjectPointMapper;
+import com.ruoyi.wxcxc.mapper.WxcxcProjectStructureMapper;
 import com.ruoyi.wxcxc.service.IWxcxcBusinessMemberService;
 import com.ruoyi.wxcxc.service.IWxcxcProjectAlarmConfigService;
 import com.ruoyi.wxcxc.service.IWxcxcProjectPointService;
@@ -32,6 +33,12 @@ public class PackDto {
     private IWxcxcProjectStructureService wxcxcProjectStructureService;
     @Autowired
     private WxcxcBusinessMemberRoleMapper wxcxcBusinessMemberRoleMapper;
+    @Autowired
+    private WxcxcProjectPointGatherConfigMapper wxcxcProjectAlarmConfigDto;
+    @Autowired
+    private WxcxcProjectPointMapper wxcxcProjectPointMapper;
+    @Autowired
+    private WxcxcProjectStructureMapper wxcxcProjectStructureMapper;
 
     public BusinessMemberDto generateBusinessMemberDtoById(Long id) {
         if (null == id) return null;
@@ -80,5 +87,29 @@ public class PackDto {
             wxcxcProjectAlarmConfigDto.setProjectId(wxcxcProjectStructure.getProjectId());
 
         return wxcxcProjectAlarmConfigDto;
+    }
+
+
+    public WxcxcProjectPointGatherConfigDto generateWxcxcProjectPointGatherConfigDtoById(Long id) {
+        WxcxcProjectPointGatherConfig wxcxcProjectPointGatherConfig = wxcxcProjectAlarmConfigDto.selectWxcxcProjectPointGatherConfigById(id);
+        if (null == wxcxcProjectPointGatherConfig) return null;
+
+        WxcxcProjectPoint wxcxcProjectPoint = wxcxcProjectPointMapper.selectWxcxcProjectPointById(wxcxcProjectPointGatherConfig.getPointId());
+
+        if (null == wxcxcProjectPoint) return null;
+
+        WxcxcProjectStructure wxcxcProjectStructure = wxcxcProjectStructureMapper.selectWxcxcProjectStructureById(wxcxcProjectPoint.getProjectStructureId());
+        if (null == wxcxcProjectStructure) return null;
+
+        WxcxcProjectPointGatherConfigDto wxcxcProjectPointGatherConfigDto = new WxcxcProjectPointGatherConfigDto();
+
+        wxcxcProjectPointGatherConfigDto.setCalcType(wxcxcProjectPointGatherConfig.getCalcType());
+        wxcxcProjectPointGatherConfigDto.setId(wxcxcProjectPointGatherConfig.getId());
+        wxcxcProjectPointGatherConfigDto.setCycle(wxcxcProjectPointGatherConfig.getCycle());
+        wxcxcProjectPointGatherConfigDto.setPointId(wxcxcProjectPointGatherConfig.getPointId());
+        wxcxcProjectPointGatherConfigDto.setProjectId(wxcxcProjectStructure.getProjectId());
+        wxcxcProjectPointGatherConfigDto.setStructureId(wxcxcProjectPoint.getProjectStructureId());
+
+        return wxcxcProjectPointGatherConfigDto;
     }
 }

@@ -227,9 +227,9 @@
                 }
             },
             projectId: function (newObject, oldObject) {
-                if (this.projectId) {
+                // if (this.projectId) {
                     this.condition.projectId = this.projectId;
-                }
+                // }
             }
         },
         methods: {

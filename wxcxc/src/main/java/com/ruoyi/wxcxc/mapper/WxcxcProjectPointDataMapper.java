@@ -3,6 +3,7 @@ package com.ruoyi.wxcxc.mapper;
 import java.util.List;
 
 import com.ruoyi.wxcxc.domain.WxcxcProjectPointData;
+import com.ruoyi.wxcxc.dto.GatherDataDto;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -29,4 +30,16 @@ public interface WxcxcProjectPointDataMapper {
 
     WxcxcProjectPointData selectWxcxcProjectPointDataListReportForm(@Param("structureId") Long structureId, @Param("pointId") Long pointId,
                                                                     @Param("beginTime") String beginTime, @Param("endTime") String endTime, @Param("position") Long position);
+
+    List<GatherDataDto> selectGatherDataDtoList(@Param("structureId") Long structureId,
+                                                @Param("calcType") String calcType, @Param("cycle") String cycle,
+                                                @Param("wxcxcProjectPointData") WxcxcProjectPointData wxcxcProjectPointData);
+
+    // 根据结构物id和测点id获取数据
+    List<WxcxcProjectPointData> selectPointDataList(@Param("structureId") Long structureId, @Param("pointId") Long pointId,
+                                                    @Param("beginTime") String beginTime, @Param("endTime") String endTime);
+
+    // 查询上一条数据
+    WxcxcProjectPointData selectPointDataPrevious(@Param("structureId") Long structureId, @Param("pointId") Long pointId);
+
 }

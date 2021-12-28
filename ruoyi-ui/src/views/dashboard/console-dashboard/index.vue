@@ -109,10 +109,10 @@
             return {
                 lineChartData: {},
                 businessDataList: {
-                    dataCount: {expectedData: [1,1]},
-                    projectCount: {expectedData: [1,1]},
-                    structureCount: {expectedData: [1,1]},
-                    deviceCount: {expectedData: [1,1]}
+                    dataCount: {expectedData: [0]},
+                    projectCount: {expectedData: [0]},
+                    structureCount: {expectedData: [0]},
+                    deviceCount: {expectedData: [0]}
                 }
             };
         },
@@ -121,6 +121,13 @@
 
             dashboardBusiness().then(response => {
                 var businessData = response.businessData;
+
+                this.businessDataList = {
+                    dataCount: {expectedData: []},
+                    projectCount: {expectedData: []},
+                    structureCount: {expectedData: []},
+                    deviceCount: {expectedData: []}
+                }
 
                 for (var i = 0; i < businessData.length; i++) {
                     var item = businessData[i]
@@ -146,7 +153,6 @@
                         item.deviceCount
                     ]);
                 }
-
 
                 this.lineChartData = this.businessDataList.dataCount;
 

@@ -92,4 +92,18 @@
             </if>
         </where>
     </select>
+
+    <select id="selectWxcxcProjectAlarmRecordListByMemberIdProject" parameterType="WxcxcProjectAlarmRecord"
+            resultMap="WxcxcProjectAlarmRecordResult">
+        <include refid="selectWxcxcProjectAlarmRecordVo"/>
+        <where>
+            <if test="wxcxcProjectAlarmRecord.title != null and wxcxcProjectAlarmRecord.title != ''">and title = #{wxcxcProjectAlarmRecord.title}</if>
+            <if test="wxcxcProjectAlarmRecord.content != null and wxcxcProjectAlarmRecord.content != ''">and content = #{wxcxcProjectAlarmRecord.content}</if>
+            <if test="wxcxcProjectAlarmRecord.projectId != null and businessId == null">and project_id = #{wxcxcProjectAlarmRecord.projectId}</if>
+            <if test="wxcxcProjectAlarmRecord.readFlag != null and wxcxcProjectAlarmRecord.readFlag != ''">and read_flag = #{wxcxcProjectAlarmRecord.readFlag}</if>
+            <if test="businessId != null and businessId != ''">
+                and project_id in (select id FROM wxcxc_project WHERE del_flag = 0 AND business_id = #{businessId})
+            </if>
+        </where>
+    </select>
 </mapper>

@@ -5,7 +5,7 @@
       <el-col :span="14">
         <el-form ref="form" :model="form" label-width="80px">
           <el-form-item label="选择项目">
-            <el-select v-model="form.projectId" placeholder="请选择项目">
+            <el-select v-model="form.projectId" placeholder="请选择项目" style="width: 350px">
               <el-option v-for="item in projectList"
                          :label="item.name"
                          :value="item.id"
@@ -23,8 +23,21 @@
               start-placeholder="开始日期"
               end-placeholder="结束日期"
               :picker-options="pickerOptions"
+              :default-time="['00:00:00', '23:59:59']"
             >
             </el-date-picker>
+          </el-form-item>
+          <el-form-item label="数据类型">
+            <el-select v-model="form.gatherType" size="small" style="width: 350px" @change="gatherTypeChange">
+              <el-option
+                :label="'实时数据'"
+                :value="'1'"
+                :key="1"/>
+              <el-option
+                :label="'聚集数据'"
+                :value="'2'"
+                :key="2"/>
+            </el-select>
           </el-form-item>
           <div style="text-align: left">
             <el-transfer
@@ -37,9 +50,8 @@
                   noChecked: '${total}',
                   hasChecked: '${checked}/${total}'
                 }"
-              @change="handleChange"
               :data="attrData">
-              <span slot-scope="{ option }">{{ option.key }} - {{ option.label }}</span>
+              <span slot-scope="{ option }">{{ option.label }}</span>
             </el-transfer>
           </div>
           <el-form-item style="margin: 30px 0px">
@@ -57,11 +69,12 @@
         reportForm
     } from "@/api/iot/console";
 
-
     export default {
         data() {
             return {
-                form: {},
+                form: {
+                    gatherType: '1'
+                },
                 pickerOptions: {
                     shortcuts: [
                         {
@@ -143,8 +156,6 @@
                     this.form.endTime = this.formatDate(this.daterangeReleaseTime[1])
                 }
 
-                console.log(this.form)
-
                 this.$modal.confirm('是否确认导出报表？').then(() => {
                     this.exportLoading = true;
                     return reportForm(this.form);
@@ -155,20 +166,78 @@
                 });
             },
             formatDate(date) {
-                // var date = new Date(time);
-
                 var year = date.getFullYear(),
                     month = date.getMonth() + 1,//月份是从0开始的
                     day = date.getDate(),
                     hour = date.getHours(),
                     min = date.getMinutes();
-                var newTime = '' + year +
-                    (month < 10 ? '0' + month : month) +
-                    (day < 10 ? '0' + day : day) +
-                    (hour < 10 ? '0' + hour : hour) +
+                var newTime = '' + year + '-' +
+                    (month < 10 ? '0' + month : month) + '-' +
+                    (day < 10 ? '0' + day : day) + ' ' +
+                    (hour < 10 ? '0' + hour : hour) + ':' +
                     (min < 10 ? '0' + min : min);
-
                 return newTime;
+            },
+            gatherTypeChange() {
+                if ("1" == this.form.gatherType) {
+                    this.attrData = [{
+                        key: 1,
+                        label: `上次沉降值（mm）`
+                    },
+                        {
+                            key: 2,
+                            label: `当前沉降值（mm）`
+                        },
+                        // {
+                        //     key: 3,
+                        //     label: `变化速率（mm/d）`
+                        // },
+                        {
+                            key: 4,
+                            label: `控制值累计变化值（mm）`
+                        },
+                        // {
+                        //     key: 5,
+                        //     label: `控制值变化速率值（mm/d）`
+                        // },
+                        {
+                            key: 6,
+                            label: `本次监测时间`
+                        },
+                        {
+                            key: 7,
+                            label: `上次监测时间`
+                        }]
+                } else {
+                    this.attrData = [{
+                        key: 1,
+                        label: `上次沉降值（mm）`
+                    },
+                        {
+                            key: 2,
+                            label: `当前沉降值（mm）`
+                        },
+                        {
+                            key: 3,
+                            label: `变化速率（mm/d）`
+                        },
+                        {
+                            key: 4,
+                            label: `控制值累计变化值（mm）`
+                        },
+                        {
+                            key: 5,
+                            label: `控制值变化速率值（mm/d）`
+                        },
+                        {
+                            key: 6,
+                            label: `本次监测时间`
+                        },
+                        {
+                            key: 7,
+                            label: `上次监测时间`
+                        }]
+                }
             }
         }
     };

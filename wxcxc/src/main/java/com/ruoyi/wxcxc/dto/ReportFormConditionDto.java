@@ -13,6 +13,9 @@ public class ReportFormConditionDto {
     // 表头
     private List<String> attrDataList;
 
+    // 数据类型
+    private String gatherType;
+
     // 时间段
     private String beginTime;
     private String endTime;

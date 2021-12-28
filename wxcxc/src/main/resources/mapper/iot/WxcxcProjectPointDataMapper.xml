@@ -24,13 +24,13 @@
             <if test="wxcxcProjectPointData.data != null  and data != ''">and data = #{wxcxcProjectPointData.data}</if>
             <if test="wxcxcProjectPointData.createTime != null ">and create_time = #{wxcxcProjectPointData.createTime}
             </if>
-            <if test="wxcxcProjectPointData.params.beginTime != null and wxcxcProjectPointData.params.beginTime != ''"><!-- 开始时间检索 -->
+            <if test="wxcxcProjectPointData.params.beginReleaseTime != null and wxcxcProjectPointData.params.beginReleaseTime != ''"><!-- 开始时间检索 -->
                 AND date_format(create_time,'%Y%m%d%H%i') &gt;=
-                date_format(#{wxcxcProjectPointData.params.beginTime},'%Y%m%d%H%i')
+                date_format(#{wxcxcProjectPointData.params.beginReleaseTime},'%Y%m%d%H%i')
             </if>
-            <if test="wxcxcProjectPointData.params.endTime != null and wxcxcProjectPointData.params.endTime != ''"><!-- 结束时间检索 -->
+            <if test="wxcxcProjectPointData.params.endReleaseTime != null and wxcxcProjectPointData.params.endReleaseTime != ''"><!-- 结束时间检索 -->
                 and date_format(create_time,'%Y%m%d%H%i') &lt;=
-                date_format(#{wxcxcProjectPointData.params.endTime},'%Y%m%d%H%i')
+                date_format(#{wxcxcProjectPointData.params.endReleaseTime},'%Y%m%d%H%i')
             </if>
         </where>
     </select>
@@ -85,5 +85,70 @@
             </if>
         </where>
         ORDER BY create_time DESC limit #{position},1
+    </select>
+
+    <!--  获取聚集数据  -->
+    <select id="selectGatherDataDtoList" resultType="com.ruoyi.wxcxc.dto.GatherDataDto">
+        SELECT
+        <if test="calcType eq 1 ">
+            min(data) AS calcData,
+        </if>
+        <if test="calcType eq 2 ">
+            max(data) AS calcData,
+        </if>
+        <if test="calcType eq 3 ">
+            avg(data) AS calcData,
+        </if>
+        <if test="cycle eq 1 ">
+            DATE_FORMAT(create_time,'%Y-%m-%d') AS dateTime
+        </if>
+        <if test="cycle eq 2 ">
+            WEEK(create_time) AS dateTime
+        </if>
+        <if test="cycle eq 3 ">
+            MONTH(create_time) AS dateTime
+        </if>
+        FROM wxcxc_project_point_data_${structureId}
+        <where>
+            <if test="wxcxcProjectPointData.id != null ">and id = #{wxcxcProjectPointData.id}</if>
+            <if test="wxcxcProjectPointData.pointId != null ">and point_id = #{wxcxcProjectPointData.pointId}</if>
+            <if test="wxcxcProjectPointData.data != null  and data != ''">and data = #{wxcxcProjectPointData.data}</if>
+            <if test="wxcxcProjectPointData.createTime != null ">and create_time = #{wxcxcProjectPointData.createTime}
+            </if>
+            <if test="wxcxcProjectPointData.params.beginReleaseTime != null and wxcxcProjectPointData.params.beginReleaseTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%Y%m%d%H%i') &gt;=
+                date_format(#{wxcxcProjectPointData.params.beginReleaseTime},'%Y%m%d%H%i')
+            </if>
+            <if test="wxcxcProjectPointData.params.endReleaseTime != null and wxcxcProjectPointData.params.endReleaseTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%Y%m%d%H%i') &lt;=
+                date_format(#{wxcxcProjectPointData.params.endReleaseTime},'%Y%m%d%H%i')
+            </if>
+        </where>
+        GROUP BY dateTime ASC;
+    </select>
+
+    <!--  根据结构物id和测点id获取数据  -->
+    <select id="selectPointDataList" resultMap="WxcxcProjectPointDataResult">
+        select id, point_id, data, create_time from wxcxc_project_point_data_${structureId}
+        <where>
+            <if test="pointId != null ">and point_id = #{pointId}</if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%Y%m%d%H%i') &gt;=
+                date_format(#{beginTime},'%Y%m%d%H%i')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%Y%m%d%H%i') &lt;=
+                date_format(#{endTime},'%Y%m%d%H%i')
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!--  查询上一条数据  -->
+    <select id="selectPointDataPrevious" resultMap="WxcxcProjectPointDataResult">
+        SELECT * FROM wxcxc_project_point_data_${structureId} WHERE
+        point_id = (SELECT point_id FROM wxcxc_project_point_data_10 AS currentData WHERE id = #{pointId})
+        AND create_time &lt; (SELECT create_time FROM wxcxc_project_point_data_10 AS currentData WHERE id = #{pointId})
+        ORDER BY create_time DESC LIMIT 0,1
     </select>
 </mapper>
